@@ -1,0 +1,150 @@
+---
+import {
+  updateSitecoreContext,
+  updateSitecoreDictionary,
+} from "@exdst-sitecore-content-sdk/astro/context";
+import {
+  isDesignLibraryPreviewData,
+  PreviewCookies
+} from "@exdst-sitecore-content-sdk/astro/editing";
+import { extractPath, removeLanguageFromPath } from "@exdst-sitecore-content-sdk/astro/utils";
+import client from "@/lib/sitecore-client";
+import Layout from "@/Layout.astro";
+import components from ".sitecore/component-map";
+import config from "sitecore.config";
+import sites from ".sitecore/sites.json";
+import languages from "lib/languages";
+import NotFound from "@/NotFound.astro";
+import { GetStaticPaths } from "astro";
+import { StaticPath } from "@sitecore-content-sdk/core";
+import { SITE_PREFIX } from "@sitecore-content-sdk/core/site";
+
+let props = {};
+
+let path = extractPath(Astro.params);
+
+// Remove language segment from path
+path = removeLanguageFromPath(path, languages);
+
+// Re-add _site_ prefix that has been removed in GetStaticPaths
+if (Astro.isPrerendered) {
+  const site = import.meta.env.SITE_NAME;
+  path = `${SITE_PREFIX}${site}/${path}`;
+}
+
+let page;
+let previewData;
+
+if (!Astro.isPrerendered) {
+  const previewDataCookies = Astro.cookies.get(PreviewCookies.PREVIEW_DATA);
+  previewData = previewDataCookies ? JSON.parse(previewDataCookies.value) : "";
+}
+
+const context = {
+  preview: !!previewData,
+  previewData: previewData,
+};
+
+if (context.preview && isDesignLibraryPreviewData(context.previewData)) {
+  page = await client.getDesignLibraryData(context.previewData);
+} else {
+  page = context.preview
+    ? await client.getPreview(context.previewData)
+    : await client.getPage(path, {
+        locale: Astro.props.locale || Astro.currentLocale,
+      });
+}
+
+if (page) {
+  props = {
+    page,
+    // dictionary: await client.getDictionary({
+    //   site: page.siteName,
+    //   locale: page.locale,
+    // }),
+    //componentProps: await client.getComponentData(page.layout, context, components),
+  };
+
+  const dictionary = await client.getDictionary({
+    site: page.siteName,
+    locale: page.locale,
+  });
+
+  // // Replace sxastarter.localhost with sxastarter.localhost.astro in the the layout data (image URLs)
+  // // It is required, because we run Next.js and Astro headless sites on the same Sitecore project
+  // // And we don't want to touch Next.js at it is "etalon" for comparison
+  // // This code should be remove on real project
+  let strProps = JSON.stringify(page);
+
+  if (import.meta.env?.PUBLIC_URL?.indexOf(".localhost") > -1) {
+    strProps = strProps
+      .replaceAll(
+        ':"https://services.sxastarter.localhost.astro',
+        ':"http://cm:80'
+      )
+      .replaceAll(
+        ':"https://financial.sxastarter.localhost.astro',
+        ':"http://cm:80'
+      );
+  }
+
+  page = JSON.parse(strProps);
+
+  updateSitecoreContext({
+    page,
+    api: config.api,
+    componentMap: components,
+  });
+
+  updateSitecoreDictionary({
+    dictionary,
+  });
+}
+
+// This function gets called at build and export time to determine
+// pages for SSG ("paths", as tokenized array).
+export const getStaticPaths = (async () => {
+  let paths: StaticPath[] = [];
+
+  if (process.env.NODE_ENV !== "development" && config.generateStaticPaths) {
+    try {
+      // Build static pages for a single site only.
+      // Multisite SSG is not supported yet.
+      const siteName = import.meta.env.SITE_NAME;
+      const site = sites.find((s) => s.name === siteName) || sites[0];
+      paths = await client.getPagePaths([site.name], languages);
+    } catch (error) {
+      console.log("Error occurred while fetching static paths");
+      console.log(error);
+    }
+
+    console.log("Paths", JSON.stringify(paths));
+  }
+
+  return paths.map((p) => {
+    const pathSegments = p.params.path;
+
+    // Remove _site_ segment from the output folder structure as we don't support multisite SSG.
+    const path =
+      pathSegments.length > 1
+        ? pathSegments.slice(1, pathSegments.length).join("/")
+        : "";
+
+    return {
+      params: { path: `${p.locale}/${path}` },
+      props: { locale: p.locale },
+    };
+  });
+}) satisfies GetStaticPaths;
+---
+
+<>
+  {page && <Layout page={page} />}
+  {!page && <NotFound />}
+</>
+
+<script is:inline>
+  // This is a workaround to fix the 'process is not defined' error in Bootstrap component.
+  // 'debug' library used in CloudSDK has a dependency on a variable from the node environment)
+  const process = {};
+</script>
