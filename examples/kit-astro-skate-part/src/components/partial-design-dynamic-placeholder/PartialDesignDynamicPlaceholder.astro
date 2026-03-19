@@ -1,0 +1,8 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering } = Astro.props as ComponentProps;
+---
+
+<Placeholder name={rendering?.params?.sig || ""} rendering={rendering} />

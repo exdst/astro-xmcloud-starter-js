@@ -1,0 +1,36 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+type RowNumber = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+
+type RowStyles = {
+  [K in `Styles${RowNumber}`]?: string;
+};
+
+interface RowSplitterProps extends ComponentProps {
+  params: ComponentProps["params"] & RowStyles;
+}
+
+const { params, rendering } = Astro.props as RowSplitterProps;
+const enabledPlaceholders = params.EnabledPlaceholders?.split(",") ?? [];
+const id = params.RenderingIdentifier;
+---
+
+<section class={`component row-splitter ${params.styles}`} id={id}>
+  {enabledPlaceholders.map((ph) => {
+    const num = Number(ph) as RowNumber;
+    const placeholderKey = `row-${num}-{*}`;
+    const rowStyles = `${(params as any)[`Styles${num}`] ?? ""}`.trimEnd();
+
+    return (
+      <section class={`container-fluid ${rowStyles}`.trimEnd()}>
+        <div>
+          <div class="row">
+            <Placeholder name={placeholderKey} rendering={rendering} />
+          </div>
+        </div>
+      </section>
+    );
+  })}
+</section>

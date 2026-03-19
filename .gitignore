@@ -49,3 +49,5 @@ packages/
 
 # VS Code settings
 .vscode/
+/examples/kit-astro-skate-part/node_modules
+/examples/kit-astro-skate-part/dist

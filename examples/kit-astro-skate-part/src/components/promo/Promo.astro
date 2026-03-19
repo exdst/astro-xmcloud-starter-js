@@ -1,0 +1,76 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import StructuredData from "@/components/structured-data/StructuredData.astro";
+import { buildProductJsonLd } from "@/lib/structured-data/schema";
+import type { ComponentProps } from "@/lib/component-props";
+import type { Field } from "@exdst-sitecore-content-sdk/astro";
+
+interface PromoProps extends ComponentProps {
+  fields: {
+    PromoIcon: any;
+    PromoText: Field<string>;
+    PromoLink: any;
+    PromoText2: Field<string>;
+  };
+  params: ComponentProps["params"] & {
+    FieldNames?: string;
+  };
+}
+
+const { params, fields } = Astro.props as PromoProps;
+const { styles = "", RenderingIdentifier: id, FieldNames } = params;
+const isWithText = FieldNames === "WithText";
+---
+
+<article
+  class={`component promo ${styles}`}
+  id={id}
+  itemscope
+  itemtype="https://schema.org/Product"
+>
+  <div class="component-content">
+    {!fields ? (
+      <span class="is-empty-hint">Promo</span>
+    ) : (
+      <>
+        <figure class="field-promoicon" itemprop="image">
+          <AstroImage field={fields.PromoIcon} />
+        </figure>
+        <div class="promo-text" itemprop="description">
+          {isWithText ? (
+            <>
+              <div class="field-promotext">
+                <RichTextSDK field={fields.PromoText} />
+              </div>
+              <div class="field-promotext">
+                <RichTextSDK field={fields.PromoText2} />
+              </div>
+            </>
+          ) : (
+            <>
+              <div class="field-promotext">
+                <RichTextSDK field={fields.PromoText} />
+              </div>
+              <div class="field-promolink">
+                <Link field={fields.PromoLink} />
+              </div>
+            </>
+          )}
+        </div>
+        <StructuredData
+          id={`jsonld-product-${id ?? "promo"}`}
+          data={buildProductJsonLd({
+            name:
+              fields.PromoLink?.value?.title ||
+              (fields.PromoText?.value ? String(fields.PromoText.value) : undefined),
+            descriptionHtml: fields.PromoText?.value ? String(fields.PromoText.value) : undefined,
+            url: fields.PromoLink?.value?.href,
+            image: fields.PromoIcon?.value?.src,
+          })}
+        />
+      </>
+    )}
+  </div>
+</article>

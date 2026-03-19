@@ -1,0 +1,26 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import type { Field } from "@exdst-sitecore-content-sdk/astro";
+
+interface ContentBlockProps extends ComponentProps {
+  fields: {
+    heading: Field<string>;
+    content: Field<string>;
+  };
+}
+
+const { fields } = Astro.props as ContentBlockProps;
+---
+
+{fields ? (
+  <section class="contentBlock">
+    <Text tag="h2" class="contentTitle" field={fields.heading} />
+    <RichTextSDK class="contentDescription" field={fields.content} />
+  </section>
+) : (
+  <section class="contentBlock">
+    <span class="is-empty-hint">Content Block</span>
+  </section>
+)}

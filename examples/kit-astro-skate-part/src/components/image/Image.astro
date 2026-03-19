@@ -1,0 +1,79 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import type { ComponentProps } from "@/lib/component-props";
+import type { Field } from "@exdst-sitecore-content-sdk/astro";
+
+interface ImageFields {
+  Image: any;
+  ImageCaption: Field<string>;
+  TargetUrl: any;
+}
+
+interface ImageProps extends ComponentProps {
+  fields: ImageFields;
+  params: ComponentProps["params"] & {
+    FieldNames?: string;
+  };
+}
+
+const { params, fields } = Astro.props as ImageProps;
+const { styles = "", RenderingIdentifier: id, FieldNames } = params;
+const variant = FieldNames || "Default";
+
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing;
+
+const isBanner = variant === "Banner";
+---
+
+{!fields ? (
+  <figure class={`component image ${styles}`.trim()}>
+    <div class="component-content">
+      <span class="is-empty-hint">Image</span>
+    </div>
+  </figure>
+) : isBanner ? (
+  <figure class={`component hero-banner ${styles}`.trim()} id={id}>
+    <div class="component-content sc-sxa-image-hero-banner">
+      <AstroImage
+        field={{
+          ...fields.Image,
+          value: {
+            ...fields.Image?.value,
+            style: "object-fit: cover; width: 100%; height: 100%;",
+          },
+        }}
+        loading="eager"
+        fetchpriority="high"
+        sizes="(max-width: 640px) 100vw, (max-width: 768px) 768px, (max-width: 1024px) 1024px, (max-width: 1440px) 1280px, 1920px"
+        alt={typeof fields.Image?.value?.alt === "string" ? fields.Image.value.alt : "Hero banner"}
+      />
+    </div>
+  </figure>
+) : (
+  <figure class={`component image ${styles}`.trim()} id={id}>
+    <div class="component-content">
+      {!isEditing && fields.TargetUrl?.value?.href ? (
+        <Link field={fields.TargetUrl}>
+          <AstroImage
+            field={fields.Image}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 90vw, 1200px"
+            alt={typeof fields.Image?.value?.alt === "string" ? fields.Image.value.alt : ""}
+          />
+        </Link>
+      ) : (
+        <AstroImage
+          field={fields.Image}
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 90vw, 1200px"
+          alt={typeof fields.Image?.value?.alt === "string" ? fields.Image.value.alt : ""}
+        />
+      )}
+      <figcaption class="image-caption field-imagecaption">
+        <Text tag="span" field={fields.ImageCaption} />
+      </figcaption>
+    </div>
+  </figure>
+)}

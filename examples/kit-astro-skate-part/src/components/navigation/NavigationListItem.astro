@@ -1,0 +1,60 @@
+---
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Fields {
+  Id: string;
+  DisplayName: string;
+  Title: { value?: string };
+  NavigationTitle: { value?: string };
+  Href: string;
+  Querystring: string;
+  Children: Array<Fields>;
+  Styles: string[];
+}
+
+interface Props {
+  fields: Fields;
+  relativeLevel: number;
+}
+
+const { fields, relativeLevel } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing;
+
+const classNames = [...(fields.Styles || []), `rel-level${relativeLevel}`].join(" ");
+const hasChildren = fields.Children?.length > 0;
+
+const linkField = {
+  value: {
+    href: fields.Href,
+    title:
+      fields.NavigationTitle?.value?.toString() ??
+      fields.Title?.value?.toString() ??
+      fields.DisplayName,
+    querystring: fields.Querystring,
+  },
+};
+
+const textContent = fields.NavigationTitle
+  ? fields.NavigationTitle
+  : fields.Title
+    ? fields.Title
+    : null;
+---
+
+<li class={classNames} tabindex="0">
+  <div class={`navigation-title ${hasChildren ? "child" : ""}`}>
+    <Link field={linkField} editable={isEditing}>
+      {textContent ? <Text field={textContent} /> : fields.DisplayName}
+    </Link>
+  </div>
+  {hasChildren && (
+    <ul class="clearfix">
+      {fields.Children.map((child) => (
+        <Astro.self fields={child} relativeLevel={relativeLevel + 1} />
+      ))}
+    </ul>
+  )}
+</li>

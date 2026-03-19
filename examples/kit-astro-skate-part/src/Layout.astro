@@ -1,0 +1,83 @@
+---
+import { type Field, type Page } from "@exdst-sitecore-content-sdk/astro";
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Bootstrap from "@/Bootstrap.astro";
+import Scripts from "@/Scripts.astro";
+import SitecoreStyles from "@/components/content-sdk/SitecoreStyles.astro";
+import StructuredData from "@/components/structured-data/StructuredData.astro";
+import { generateWebSiteSchema, generateOrganizationSchema } from "@/lib/structured-data/schema";
+import { getBaseUrl } from "@/lib/utils";
+
+interface LayoutProps {
+  page: Page;
+}
+
+interface RouteFields {
+  [key: string]: unknown;
+  Title?: Field;
+}
+
+const { page } = Astro.props as LayoutProps;
+const { layout, mode } = page;
+const { route, context } = layout.sitecore;
+const fields = route?.fields as RouteFields;
+const mainClassPageEditing = mode.isEditing ? "editing-mode" : "prod-mode";
+
+const theme = context.theme as string;
+const language = context.language || "en";
+
+const siteName = page.siteName || "Skate Park";
+const siteUrl = getBaseUrl();
+---
+
+<!doctype html>
+<html lang=`${language}`>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{fields?.Title?.value?.toString() || "Page"}</title>
+    <link rel="icon" href={`${Astro.url.origin}/favicon.ico`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <SitecoreStyles layoutData={layout} />
+    <StructuredData id="jsonld-website" data={generateWebSiteSchema(siteName, siteUrl)} />
+    <StructuredData id="jsonld-organization" data={generateOrganizationSchema(siteName, siteUrl)} />
+  </head>
+
+  <body>
+    <div class={`${mainClassPageEditing} site-${theme?.toLowerCase()} body`}>
+      <header>
+        <div id="header">
+          {route && <Placeholder name="headless-header" rendering={route} />}
+        </div>
+      </header>
+      <main>
+        <div id="content">
+          {route && <Placeholder name="headless-main" rendering={route} />}
+        </div>
+      </main>
+      <footer>
+        <div id="footer">
+          {route && <Placeholder name="headless-footer" rendering={route} />}
+        </div>
+      </footer>
+    </div>
+    <Bootstrap page={page} />
+    <Scripts />
+  </body>
+</html>
+
+<style is:global>
+  @import "tailwindcss";
+  @import "@/assets/base/index.css";
+  @import "@/assets/components/index.css";
+
+  @plugin "tailwind-bootstrap-grid" {
+    container_max_widths:
+      "sm", "576px", "md", "768px", "lg", "992px", "xl", "1200px", "2xl", "1400px";
+  }
+
+  @source inline("col-{1..12}");
+  @source inline("offset-{1..12}");
+</style>

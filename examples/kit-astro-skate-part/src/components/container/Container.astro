@@ -1,0 +1,50 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface ContainerProps extends ComponentProps {
+  params: ComponentProps["params"] & {
+    BackgroundImage?: string;
+    DynamicPlaceholderId: string;
+  };
+}
+
+const { params, rendering } = Astro.props as ContainerProps;
+const {
+  styles = "",
+  RenderingIdentifier: id,
+  BackgroundImage: backgroundImage,
+  DynamicPlaceholderId,
+} = params;
+const phKey = `container-${DynamicPlaceholderId}`;
+
+const mediaUrlPattern = /mediaurl="([^"]*)"/i;
+let backgroundStyle = "";
+
+if (backgroundImage && backgroundImage.match(mediaUrlPattern)) {
+  const mediaUrl = backgroundImage.match(mediaUrlPattern)?.[1] || "";
+  backgroundStyle = `background-image: url('${mediaUrl}');`;
+}
+
+const shouldWrapContainer = styles?.split(" ").includes("container");
+---
+
+{shouldWrapContainer ? (
+  <div class="container-wrapper">
+    <section class={`component container-default ${styles}`} id={id}>
+      <div class="component-content" style={backgroundStyle}>
+        <div class="row">
+          <Placeholder name={phKey} rendering={rendering} />
+        </div>
+      </div>
+    </section>
+  </div>
+) : (
+  <section class={`component container-default ${styles}`} id={id}>
+    <div class="component-content" style={backgroundStyle}>
+      <div class="row">
+        <Placeholder name={phKey} rendering={rendering} />
+      </div>
+    </div>
+  </section>
+)}
