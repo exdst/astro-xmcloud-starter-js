@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^10.0.2",
     "@exdst-sitecore-content-sdk/astro": "^0.0.15",
     "@sitecore-cloudsdk/core": "^0.5.8",
     "@sitecore-cloudsdk/events": "^0.5.8",

@@ -1,6 +1,9 @@
 ---
 import { type Field, type Page } from "@exdst-sitecore-content-sdk/astro";
 import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Bootstrap from "@/Bootstrap.astro";
+import Scripts from "@/Scripts.astro";
+import SitecoreStyles from "@/components/content-sdk/SitecoreStyles.astro";
 
 interface LayoutProps {
   page: Page;
@@ -28,14 +31,7 @@ const language = context.language || "en";
     <meta name="viewport" content="width=device-width" />
     <title>{fields?.Title?.value?.toString() || "Page"}</title>
     <link rel="icon" href={`${Astro.url.origin}/favicon.ico`} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin={"anonymous"}
-    />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
-    <meta name="description" content="A Verticals demo site." />
+    <SitecoreStyles layoutData={layout} />
   </head>
 
   <body>
@@ -56,5 +52,7 @@ const language = context.language || "en";
         </div>
       </footer>
     </div>
+    <Bootstrap page={page} />
+    <Scripts />
   </body>
 </html>

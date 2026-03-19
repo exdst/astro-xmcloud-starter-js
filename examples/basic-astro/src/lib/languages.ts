@@ -1,2 +1,3 @@
-const languages = ["en", "fr-ca", "ja-jp"];
+const languages: string[] = ["en"];
+
 export default languages;

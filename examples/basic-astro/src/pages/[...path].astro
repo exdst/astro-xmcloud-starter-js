@@ -10,6 +10,7 @@ import {
 import { extractPath, removeLanguageFromPath } from "@exdst-sitecore-content-sdk/astro/utils";
 import client from "@/lib/sitecore-client";
 import Layout from "@/Layout.astro";
+import NotFound from "@/NotFound.astro";
 import components from ".sitecore/component-map";
 import config from "sitecore.config";
 import sites from ".sitecore/sites.json";
@@ -55,39 +56,10 @@ if (context.preview && isDesignLibraryPreviewData(context.previewData)) {
 }
 
 if (page) {
-  props = {
-    page,
-    // dictionary: await client.getDictionary({
-    //   site: page.siteName,
-    //   locale: page.locale,
-    // }),
-    //componentProps: await client.getComponentData(page.layout, context, components),
-  };
-
   const dictionary = await client.getDictionary({
     site: page.siteName,
     locale: page.locale,
   });
-
-  // // Replace sxastarter.localhost with sxastarter.localhost.astro in the the layout data (image URLs)
-  // // It is required, because we run Next.js and Astro headless sites on the same Sitecore project
-  // // And we don't want to touch Next.js at it is "etalon" for comparison
-  // // This code should be remove on real project
-  let strProps = JSON.stringify(page);
-
-  if (import.meta.env?.PUBLIC_URL?.indexOf(".localhost") > -1) {
-    strProps = strProps
-      .replaceAll(
-        ':"https://services.sxastarter.localhost.astro',
-        ':"http://cm:80'
-      )
-      .replaceAll(
-        ':"https://financial.sxastarter.localhost.astro',
-        ':"http://cm:80'
-      );
-  }
-
-  page = JSON.parse(strProps);
 
   updateSitecoreContext({
     page,
@@ -109,8 +81,6 @@ export const getStaticPaths = (async () => {
 
   if (process.env.NODE_ENV !== "development" && config.generateStaticPaths) {
     try {
-      // Build static pages for a single site only.
-      // Multisite SSG is not supported yet.
       const siteName = import.meta.env.SITE_NAME;
       const site = sites.find((s) => s.name === siteName) || sites[0];
       paths = await client.getPagePaths([site.name], languages);
@@ -141,7 +111,7 @@ export const getStaticPaths = (async () => {
 
 <>
   {page && <Layout page={page} />}
-  {!page && <p>Page not found</p>}
+  {!page && <NotFound />}
 </>
 
 <script is:inline>

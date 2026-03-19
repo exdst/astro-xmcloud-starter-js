@@ -1,7 +1,9 @@
-// Below are built-in components that are available in the app, it's recommended to keep them as is
+// Register your Sitecore components here.
+// Each entry maps a Sitecore rendering name to its Astro component.
+// Example:
+//   import MyComponent from '@/components/MyComponent.astro';
+//   components.set('MyComponent', MyComponent);
 
-export const componentMap = new Map<string, any>([
+const components = new Map<string, any>();
 
-]);
-
-export default componentMap;
+export default components;
