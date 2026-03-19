@@ -1,5 +1,5 @@
 export function getBaseUrl(): string {
-  return import.meta.env.PUBLIC_SITE_URL || "http://localhost:3000";
+  return import.meta.env.PUBLIC_SITE_URL || "http://localhost:3005";
 }
 
 export function getFullUrl(path: string): string {

@@ -148,7 +148,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit --incremental false",
     "next:build": "next build",
-    "next:dev": "cross-env NODE_OPTIONS='--inspect' next dev --turbopack",
+    "next:dev": "cross-env NODE_OPTIONS='--inspect' next dev --turbopack -p 3004",
     "next:start": "next start",
     "sitecore-tools:build": "sitecore-tools project build",
     "sitecore-tools:generate-map": "sitecore-tools project component generate-map",

@@ -60,7 +60,7 @@ function resolveSiteUrl(req: NextApiRequest): string {
     return `https://${defaultSite.hostName}`;
   }
 
-  return 'https://localhost:3000';
+  return 'https://localhost:3004';
 }
 
 /** API handler that serves the ai.txt file for AI crawlers. */

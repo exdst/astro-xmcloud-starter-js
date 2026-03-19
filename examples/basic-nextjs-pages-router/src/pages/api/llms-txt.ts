@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const protocol = req.headers['x-forwarded-proto'] || 'https';
-  const host = req.headers.host || 'localhost:3000';
+  const host = req.headers.host || 'localhost:3004';
   const baseUrl = `${protocol}://${host}`;
 
   const content = `# Basic Next.js Starter (Pages Router)
