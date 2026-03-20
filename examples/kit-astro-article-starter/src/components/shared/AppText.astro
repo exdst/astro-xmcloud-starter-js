@@ -1,0 +1,28 @@
+---
+/**
+ * Wrapper around the SDK's Text component that fixes a duplicate rendering bug.
+ * The SDK Text.astro has non-mutually-exclusive conditions that cause double
+ * rendering when `tag` is set with default `encode=true`.
+ * This wrapper strips the `tag` prop and wraps the element manually.
+ */
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+
+interface AppTextProps {
+  [key: string]: unknown;
+  field: any;
+  tag?: string;
+  encode?: boolean;
+  class?: string;
+}
+
+const { tag, field, encode, ...rest } = Astro.props as AppTextProps;
+const Tag = tag || 'span';
+---
+
+{tag ? (
+  <Tag {...rest}>
+    <Text field={field} encode={encode} />
+  </Tag>
+) : (
+  <Text field={field} encode={encode} {...rest} />
+)}

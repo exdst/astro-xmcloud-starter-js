@@ -1,0 +1,14 @@
+{
+  "name": "kit-astro-article-starter-backstop",
+  "private": true,
+  "version": "1.0.0",
+  "description": "BackstopJS visual regression tests — Astro vs Next.js",
+  "scripts": {
+    "reference": "backstop reference --config=backstop.json",
+    "test": "backstop test --config=backstop.json",
+    "approve": "backstop approve --config=backstop.json"
+  },
+  "devDependencies": {
+    "backstopjs": "^6.3.25"
+  }
+}

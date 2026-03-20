@@ -73,14 +73,14 @@ const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
   </head>
 
   <body>
-    <div class={`${mainClassPageEditing} site-${theme?.toLowerCase()} body`}>
+    <div class={`${mainClassPageEditing} site-${theme?.toLowerCase()} body main-layout min-h-screen flex flex-col`}>
       <header>
         <div id="header">
           {route && <Placeholder name="headless-header" rendering={route} />}
         </div>
       </header>
       <main>
-        <div id="content">
+        <div id="content" class="antialiased">
           {route && <Placeholder name="headless-main" rendering={route} />}
         </div>
       </main>
@@ -110,6 +110,11 @@ const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
   @config "./assets/tailwind.config.cjs";
 
   @layer base {
+    :root {
+      --font-heading: 'Figtree', sans-serif;
+      --font-body: 'Figtree', sans-serif;
+      --font-accent: 'Helvetica', sans-serif;
+    }
     * {
       @apply border-border font-body;
     }

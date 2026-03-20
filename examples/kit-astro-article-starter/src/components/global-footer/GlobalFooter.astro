@@ -1,6 +1,6 @@
 ---
 import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
-import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import Text from "@/components/shared/AppText.astro";
 import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
 import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
 import type { ComponentProps } from "@/lib/component-props";
@@ -79,7 +79,7 @@ const footerCopyright = datasource?.footerCopyright?.jsonValue;
         </div>
         {/* Copyright text */}
         {footerCopyright && (
-          <Text class="text-sm text-white/80" field={footerCopyright} encode={false} />
+          <Text tag="span" class="text-sm text-white/80" field={footerCopyright} />
         )}
       </div>
     </div>

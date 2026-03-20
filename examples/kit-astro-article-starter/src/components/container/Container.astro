@@ -16,7 +16,15 @@ const {
   BackgroundImage: backgroundImage,
   DynamicPlaceholderId,
 } = params;
-const phKey = `container-${DynamicPlaceholderId}`;
+// Map componentName to the correct placeholder prefix (must match CMS placeholder keys)
+const placeholderPrefixMap: Record<string, string> = {
+  ContainerFullWidth: "container-fullwidth",
+  ContainerFullBleed: "container-fullbleed",
+  Container70: "container-seventy",
+};
+const componentName = rendering?.componentName || "";
+const prefix = placeholderPrefixMap[componentName] || "container";
+const phKey = `${prefix}-${DynamicPlaceholderId}`;
 
 const mediaUrlPattern = /mediaurl="([^"]*)"/i;
 let backgroundStyle = "";

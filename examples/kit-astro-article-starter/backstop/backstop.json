@@ -1,0 +1,90 @@
+{
+  "id": "astro-vs-nextjs",
+  "viewports": [
+    { "label": "desktop", "width": 1920, "height": 1080 },
+    { "label": "tablet", "width": 768, "height": 1024 },
+    { "label": "mobile", "width": 375, "height": 812 }
+  ],
+  "scenarios": [
+    {
+      "label": "Homepage",
+      "url": "http://localhost:3005/",
+      "referenceUrl": "http://localhost:3004/",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Article Page",
+      "url": "http://localhost:3005/Article-Page",
+      "referenceUrl": "http://localhost:3004/Article-Page",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Landing Page",
+      "url": "http://localhost:3005/Landing-Page",
+      "referenceUrl": "http://localhost:3004/Landing-Page",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Article 1",
+      "url": "http://localhost:3005/Articles/Article-1",
+      "referenceUrl": "http://localhost:3004/Articles/Article-1",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Article 2",
+      "url": "http://localhost:3005/Articles/Article-2",
+      "referenceUrl": "http://localhost:3004/Articles/Article-2",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "Article 3",
+      "url": "http://localhost:3005/Articles/Article-3",
+      "referenceUrl": "http://localhost:3004/Articles/Article-3",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "QA Article 1",
+      "url": "http://localhost:3005/Articles/QA-Article-1",
+      "referenceUrl": "http://localhost:3004/Articles/QA-Article-1",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    },
+    {
+      "label": "QA Article 2",
+      "url": "http://localhost:3005/Articles/QA-Article-2",
+      "referenceUrl": "http://localhost:3004/Articles/QA-Article-2",
+      "delay": 3000,
+      "readySelector": "body",
+      "misMatchThreshold": 0.1
+    }
+  ],
+  "paths": {
+    "bitmaps_reference": "backstop_data/bitmaps_reference",
+    "bitmaps_test": "backstop_data/bitmaps_test",
+    "engine_scripts": "backstop_data/engine_scripts",
+    "html_report": "backstop_data/html_report",
+    "ci_report": "backstop_data/ci_report"
+  },
+  "engine": "puppeteer",
+  "engineOptions": {
+    "args": ["--no-sandbox"]
+  },
+  "report": ["browser"],
+  "asyncCaptureLimit": 5,
+  "asyncCompareLimit": 50,
+  "debug": false,
+  "debugWindow": false
+}
