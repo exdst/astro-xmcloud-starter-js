@@ -1,0 +1,47 @@
+---
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import StructuredData from "@/components/structured-data/StructuredData.astro";
+import { buildArticleJsonLd } from "@/lib/structured-data/schema";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface PageContentProps extends ComponentProps {
+  fields: {
+    Content: { value?: string };
+  };
+}
+
+const { params, fields } = Astro.props as PageContentProps;
+const { styles = "", RenderingIdentifier: id } = params;
+
+const { page } = useSitecore();
+const route = page?.layout?.sitecore?.route;
+
+const field = fields?.Content ?? (route?.fields?.Content as { value?: string });
+const titleField = route?.fields?.Title as { value?: unknown } | undefined;
+const headline = titleField?.value ? String(titleField.value) : undefined;
+const articleBodyHtml = field?.value ? String(field.value) : undefined;
+---
+
+<article
+  class={`component content ${styles}`}
+  id={id}
+  itemscope
+  itemtype="https://schema.org/Article"
+>
+  <div class="component-content">
+    <div class="field-content" itemprop="articleBody">
+      {field ? <RichTextSDK field={field} /> : "[Content]"}
+    </div>
+  </div>
+  {(headline || articleBodyHtml) && (
+    <StructuredData
+      id={`jsonld-article-${id ?? "page-content"}`}
+      data={buildArticleJsonLd({
+        headline,
+        articleBodyHtml,
+        inLanguage: page?.locale,
+      })}
+    />
+  )}
+</article>

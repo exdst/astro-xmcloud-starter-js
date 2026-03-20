@@ -1,0 +1,29 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const image = fields?.image;
+const caption = fields?.caption;
+---
+
+{fields ? (
+  <figure class={`component ${params?.styles || ''}`}>
+    {image && (
+      <AstroImage
+        field={image}
+        class="mb-[24px] h-full w-full object-cover"
+      />
+    )}
+    {caption && (
+      <figcaption>
+        <Text field={caption} />
+      </figcaption>
+    )}
+  </figure>
+) : (
+  <div class="is-empty-hint">Image</div>
+)}

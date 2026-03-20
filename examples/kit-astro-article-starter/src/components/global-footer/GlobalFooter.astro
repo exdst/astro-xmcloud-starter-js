@@ -1,0 +1,89 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const footerLogo = datasource?.footerLogo?.jsonValue;
+const footerPromoTitle = datasource?.footerPromoTitle?.jsonValue;
+const footerPromoDescription = datasource?.footerPromoDescription?.jsonValue;
+const footerPromoLink = datasource?.footerPromoLink?.jsonValue;
+const footerSocialLinks = datasource?.footerSocialLinks?.results ?? [];
+const footerCopyright = datasource?.footerCopyright?.jsonValue;
+---
+
+{datasource ? (
+  <footer class="@container bg-primary text-white">
+    <div class="@md:grid-cols-2 @lg:grid-cols-12 @lg:gap-8 @xl:px-8 mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-8 px-4 py-12">
+      {/* Logo section */}
+      <div class="@lg:col-span-2">
+        <div class="max-w-[121px]">
+          {footerLogo?.value?.src && (
+            <a href="/">
+              <AstroImage field={footerLogo} />
+            </a>
+          )}
+        </div>
+      </div>
+      {/* Main footer columns */}
+      <div class="@md:grid-cols-3 @md:col-span-2 @lg:col-span-6 grid grid-cols-1 gap-8">
+        <Placeholder name="container-footer-column" rendering={rendering} />
+      </div>
+      {/* Callout section */}
+      <div class="@md:col-span-2 @lg:col-span-4">
+        <div class="space-y-4">
+          {footerPromoTitle && (
+            <Text tag="h3" class="text-lg font-medium" field={footerPromoTitle} />
+          )}
+          {footerPromoDescription && (
+            <Text tag="p" class="text-sm text-white/80" field={footerPromoDescription} />
+          )}
+          {footerPromoLink?.value?.href && (
+            <Link field={footerPromoLink} class="inline-block rounded-full border border-white px-4 py-2 text-sm text-white hover:bg-white/10" />
+          )}
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-white/10">
+      <div class="@md:flex-row @xl:px-8 mx-auto flex max-w-screen-xl flex-col items-center justify-between gap-4 px-4 py-6">
+        {/* Social links */}
+        <div class="flex space-x-4">
+          {footerSocialLinks.map((socialLink: any) => {
+            const linkField = socialLink?.link?.jsonValue;
+            const iconField = socialLink?.socialIcon?.jsonValue;
+            const href = linkField?.value?.href || '#';
+            const text = linkField?.value?.text || '';
+            return (
+              <a
+                href={href}
+                class="relative inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-white/10"
+                aria-label={text}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {iconField?.value?.src ? (
+                  <img src={iconField.value.src} alt={text} class="h-6 w-6 object-contain" />
+                ) : (
+                  <span class="text-sm">{text}</span>
+                )}
+              </a>
+            );
+          })}
+        </div>
+        {/* Copyright text */}
+        {footerCopyright && (
+          <Text class="text-sm text-white/80" field={footerCopyright} encode={false} />
+        )}
+      </div>
+    </div>
+  </footer>
+) : (
+  <div class="is-empty-hint">Global Footer</div>
+)}

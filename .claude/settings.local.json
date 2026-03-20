@@ -45,7 +45,13 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:vite.dev)",
       "Bash(npx tsc:*)",
-      "Bash(npm i:*)"
+      "Bash(npm i:*)",
+      "Bash(find src/components -name \"*.astro\" -exec grep -l \"getSitecoreContext\" {})",
+      "Bash(while read:*)",
+      "Bash(do sed:*)",
+      "Bash(done)",
+      "Bash(echo \"Fixed getSitecoreContext -> useSitecore in all files\")",
+      "Bash(echo \"Fixed getDictionary -> useDictionary\")"
     ]
   }
 }

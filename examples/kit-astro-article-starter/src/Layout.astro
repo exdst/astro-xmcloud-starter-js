@@ -1,0 +1,142 @@
+---
+import { type Field, type Page } from "@exdst-sitecore-content-sdk/astro";
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Bootstrap from "@/Bootstrap.astro";
+import Scripts from "@/Scripts.astro";
+import SitecoreStyles from "@/components/content-sdk/SitecoreStyles.astro";
+import StructuredData from "@/components/structured-data/StructuredData.astro";
+import { generateWebSiteSchema, generateOrganizationSchema } from "@/lib/structured-data/schema";
+import { getBaseUrl } from "@/lib/utils";
+
+interface LayoutProps {
+  page: Page;
+}
+
+interface RouteFields {
+  [key: string]: unknown;
+  Title?: Field;
+  metadataDescription?: Field;
+  ogTitle?: Field;
+  ogDescription?: Field;
+  ogImage?: { value?: { src?: string } };
+  metadataKeywords?: Field;
+}
+
+const { page } = Astro.props as LayoutProps;
+const { layout, mode } = page;
+const { route, context } = layout.sitecore;
+const fields = route?.fields as RouteFields;
+const mainClassPageEditing = mode.isEditing ? "editing-mode" : "prod-mode";
+
+const theme = context.theme as string;
+const language = context.language || "en";
+
+const siteName = page.siteName || "Solterra & Co.";
+const siteUrl = getBaseUrl();
+
+const pageTitle = fields?.Title?.value?.toString() || "Page";
+const pageDescription = fields?.metadataDescription?.value?.toString() || fields?.ogDescription?.value?.toString() || "";
+const ogTitle = fields?.ogTitle?.value?.toString() || pageTitle;
+const ogDescription = fields?.ogDescription?.value?.toString() || pageDescription;
+const ogImageSrc = fields?.ogImage?.value?.src;
+const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
+---
+
+<!doctype html>
+<html lang={language}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+    <link rel="icon" href={`${Astro.url.origin}/favicon.ico`} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://edge-platform.sitecorecloud.io" />
+    {pageDescription && <meta name="description" content={pageDescription} />}
+    <link rel="canonical" href={canonicalUrl} />
+    <!-- Open Graph -->
+    <meta property="og:title" content={ogTitle} />
+    {ogDescription && <meta property="og:description" content={ogDescription} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImageSrc && <meta property="og:image" content={ogImageSrc} />}
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    {ogDescription && <meta name="twitter:description" content={ogDescription} />}
+    {ogImageSrc && <meta name="twitter:image" content={ogImageSrc} />}
+    <SitecoreStyles layoutData={layout} />
+    <StructuredData id="jsonld-website" data={generateWebSiteSchema({ name: siteName, url: siteUrl })} />
+    <StructuredData id="jsonld-organization" data={generateOrganizationSchema({ name: siteName, url: siteUrl })} />
+  </head>
+
+  <body>
+    <div class={`${mainClassPageEditing} site-${theme?.toLowerCase()} body`}>
+      <header>
+        <div id="header">
+          {route && <Placeholder name="headless-header" rendering={route} />}
+        </div>
+      </header>
+      <main>
+        <div id="content">
+          {route && <Placeholder name="headless-main" rendering={route} />}
+        </div>
+      </main>
+      <footer>
+        <div id="footer">
+          {route && <Placeholder name="headless-footer" rendering={route} />}
+        </div>
+      </footer>
+    </div>
+    <Bootstrap page={page} />
+    <Scripts />
+  </body>
+</html>
+
+<style is:global>
+  @import "tailwindcss";
+  @import "@/assets/main.css";
+
+  @plugin "tailwind-bootstrap-grid" {
+    container_max_widths:
+      "sm", "576px", "md", "768px", "lg", "992px", "xl", "1200px", "2xl", "1400px";
+  }
+
+  @source inline("col-{1..12}");
+  @source inline("offset-{1..12}");
+
+  @config "./assets/tailwind.config.cjs";
+
+  @layer base {
+    * {
+      @apply border-border font-body;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      @apply font-heading;
+    }
+    h1, .h1 { @apply text-5xl font-normal @md:text-6xl; }
+    h2, .h2 { @apply text-4xl font-normal @md:text-5xl; }
+    h3, .h3 { @apply text-3xl font-normal @md:text-4xl; }
+    h4, .h4 { @apply text-2xl font-normal @md:text-3xl; }
+    h5, .h5 { @apply text-xl font-normal @md:text-2xl; }
+    body {
+      @apply bg-background text-foreground;
+      font-feature-settings: 'rlig' 1, 'calt' 1;
+    }
+  }
+
+  @utility text-box-trim-start { text-box-trim: trim-start; }
+  @utility text-box-trim-end { text-box-trim: trim-end; }
+  @utility text-box-trim-both { text-box-trim: trim-both; }
+  @utility text-box-edge-asc-desc { text-box-edge: text text; }
+  @utility text-box-edge-asc-baseline { text-box-edge: text alphabetic; }
+  @utility text-box-edge-cap-baseline { text-box-edge: cap alphabetic; }
+  @utility position-left { @apply text-start; }
+  @utility position-center { @apply text-center; }
+  @utility position-right { @apply text-end; }
+  @utility indent-top { @apply mt-8 @md:mt-16; }
+  @utility indent-bottom { @apply mb-8 @md:mb-16; }
+  @utility indent { @apply px-8 @md:px-16; }
+</style>

@@ -1,0 +1,46 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as TestimonialCarousel } from "./TestimonialCarousel.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const children = datasource?.children?.results ?? [];
+
+const items = children.map((child: any, index: number) => ({
+  id: child?.id || `testimonial-${index}`,
+  quote: child?.quote?.jsonValue?.value || child?.quote?.value || "",
+  author: child?.author?.jsonValue?.value || child?.author?.value || "",
+  role: child?.role?.jsonValue?.value || child?.role?.value || "",
+  image: child?.image?.jsonValue?.value?.src || child?.image?.value?.src || "",
+}));
+
+const title = datasource?.title?.jsonValue?.value || datasource?.title?.value || "";
+
+const { styles = "", RenderingIdentifier: id } = params;
+---
+
+<div class={`component testimonial-carousel ${styles}`} id={id}>
+  {isEditing ? (
+    <div class="component-content p-4">
+      <p class="text-sm text-gray-500">Testimonial Carousel (editing mode)</p>
+      {items.length === 0 ? (
+        <span class="is-empty-hint">Testimonial Carousel</span>
+      ) : (
+        <ul class="space-y-4">
+          {items.map((item: any) => (
+            <li class="border p-4 rounded">
+              <blockquote class="italic">{item.quote}</blockquote>
+              <p class="font-semibold mt-2">— {item.author}</p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  ) : (
+    <TestimonialCarousel client:visible items={items} title={title} />
+  )}
+</div>

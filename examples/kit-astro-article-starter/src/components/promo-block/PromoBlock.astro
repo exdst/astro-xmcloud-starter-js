@@ -1,0 +1,72 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const heading = fields?.heading;
+const description = fields?.description;
+const image = fields?.image;
+const link = fields?.link;
+
+const orientation = (params as any)?.orientation || 'image-left';
+const variation = (params as any)?.variation || 'default';
+
+const isImageRight = orientation === 'image-right';
+const isVariationTwo = variation === 'version-two';
+
+// Default variation classes
+const containerClass = isImageRight
+  ? 'row-start-1 col-start-1 col-end-1 sm:col-start-7 sm:col-end-13'
+  : 'row-start-1 col-start-1 col-end-1 sm:col-start-1 sm:col-end-7';
+
+const copyClass = isImageRight
+  ? 'px-4 pb-6 sm:px-0 sm:pb-0 col-start-1 col-end-1 sm:col-end-7'
+  : 'px-4 pb-6 sm:px-0 sm:pb-0 col-start-1 col-end-1 sm:col-start-7 sm:col-end-13';
+
+const imageClass = isVariationTwo
+  ? 'aspect-video h-full w-full object-cover sm:aspect-[1920/1080]'
+  : 'aspect-video h-full w-full object-cover sm:aspect-[4/3]';
+---
+
+{fields ? (
+  <div class="component promo-block grid columns-1 gap-6 align-middle sm:columns-12">
+    <div class={`flex flex-col justify-center gap-4 ${copyClass}`}>
+      <h3>
+        <Text field={heading} />
+      </h3>
+      <RichTextSDK field={description} />
+      <div class={isImageRight && isVariationTwo ? 'flex justify-end' : 'flex'}>
+        {link?.value?.href && (
+          isEditing ? (
+            <Link
+              field={link}
+              class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
+            />
+          ) : (
+            <a
+              href={link.value.href}
+              class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
+            >
+              {link.value.text}
+            </a>
+          )
+        )}
+      </div>
+    </div>
+    <div class={containerClass}>
+      {image && (
+        <AstroImage field={image} class={imageClass} />
+      )}
+    </div>
+  </div>
+) : (
+  <div class="is-empty-hint">Promo Block</div>
+)}

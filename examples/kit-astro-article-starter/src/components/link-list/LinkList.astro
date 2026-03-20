@@ -1,0 +1,64 @@
+---
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface LinkListProps extends ComponentProps {
+  fields: {
+    data: {
+      datasource: {
+        children: {
+          results: Array<{
+            field: {
+              link: any;
+            };
+          }>;
+        };
+        field: {
+          title: { value?: string };
+        };
+      };
+    };
+  };
+}
+
+const { params, fields } = Astro.props as LinkListProps;
+const datasource = fields?.data?.datasource;
+const styleClasses = `component link-list ${params.styles || ""}`.trim();
+const id = params.RenderingIdentifier;
+
+const links = datasource?.children?.results?.filter((el) => el?.field?.link) ?? [];
+const total = links.length;
+---
+
+<aside class={styleClasses} id={id}>
+  <div class="component-content">
+    {!datasource ? (
+      <h3>Link List</h3>
+    ) : (
+      <>
+        <Text tag="h3" field={datasource.field?.title} />
+        <ul>
+          {links.map((element, index) => {
+            const classNames = [
+              `item${index}`,
+              index % 2 === 0 ? "odd" : "even",
+              index === 0 ? "first" : "",
+              index === total - 1 ? "last" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <li class={classNames}>
+                <div class="field-link">
+                  <Link field={element.field.link} />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </>
+    )}
+  </div>
+</aside>

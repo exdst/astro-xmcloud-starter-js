@@ -1,0 +1,47 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as LogoTabs } from "./LogoTabs.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const children = datasource?.children?.results ?? [];
+
+const items = children.map((child: any, index: number) => ({
+  id: child?.id || `logo-tab-${index}`,
+  label: child?.label?.jsonValue?.value || child?.label?.value || child?.title?.jsonValue?.value || child?.title?.value || `Tab ${index + 1}`,
+  logo: child?.logo?.jsonValue?.value?.src || child?.logo?.value?.src || "",
+  title: child?.title?.jsonValue?.value || child?.title?.value || "",
+  description: child?.description?.jsonValue?.value || child?.description?.value || "",
+  backgroundImage: child?.backgroundImage?.jsonValue?.value?.src || child?.backgroundImage?.value?.src || "",
+}));
+
+const title = datasource?.title?.jsonValue?.value || datasource?.title?.value || "";
+
+const { styles = "", RenderingIdentifier: id } = params;
+---
+
+<div class={`component logo-tabs ${styles}`} id={id}>
+  {isEditing ? (
+    <div class="component-content p-4">
+      <p class="text-sm text-gray-500">Logo Tabs (editing mode)</p>
+      {items.length === 0 ? (
+        <span class="is-empty-hint">Logo Tabs</span>
+      ) : (
+        <div class="space-y-4">
+          {items.map((item: any) => (
+            <div class="border p-4 rounded">
+              <h3 class="font-semibold">{item.title}</h3>
+              <p class="text-sm text-gray-600">{item.description}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <LogoTabs client:visible items={items} title={title} />
+  )}
+</div>

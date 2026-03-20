@@ -1,0 +1,24 @@
+---
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const id = params?.RenderingIdentifier;
+---
+
+{fields ? (
+  <div
+    class={`prose ${params?.styles || ''}`}
+    id={id || undefined}
+    data-component-name="rich-text-block"
+  >
+    {fields.text ? (
+      <RichTextSDK field={fields.text} />
+    ) : (
+      <span class="is-empty-hint">Rich text</span>
+    )}
+  </div>
+) : (
+  <div class="is-empty-hint">Rich Text Block</div>
+)}

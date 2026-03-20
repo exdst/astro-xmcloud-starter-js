@@ -1,0 +1,67 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as MultiPromoTabs } from "./MultiPromoTabs.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const children = datasource?.children?.results ?? [];
+
+const tabs = children.map((child: any, index: number) => {
+  const tabItems = child?.children?.results ?? [];
+  return {
+    id: child?.id || `tab-${index}`,
+    label: child?.title?.jsonValue?.value || child?.title?.value || `Tab ${index + 1}`,
+    items: tabItems.map((item: any, itemIndex: number) => ({
+      id: item?.id || `item-${index}-${itemIndex}`,
+      title: item?.title?.jsonValue?.value || item?.title?.value || "",
+      description: item?.description?.jsonValue?.value || item?.description?.value || "",
+      image: item?.image?.jsonValue?.value?.src || item?.image?.value?.src || "",
+      link: item?.link?.jsonValue?.value
+        ? {
+            href: item.link.jsonValue.value.href || "",
+            text: item.link.jsonValue.value.text || item.link.jsonValue.value.title || "Learn more",
+          }
+        : item?.link?.value
+          ? {
+              href: item.link.value.href || "",
+              text: item.link.value.text || item.link.value.title || "Learn more",
+            }
+          : undefined,
+    })),
+  };
+});
+
+const title = datasource?.title?.jsonValue?.value || datasource?.title?.value || "";
+
+const { styles = "", RenderingIdentifier: id } = params;
+---
+
+<div class={`component multi-promo-tabs ${styles}`} id={id}>
+  {isEditing ? (
+    <div class="component-content p-4">
+      <p class="text-sm text-gray-500">Multi Promo Tabs (editing mode)</p>
+      {tabs.length === 0 ? (
+        <span class="is-empty-hint">Multi Promo Tabs</span>
+      ) : (
+        <div class="space-y-4">
+          {tabs.map((tab: any) => (
+            <div class="border p-4 rounded">
+              <h3 class="font-semibold">{tab.label}</h3>
+              <ul class="mt-2 space-y-2">
+                {tab.items.map((item: any) => (
+                  <li class="text-sm text-gray-600">{item.title}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <MultiPromoTabs client:visible tabs={tabs} title={title} />
+  )}
+</div>

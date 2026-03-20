@@ -1,0 +1,70 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as SubscriptionBanner } from "./SubscriptionBanner.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+// Extract field values from datasource
+const title = datasource?.title?.jsonValue?.value || datasource?.title?.value || "";
+const description = datasource?.description?.jsonValue?.value || datasource?.description?.value || "";
+
+// Dictionary entries for localization (passed from Sitecore or defaults)
+const dictionary = rendering?.fields?.data?.dictionary ?? {};
+const placeholderText =
+  dictionary?.placeholderText?.jsonValue?.value ||
+  dictionary?.placeholderText?.value ||
+  datasource?.placeholderText?.jsonValue?.value ||
+  datasource?.placeholderText?.value ||
+  "Enter your email";
+const submitButtonText =
+  dictionary?.submitButtonText?.jsonValue?.value ||
+  dictionary?.submitButtonText?.value ||
+  datasource?.submitButtonText?.jsonValue?.value ||
+  datasource?.submitButtonText?.value ||
+  "Subscribe";
+const successMessage =
+  dictionary?.successMessage?.jsonValue?.value ||
+  dictionary?.successMessage?.value ||
+  datasource?.successMessage?.jsonValue?.value ||
+  datasource?.successMessage?.value ||
+  "Thank you for subscribing!";
+const errorMessage =
+  dictionary?.errorMessage?.jsonValue?.value ||
+  dictionary?.errorMessage?.value ||
+  datasource?.errorMessage?.jsonValue?.value ||
+  datasource?.errorMessage?.value ||
+  "Please enter a valid email address.";
+
+const { styles = "", RenderingIdentifier: id } = params;
+---
+
+<div class={`component subscription-banner ${styles}`} id={id}>
+  {isEditing ? (
+    <div class="component-content p-4 bg-blue-100 rounded">
+      <p class="text-sm text-gray-500">Subscription Banner (editing mode)</p>
+      {!datasource ? (
+        <span class="is-empty-hint">Subscription Banner</span>
+      ) : (
+        <div>
+          <h3 class="font-semibold">{title || "Subscribe"}</h3>
+          <p class="text-sm text-gray-600">{description}</p>
+          <p class="text-xs text-gray-400 mt-2">Email form will render in preview/live mode</p>
+        </div>
+      )}
+    </div>
+  ) : (
+    <SubscriptionBanner
+      client:visible
+      title={title}
+      description={description}
+      placeholderText={placeholderText}
+      submitButtonText={submitButtonText}
+      successMessage={successMessage}
+      errorMessage={errorMessage}
+    />
+  )}
+</div>

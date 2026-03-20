@@ -1,0 +1,54 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const ancestors = datasource?.ancestors ?? [];
+const name = datasource?.name ?? '';
+
+const truncate = (str: string): string => {
+  return str?.length > 25
+    ? str.replace(/(.{24})..+/, '$1').trim().concat('...')
+    : str;
+};
+---
+
+{datasource ? (
+  <nav aria-label="Breadcrumb">
+    <ol class="flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5">
+      {ancestors.length > 0 ? (
+        <>
+          {ancestors.map((ancestor: any, index: number) => {
+            const title =
+              ancestor.navigationTitle?.jsonValue?.value ||
+              ancestor.title?.jsonValue?.value ||
+              ancestor.name;
+            return (
+              <>
+                <li class="inline-flex items-center gap-1.5">
+                  <a href={ancestor.url?.href || ''} class="transition-colors hover:text-foreground">
+                    {title}
+                  </a>
+                </li>
+                <li role="presentation" aria-hidden="true" class="[&>svg]:size-3.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </li>
+              </>
+            );
+          })}
+          <li class="inline-flex items-center gap-1.5">
+            <span role="link" aria-disabled="true" aria-current="page" class="font-normal text-foreground">
+              {truncate(name)}
+            </span>
+          </li>
+        </>
+      ) : (
+        <li class="inline-flex items-center gap-1.5">
+          <a href="/" class="transition-colors hover:text-foreground">Home</a>
+        </li>
+      )}
+    </ol>
+  </nav>
+) : (
+  <div class="is-empty-hint">Breadcrumbs</div>
+)}

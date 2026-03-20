@@ -1,0 +1,190 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const titleOptional = fields?.titleOptional;
+const descriptionOptional = fields?.descriptionOptional;
+const linkOptional = fields?.linkOptional;
+const featuredContent = fields?.featuredContent ?? [];
+
+interface TransformedArticle {
+  link: string;
+  image: string;
+  title: string;
+  summary: string;
+  author: string;
+  authorImage: string;
+  readTime: string;
+}
+
+// Transform the featuredContent array (server-side, replaces useMemo)
+const articles: TransformedArticle[] = featuredContent.map((article: any) => ({
+  link: article.url || '',
+  image: article.fields?.pageThumbnail?.value?.src || '',
+  title: article.fields?.pageTitle?.value || '',
+  summary: article.fields?.pageSummary?.value || '',
+  author: `${article.fields?.taxAuthor?.fields?.personFirstName?.value || ''} ${
+    article.fields?.taxAuthor?.fields?.personLastName?.value || ''
+  }`.trim(),
+  authorImage: article.fields?.taxAuthor?.fields?.personProfileImage?.value?.src || '',
+  readTime: article.fields?.pageReadTime?.value || '',
+}));
+
+const featuredArticles = articles.slice(0, 2);
+const regularArticles = articles.slice(2);
+
+const sectionId = 'article-listing-section';
+---
+
+<section
+  data-component="ArticleListing"
+  class="@container"
+  {...(titleOptional?.value ? { 'aria-labelledby': sectionId } : {})}
+>
+  <div class={`w-full ${params?.styles || ''}`}>
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {(titleOptional || linkOptional?.value?.href || isEditing) && (
+        <div class="@md:flex-row @md:justify-between @md:items-center mb-20 flex flex-col">
+          {titleOptional && (
+            <div class="@md:mb-0 mb-4">
+              <Text
+                tag="h2"
+                id={sectionId}
+                field={titleOptional}
+                class="font-heading @md:text-6xl text-primary text-4xl font-normal leading-[1.20] tracking-tighter"
+              />
+              {descriptionOptional && (
+                <Text
+                  tag="p"
+                  field={descriptionOptional}
+                  class="text-muted-foreground font-body mt-[20px] max-w-3xl text-lg font-normal leading-relaxed"
+                />
+              )}
+            </div>
+          )}
+          {(linkOptional?.value?.href || isEditing) && (
+            <div>
+              {isEditing ? (
+                <Link
+                  field={linkOptional}
+                  class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
+                />
+              ) : (
+                <a
+                  href={linkOptional?.value?.href}
+                  class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
+                >
+                  {linkOptional?.value?.text}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Featured articles - 2 column layout */}
+      <div class="@md:grid-cols-2 mb-[28px] grid gap-8">
+        {featuredArticles.map((article) => (
+          <article class="@md:mb-0 group/article mb-6">
+            <a href={article.link} class="block">
+              <div class="rounded-default @md:mb-0 relative mb-4 aspect-[3/2] w-full overflow-hidden">
+                {article.image && (
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    class="h-full w-full object-cover transition-transform duration-300 group-hover/article:scale-105"
+                    loading="lazy"
+                  />
+                )}
+              </div>
+            </a>
+            <div class="@md:p-8">
+              <a href={article.link} class="block">
+                <h3 class="font-heading text-card-foreground text-3xl font-medium leading-[1.30] -tracking-[0.9px] decoration-1 underline-offset-4 group-hover/article:underline">
+                  {article.title}
+                </h3>
+              </a>
+              <p class="text-secondary-foreground text-normal mt-4 line-clamp-2 text-lg leading-[1.5] tracking-tighter">
+                {article.summary}
+              </p>
+              <div class="mt-6 flex items-center gap-4">
+                {(article.authorImage || article.author) && (
+                  <div class="bg-primary text-primary-foreground relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
+                    {article.authorImage ? (
+                      <img
+                        src={article.authorImage}
+                        alt={`${article.author} avatar`}
+                        class="h-full w-full object-cover"
+                      />
+                    ) : article.author ? (
+                      <span class="text-xs font-medium">
+                        {article.author.split(' ').map((n: string) => n[0]).join('')}
+                      </span>
+                    ) : null}
+                  </div>
+                )}
+                <div class="flex items-center gap-[9px]">
+                  {article.author && (
+                    <p class="font-body text-accent-foreground text-sm font-medium">{article.author}</p>
+                  )}
+                  {article.author && article.readTime && (
+                    <span class="text-accent text-sm">&bull;</span>
+                  )}
+                  <p class="text-accent-foreground text-sm">{article.readTime}</p>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {/* Regular articles - 3 column compact layout */}
+      <div class="@sm:grid-cols-2 @lg:grid-cols-3 grid gap-8">
+        {regularArticles.map((article) => (
+          <article class="@md:p-8 rounded-default hover:bg-tertiary-hover group/article flex h-full flex-col p-4 transition-colors">
+            <div>
+              <a href={article.link} class="block">
+                <h3 class="font-heading text-card-foreground text-2xl font-medium leading-normal tracking-tighter decoration-1 underline-offset-4 group-hover/article:underline">
+                  {article.title}
+                </h3>
+              </a>
+            </div>
+            <div class="mt-auto flex items-center gap-4 pt-6">
+              {(article.authorImage || article.author) && (
+                <div class="bg-primary text-primary-foreground relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
+                  {article.authorImage ? (
+                    <img
+                      src={article.authorImage}
+                      alt={`${article.author} avatar`}
+                      class="h-full w-full object-cover"
+                    />
+                  ) : article.author ? (
+                    <span class="text-xs font-medium">
+                      {article.author.split(' ').map((n: string) => n[0]).join('')}
+                    </span>
+                  ) : null}
+                </div>
+              )}
+              <div class="flex items-center gap-[9px]">
+                {article.author && (
+                  <p class="font-body text-accent-foreground text-sm font-medium">{article.author}</p>
+                )}
+                {article.author && article.readTime && (
+                  <span class="text-accent text-sm">&bull;</span>
+                )}
+                <p class="text-accent-foreground text-sm">{article.readTime}</p>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

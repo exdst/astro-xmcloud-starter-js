@@ -1,0 +1,65 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const titleRequired = fields?.titleRequired;
+const descriptionOptional = fields?.descriptionOptional;
+const linkOptional = fields?.linkOptional;
+
+const colorScheme = (params as any)?.colorScheme || 'default';
+
+const sectionClasses: Record<string, string> = {
+  default: 'w-full mx-auto px-6 py-16 md:py-24 text-center',
+  primary: 'w-full mx-auto px-6 py-16 md:py-24 text-center bg-primary text-primary-foreground',
+  secondary: 'w-full mx-auto px-6 py-16 md:py-24 text-center bg-secondary text-secondary-foreground',
+};
+
+const titleClasses: Record<string, string> = {
+  default: 'mb-6 text-pretty text-4xl font-normal leading-[1.1333] tracking-tighter antialiased md:text-7xl',
+  primary: 'mb-6 text-pretty text-4xl font-normal leading-[1.1333] tracking-tighter antialiased md:text-7xl text-primary-foreground',
+  secondary: 'mb-6 text-pretty text-4xl font-normal leading-[1.1333] tracking-tighter antialiased md:text-7xl text-primary',
+};
+
+const buttonClasses: Record<string, string> = {
+  default: 'text-sm font-heading font-medium inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90',
+  primary: 'text-sm font-heading font-medium inline-block rounded-md bg-accent px-6 py-3 text-accent-foreground hover:bg-accent/90',
+  secondary: 'text-sm font-heading font-medium inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90',
+};
+---
+
+{fields ? (
+  <section class={sectionClasses[colorScheme] || sectionClasses.default}>
+    <div class="mx-auto w-full max-w-4xl">
+      <Text tag="h2" class={titleClasses[colorScheme] || titleClasses.default} field={titleRequired} />
+      <Text
+        tag="p"
+        class="mx-auto mb-16 max-w-xl text-lg antialiased"
+        field={descriptionOptional}
+      />
+      {linkOptional?.value?.href && (
+        isEditing ? (
+          <Link
+            field={linkOptional}
+            class={buttonClasses[colorScheme] || buttonClasses.default}
+          />
+        ) : (
+          <a
+            href={linkOptional.value.href}
+            class={buttonClasses[colorScheme] || buttonClasses.default}
+          >
+            {linkOptional.value.text}
+          </a>
+        )
+      )}
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">CTA Banner</div>
+)}

@@ -1,0 +1,13 @@
+---
+import type { JsonLdValue } from "@/lib/structured-data/jsonld";
+import { toJsonLdString } from "@/lib/structured-data/jsonld";
+
+interface Props {
+  id: string;
+  data: JsonLdValue;
+}
+
+const { id, data } = Astro.props as Props;
+---
+
+<script id={id} type="application/ld+json" set:html={toJsonLdString(data)} />

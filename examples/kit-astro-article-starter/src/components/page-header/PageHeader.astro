@@ -1,0 +1,107 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const externalFields = rendering?.fields?.data?.externalFields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const imageRequired = datasource?.imageRequired?.jsonValue;
+const videoOptional = datasource?.videoOptional?.jsonValue;
+const logoText = datasource?.logoText?.jsonValue;
+const children = datasource?.children?.results ?? [];
+
+const pageHeaderTitle = externalFields?.pageHeaderTitle?.jsonValue;
+const pageTitle = externalFields?.pageTitle?.jsonValue;
+const pageSubtitle = externalFields?.pageSubtitle?.jsonValue;
+
+const title = pageHeaderTitle ?? pageTitle;
+const subtitle = pageSubtitle;
+
+const colorScheme = (params as any)?.colorScheme || 'default';
+const darkPlayIcon = (params as any)?.darkPlayIcon || '0';
+
+const colorClasses: Record<string, string> = {
+  default: '',
+  primary: 'bg-primary text-primary-foreground',
+  secondary: 'bg-secondary text-secondary-foreground',
+};
+
+const sectionClass = `@container my-10 flex flex-col md:grid md:gap-8 md:items-center px-4 @xl:px-8 ${colorClasses[colorScheme] || ''}`;
+
+const videoHref = videoOptional?.value?.href;
+---
+
+{datasource ? (
+  <section class={sectionClass}>
+    <div class="@md:grid-cols-2 @lg:gap-12 mx-auto grid w-full grid-cols-1 gap-8">
+      {/* Left */}
+      <div class="flex flex-col justify-between">
+        <Text
+          tag="h1"
+          class="@md:text-5xl @lg:text-7xl font-heading text-pretty text-5xl font-normal leading-[0.93] tracking-tighter"
+          field={title}
+        />
+        {children.length > 0 && (
+          <div class="@md:mt-16 mt-4 flex max-w-[504px] flex-col gap-6">
+            {logoText && (
+              <Text
+                tag="p"
+                class="text-base font-medium"
+                field={logoText}
+              />
+            )}
+            <div class="flex flex-nowrap items-center justify-between gap-8">
+              {children.map((logo: any) => (
+                <div>
+                  {logo.image?.jsonValue && (
+                    <AstroImage field={logo.image.jsonValue} />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Right */}
+      <div class="flex flex-col justify-end gap-10">
+        {subtitle && (
+          <RichTextSDK
+            class="@lg:ms-auto max-w-[547px] text-lg font-medium tracking-tight"
+            field={subtitle}
+          />
+        )}
+        <div class="@md:rounded-[22px] @lg:ms-auto relative max-w-[547px] overflow-hidden rounded-xl">
+          {videoHref ? (
+            <div class="relative aspect-video w-full">
+              <img
+                src={imageRequired?.value?.src || ''}
+                alt={title?.value || ''}
+                class="h-full w-full object-cover"
+                loading="lazy"
+              />
+              <button
+                data-video-url={videoHref}
+                class={`absolute inset-0 flex items-center justify-center ${darkPlayIcon === '1' ? 'text-black' : 'text-white'}`}
+                aria-label="Play video"
+              >
+                <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 24 24">
+                  <polygon points="5,3 19,12 5,21" />
+                </svg>
+              </button>
+            </div>
+          ) : imageRequired?.value?.src ? (
+            <AstroImage field={imageRequired} />
+          ) : null}
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Page Header</div>
+)}

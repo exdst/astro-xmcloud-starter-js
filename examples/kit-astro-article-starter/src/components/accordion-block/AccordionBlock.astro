@@ -1,0 +1,81 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const heading = datasource?.heading?.jsonValue;
+const description = datasource?.description?.jsonValue;
+const link = datasource?.link?.jsonValue;
+const accordionItems = datasource?.children?.results ?? [];
+---
+
+{datasource ? (
+  <section
+    data-component="AccordionBlock"
+    class={`@container bg-secondary text-secondary-foreground rounded-3xl ${params?.styles || ''}`}
+  >
+    <div class="@md:py-16 @lg:py-20 @lg:grid-cols-[320px,1fr] @lg:gap-12 @xl:gap-16 mx-auto grid max-w-screen-xl gap-8 py-10">
+      <div class="@lg:pr-0 space-y-4 px-6">
+        {heading && (
+          <Text
+            tag="h2"
+            class="font-heading text-primary @lg:text-7xl -ml-1 text-pretty text-5xl font-normal leading-[1.25] tracking-tighter"
+            field={heading}
+          />
+        )}
+        {description && (
+          <Text
+            class="font-body text-base font-normal"
+            tag="p"
+            field={description}
+          />
+        )}
+        {link?.value?.href && (
+          <Link
+            field={link}
+            class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
+          />
+        )}
+      </div>
+      <div class="w-full max-w-[787px] justify-self-end p-6">
+        {accordionItems.map((child: any, index: number) => (
+          <details
+            class="border-b"
+            open={isEditing ? true : undefined}
+          >
+            <summary class="line-height-6 hover:text-primary-hover font-heading flex cursor-pointer items-center justify-between py-4 text-left text-base font-medium transition-all [&::-webkit-details-marker]:hidden">
+              {child?.heading?.jsonValue && (
+                <Text field={child.heading.jsonValue} />
+              )}
+              <svg class="ml-4 h-4 w-4 shrink-0 transition-transform duration-200 details-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="overflow-hidden pb-4 text-sm">
+              <div class="font-heading grid gap-4 text-sm">
+                {child?.description?.jsonValue && (
+                  <RichTextSDK tag="div" field={child.description.jsonValue} />
+                )}
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Accordion Block</div>
+)}
+
+<style>
+  details[open] .details-chevron {
+    transform: rotate(180deg);
+  }
+</style>
