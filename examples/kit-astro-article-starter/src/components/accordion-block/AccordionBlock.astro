@@ -30,7 +30,7 @@ const accordionItems = datasource?.children?.results ?? [];
             field={heading}
           />
         )}
-        {description && (
+        {description?.value && (
           <Text
             class="font-body text-base font-normal"
             tag="p"
