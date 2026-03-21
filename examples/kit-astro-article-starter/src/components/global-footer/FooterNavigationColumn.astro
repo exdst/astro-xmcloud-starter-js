@@ -16,8 +16,8 @@ const items = datasource?.items?.results ?? [];
 {datasource ? (
   <nav>
     {/* Mobile: accordion via details/summary */}
-    <details class="footer-nav-column-mobile md:hidden w-full">
-      <summary class="flex cursor-pointer list-none items-center justify-between text-lg font-medium py-3 [&::-webkit-details-marker]:hidden">
+    <details class="footer-nav-column-mobile md:hidden w-full border-b">
+      <summary class="flex cursor-pointer list-none items-center justify-between text-lg font-medium py-4 [&::-webkit-details-marker]:hidden">
         {header && <Text field={header} />}
         <svg class="h-4 w-4 transition-transform details-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
