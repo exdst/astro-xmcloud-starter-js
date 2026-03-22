@@ -48,13 +48,13 @@ const positionClasses = isImageRight
         {image && (
           <div class={`@md:max-w-[452px] @xs:mx-0 relative mx-auto aspect-square h-full w-full max-w-[350px] rounded-r-full ${positionClasses}`}>
             <div class={`promo-animated__image-bg-extension absolute bottom-0 top-0 ${bgExtensionClass} w-[100vw] ${imageBgClass}`}></div>
-            <div class="relative aspect-square w-full overflow-hidden rounded-full">
+            <div class="relative aspect-square w-full">
               <AstroImage
                 field={image}
                 class="@md:max-w-[452px] aspect-square w-full rounded-full object-cover"
               />
             </div>
-            <div class="pointer-events-none absolute bottom-0 aspect-square h-full w-full">
+            <div class="pointer-events-none absolute bottom-0 aspect-square h-full w-full rotate-0">
               <div
                 class={`promo-animated__sprite h-full w-full rounded-full pointer-events-none ${spriteClass}`}
                 style={spriteClipPath}
