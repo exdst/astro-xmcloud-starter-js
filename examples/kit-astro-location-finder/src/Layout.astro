@@ -117,4 +117,13 @@ const canonicalUrl = `${siteUrl}${Astro.url.pathname}`;
   @source inline("offset-{1..12}");
 
   @config "./assets/tailwind.config.cjs";
+
+  @layer base {
+    @media (min-width: 768px) {
+      h1, .h1 { font-size: var(--text-8xl); }
+      h2, .h2 { font-size: var(--text-7xl); }
+      h3, .h3 { font-size: var(--text-5xl); }
+      h4, .h4 { font-size: var(--text-3xl); }
+    }
+  }
 </style>

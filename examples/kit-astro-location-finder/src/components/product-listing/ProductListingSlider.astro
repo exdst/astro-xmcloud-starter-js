@@ -1,10 +1,11 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { useDictionary } from "@exdst-sitecore-content-sdk/astro/context";
 import { ProductListingIsland } from "./ProductListing.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
+const t = useDictionary();
 
 const datasource = fields?.data?.datasource;
 const title = datasource?.title?.jsonValue?.value || "";
@@ -34,9 +35,9 @@ const styles = params?.styles || "";
     viewAllLinkText={viewAllLink.text || ""}
     styles={styles}
     dictionary={{
-      drivingRange: "Driving Range",
-      seeFullSpecs: "See Full Specs",
-      price: "Starting at",
+      drivingRange: t("Demo2_ProductListing_DrivingRange") || "Driving Range",
+      seeFullSpecs: t("Demo2_ProductListing_SeeFullSpecs") || "See Full Specs",
+      price: t("Demo2_ProductListing_Price") || "Starting at",
     }}
   />
 )}

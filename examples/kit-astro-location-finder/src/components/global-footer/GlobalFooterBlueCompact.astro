@@ -1,20 +1,28 @@
 ---
-import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
 import Text from "@/components/shared/AppText.astro";
 import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { useSitecore, useDictionary } from "@exdst-sitecore-content-sdk/astro/context";
+import { EmailSignupForm } from "@/components/forms/email/EmailSignupForm.tsx";
 
 const { rendering } = Astro.props as ComponentProps;
 const datasource = rendering?.fields?.data?.datasource;
 const { page } = useSitecore();
 const isEditing = page?.mode?.isEditing ?? false;
+const t = useDictionary();
 
 const footerNavLinks = datasource?.footerNavLinks?.results ?? [];
 const footerCopyright = datasource?.footerCopyright?.jsonValue;
 const socialLinks = datasource?.socialLinks?.results ?? [];
 const tagline = datasource?.tagline?.jsonValue;
 const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
+const dictionary = rendering?.fields?.dictionary || {};
+const globalDictionary = {
+  FOOTER_EmailPlaceholder: t("FOOTER_EmailPlaceholder") || dictionary?.FOOTER_EmailPlaceholder,
+  FOOTER_EmailSubmitLabel: t("FOOTER_EmailSubmitLabel") || dictionary?.FOOTER_EmailSubmitLabel,
+  FOOTER_EmailErrorMessage: t("FOOTER_EmailErrorMessage") || dictionary?.FOOTER_EmailErrorMessage,
+  FOOTER_EmailSuccessMessage: t("FOOTER_EmailSuccessMessage") || dictionary?.FOOTER_EmailSuccessMessage,
+};
 ---
 
 {datasource ? (
@@ -80,7 +88,14 @@ const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
                 />
               )}
               <div class="@sm:flex-row flex flex-col gap-2 ">
-                <Placeholder name="container-footer-email" rendering={rendering} />
+                <EmailSignupForm
+                  client:visible
+                  emailPlaceholder={globalDictionary.FOOTER_EmailPlaceholder || "Email address"}
+                  emailSubmitLabel={globalDictionary.FOOTER_EmailSubmitLabel || "Subscribe"}
+                  emailErrorMessage={globalDictionary.FOOTER_EmailErrorMessage || "Please enter a valid email"}
+                  emailSuccessMessage={globalDictionary.FOOTER_EmailSuccessMessage || "Thank you!"}
+                  buttonVariant="secondary"
+                />
               </div>
             </div>
           </div>

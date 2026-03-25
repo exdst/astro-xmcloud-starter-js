@@ -1,20 +1,28 @@
 ---
-import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
 import Text from "@/components/shared/AppText.astro";
 import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { useSitecore, useDictionary } from "@exdst-sitecore-content-sdk/astro/context";
+import { EmailSignupForm } from "@/components/forms/email/EmailSignupForm.tsx";
 
 const { rendering } = Astro.props as ComponentProps;
 const datasource = rendering?.fields?.data?.datasource;
 const { page } = useSitecore();
 const isEditing = page?.mode?.isEditing ?? false;
+const t = useDictionary();
 
 const footerNavLinks = datasource?.footerNavLinks?.results ?? [];
 const footerCopyright = datasource?.footerCopyright?.jsonValue;
 const socialLinks = datasource?.socialLinks?.results ?? [];
 const tagline = datasource?.tagline?.jsonValue;
 const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
+const dictionary = rendering?.fields?.dictionary || {};
+const globalDictionary = {
+  FOOTER_EmailPlaceholder: t("FOOTER_EmailPlaceholder") || dictionary?.FOOTER_EmailPlaceholder,
+  FOOTER_EmailSubmitLabel: t("FOOTER_EmailSubmitLabel") || dictionary?.FOOTER_EmailSubmitLabel,
+  FOOTER_EmailErrorMessage: t("FOOTER_EmailErrorMessage") || dictionary?.FOOTER_EmailErrorMessage,
+  FOOTER_EmailSuccessMessage: t("FOOTER_EmailSuccessMessage") || dictionary?.FOOTER_EmailSuccessMessage,
+};
 ---
 
 {datasource ? (
@@ -23,7 +31,7 @@ const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
     role="contentinfo"
   >
     {/* Main footer content */}
-    <div class="border-foreground border-b-2 px-4 py-16">
+    <div class="border-primary-foreground px-4 py-16">
       <div class="@xl:px-8 relative z-10 mx-auto max-w-screen-2xl">
         <div class="@lg:grid-cols-[2fr,1fr] grid grid-cols-1 items-end justify-end gap-8">
           {/* Left section with heading */}
@@ -69,7 +77,14 @@ const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
               />
             )}
             <div class="@sm:flex-row flex flex-col gap-2">
-              <Placeholder name="container-footer-email" rendering={rendering} />
+              <EmailSignupForm
+                client:visible
+                emailPlaceholder={globalDictionary.FOOTER_EmailPlaceholder || "Email address"}
+                emailSubmitLabel={globalDictionary.FOOTER_EmailSubmitLabel || "Subscribe"}
+                emailErrorMessage={globalDictionary.FOOTER_EmailErrorMessage || "Please enter a valid email"}
+                emailSuccessMessage={globalDictionary.FOOTER_EmailSuccessMessage || "Thank you!"}
+                buttonVariant="secondary"
+              />
             </div>
           </div>
         </div>
@@ -77,16 +92,16 @@ const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
     </div>
 
     {/* Background logo - semi-transparent */}
-    <div class="-z-1 pointer-events-none absolute inset-0 opacity-90" aria-hidden="true">
-      <div class="flex h-full w-full items-end justify-center leading-none">
-        <div class="bg-primary-gradient text-fill-transparent text-50-clamp -mb-14 bg-clip-text font-bold leading-none text-transparent">
+    <div class="@md:inset-unset @md:-right-[100px] @md:bottom-0 pointer-events-none absolute inset-0 z-0 opacity-90" aria-hidden="true" data-component="footer-logo">
+      <div class="@md:justify-end flex h-full w-full items-end justify-center leading-none">
+        <div class="bg-primary-gradient text-fill-transparent text-50-clamp @md:-mb-[80px] -mb-[40px] bg-clip-text text-center font-bold leading-none text-transparent">
           Alaris
         </div>
       </div>
     </div>
 
     {/* Bottom footer with social icons and copyright */}
-    <div class="@md:min-h-[430px] relative z-0 mx-auto mt-8 flex max-w-screen-2xl flex-col justify-end px-4 py-8">
+    <div class="relative z-0 mx-auto block border-t-2 px-4 py-8">
       <div class="@sm:flex-row flex flex-col items-center justify-between">
         {/* Social media icons */}
         <ul class="@sm:mb-0 mb-0 flex list-none gap-6">

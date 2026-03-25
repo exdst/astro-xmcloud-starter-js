@@ -37,6 +37,11 @@ module.exports = {
                 '670/356': '670/356',
             },
             backgroundImage: {
+                'light-gradient':
+                    'linear-gradient(to bottom, #ffffff 0%, rgba(0, 81, 255, 0) 100%)',
+                'primary-gradient':
+                    'linear-gradient(179.89deg, #0041CD 0.1%, rgba(0, 81, 255, 0) 115.08%)',
+                'dark-gradient': 'linear-gradient(to bottom, #C1C1C1 0%, rgba(28, 28, 28, 0) 100%)',
                 'img-primary':
                     'linear-gradient(to bottom, hsla(var(--colors-primary) / 90%), hsla(var(--colors-primary) / 60%)), var(--bg-img, url("/placeholder.svg"))',
                 'img-secondary':
@@ -87,6 +92,10 @@ module.exports = {
                 heading: 'var(--font-heading)',
                 body: 'var(--font-body)',
                 accent: 'var(--font-accent)',
+            },
+            fontSize: {
+                '50-clamp': 'clamp(100px, calc(50 * 1vw), 400px)',
+                '40-clamp': 'clamp(100px, calc(40 * 1vw), 500px)',
             },
             keyframes: {
                 'accordion-down': {

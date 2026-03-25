@@ -1,3 +1,4 @@
+import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,17 @@ function useMatchMedia(query: string): boolean {
   return matches;
 }
 
+// --- Card Spotlight Wrapper ---
+function CardSpotlightWrapper({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("rounded-default duration-400 bg-secondary group relative self-stretch transition-all", className)} data-component="CardSpotlight">
+      <div className="relative z-[2] flex h-full w-full transition-all duration-300">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // --- Product Card ---
 function ProductListingCard({
   product,
@@ -54,10 +66,11 @@ function ProductListingCard({
   const d = dictionary || { drivingRange: "Driving Range", seeFullSpecs: "See Full Specs", price: "Starting at" };
 
   return (
+    <CardSpotlightWrapper className="h-full w-full">
     <article className="@md:px-12 @md:py-12 font-heading relative z-10 flex w-full flex-col gap-8 px-6 py-10" data-component="ProductListingCard">
       <div className="relative overflow-hidden">
         {product.productThumbnail && (
-          <img src={product.productThumbnail} alt={product.productThumbnailAlt} className="mx-auto" loading="lazy" />
+          <img src={product.productThumbnail} alt={product.productThumbnailAlt} className="mx-auto" />
         )}
       </div>
 
@@ -95,6 +108,7 @@ function ProductListingCard({
         </div>
       </div>
     </article>
+    </CardSpotlightWrapper>
   );
 }
 
@@ -227,7 +241,7 @@ function ProductListingSlider(props: Omit<ProductListingIslandProps, "variant">)
       aria-labelledby="product-listing-slider-heading"
     >
       <div className="@md:py-20 @lg:py-28 py-12">
-        <div className="@xl:px-0 @md:pb-0 mx-auto max-w-screen-xl px-0 pb-10 [&:not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6">
+        <div className="@xl:px-0 @md:pb-0 mx-auto max-w-screen-xl px-0 pb-10 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6">
           <div>
             <h2 id="product-listing-slider-heading" className={cn("@md:w-1/2 w-full")}>{title}</h2>
           </div>

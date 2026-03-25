@@ -1,69 +1,22 @@
 ---
-import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
-import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import TextBannerDefault from "./TextBannerDefault.astro";
+import TextBanner01 from "./TextBanner01.astro";
+import TextBanner02 from "./TextBanner02.astro";
+import TextBannerTextTop from "./TextBannerTextTop.astro";
+import TextBannerBlueTitleRight from "./TextBannerBlueTitleRight.astro";
 
-const { rendering, params } = Astro.props as ComponentProps;
-const fields = rendering?.fields;
-const { page } = useSitecore();
-const isEditing = page?.mode?.isEditing ?? false;
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
 
-const heading = fields?.heading;
-const description = fields?.description;
-const link = fields?.link;
-const image = fields?.image;
+const variants: Record<string, any> = {
+  Default: TextBannerDefault,
+  TextBanner01: TextBanner01,
+  TextBanner02: TextBanner02,
+  TextTop: TextBannerTextTop,
+  BlueTitleRight: TextBannerBlueTitleRight,
+};
 
-const excludeTopMargin = (params as any)?.excludeTopMargin;
-const bgImageSrc = image?.value?.src;
-
-const sectionClass = [
-  'p-5',
-  excludeTopMargin ? 'mt-0' : 'mt-4',
-  'bg-cover',
-  'bg-center',
-  'bg-img-primary',
-  'text-primary-foreground',
-  params?.styles || '',
-].filter(Boolean).join(' ');
-
-const inlineStyle = bgImageSrc ? `--bg-img: url(${bgImageSrc});` : '';
+const Component = variants[variant] || TextBannerDefault;
 ---
-
-{fields ? (
-  <section class={sectionClass} style={inlineStyle}>
-    <div class="flex flex-wrap items-center gap-3 px-4 py-6">
-      <div class="basis-full">
-        <h3>
-          <Text field={heading} />
-        </h3>
-      </div>
-      <div class="basis-auto">
-        <p>
-          <Text field={description} />
-        </p>
-      </div>
-      <div class="basis-auto grow">
-        {link?.value?.href && (
-          <div class="flex justify-end">
-            {isEditing ? (
-              <Link
-                field={link}
-                class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
-              />
-            ) : (
-              <a
-                href={link.value.href}
-                class="inline-block rounded-md bg-primary px-6 py-3 text-primary-foreground hover:bg-primary/90"
-              >
-                {link.value.text}
-              </a>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  </section>
-) : (
-  <div class="is-empty-hint">Text Banner</div>
-)}
+<Component {...Astro.props} />
