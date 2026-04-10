@@ -1,7 +1,6 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
 import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { Default as CarouselReact } from "./Carousel.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -31,11 +30,288 @@ const styles = params?.styles || "";
 ---
 
 {slides.length > 0 && (
-  <CarouselReact
-    client:visible
-    slides={slides}
-    title={title}
-    tagLine={tagLine}
-    styles={styles}
-  />
+  <astro-carousel
+    class={`relative block w-full ${styles}`}
+    data-class-change
+    aria-roledescription="carousel"
+    aria-label="Carousel"
+  >
+    <div class="relative w-full overflow-hidden bg-white" style="height: 500px;" data-carousel-viewport>
+      <div class="flex h-full w-full transition-transform duration-700 ease-out" data-carousel-track>
+        {slides.map((slide: any, index: number) => (
+          <div
+            class="relative h-full w-full shrink-0"
+            aria-roledescription="slide"
+            aria-label={`Slide ${index + 1} of ${slides.length}: ${slide.title}`}
+            tabindex={index === 0 ? 0 : -1}
+            role="group"
+            data-carousel-slide
+          >
+            <div class="absolute inset-0 h-full w-full">
+              {slide.slideImage && (
+                <img
+                  src={slide.slideImage}
+                  alt={slide.slideImageAlt}
+                  class="h-full w-full object-cover"
+                  loading={index === 0 ? "eager" : "lazy"}
+                />
+              )}
+            </div>
+
+            <div class="absolute inset-0 bg-gradient-to-r from-black/10 to-black/40" aria-hidden="true" />
+
+            <div class="absolute inset-y-0 right-0 flex w-full items-center justify-end md:w-1/2 lg:w-2/5">
+              <div class="p-8 md:p-10" data-carousel-content>
+                <h2 class="mb-4 text-3xl font-bold">{slide.title}</h2>
+                <p class="mb-6">{slide.bodyText}</p>
+                {slide.callToAction && (
+                  <a
+                    href={slide.callToAction.href}
+                    target={slide.callToAction.target || undefined}
+                    class="inline-flex items-center rounded-md bg-primary px-6 py-3 text-lg font-bold text-primary-foreground hover:bg-primary/90"
+                  >
+                    {slide.callToAction.text}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center gap-4 bg-white py-4">
+      <button
+        data-carousel-playpause
+        aria-label="Pause carousel"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+      >
+        <svg class="h-4 w-4" data-icon-pause fill="currentColor" viewBox="0 0 24 24">
+          <rect x="6" y="4" width="4" height="16" />
+          <rect x="14" y="4" width="4" height="16" />
+        </svg>
+        <svg class="hidden h-4 w-4" data-icon-play fill="currentColor" viewBox="0 0 24 24">
+          <polygon points="5,3 19,12 5,21" />
+        </svg>
+      </button>
+
+      <button
+        data-carousel-prev
+        aria-label="Previous slide"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+      >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+
+      <div class="flex gap-2" role="tablist" aria-label="Slide selection" data-carousel-dots>
+        {slides.map((_: any, index: number) => (
+          <button
+            role="tab"
+            aria-label={`Go to slide ${index + 1}`}
+            aria-selected={index === 0 ? "true" : "false"}
+            class={`h-2 w-2 rounded-full transition-all ${index === 0 ? "bg-gray-900" : "bg-gray-400 hover:bg-gray-600"}`}
+            data-carousel-dot
+            data-slide-index={index}
+          />
+        ))}
+      </div>
+
+      <button
+        data-carousel-next
+        aria-label="Next slide"
+        class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+      >
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </astro-carousel>
 )}
+
+<script>
+  class AstroCarousel extends HTMLElement {
+    private track: HTMLElement | null = null;
+    private viewport: HTMLElement | null = null;
+    private prevBtn: HTMLButtonElement | null = null;
+    private nextBtn: HTMLButtonElement | null = null;
+    private playPauseBtn: HTMLButtonElement | null = null;
+    private pauseIcon: SVGElement | null = null;
+    private playIcon: SVGElement | null = null;
+    private dots: HTMLButtonElement[] = [];
+    private slides: HTMLElement[] = [];
+    private currentSlide = 0;
+    private isPlaying = true;
+    private isFocused = false;
+    private autoplayInterval: ReturnType<typeof setInterval> | null = null;
+    private prefersReducedMotion = false;
+
+    connectedCallback() {
+      this.track = this.querySelector('[data-carousel-track]');
+      this.viewport = this.querySelector('[data-carousel-viewport]');
+      this.prevBtn = this.querySelector('[data-carousel-prev]');
+      this.nextBtn = this.querySelector('[data-carousel-next]');
+      this.playPauseBtn = this.querySelector('[data-carousel-playpause]');
+      this.pauseIcon = this.querySelector('[data-icon-pause]');
+      this.playIcon = this.querySelector('[data-icon-play]');
+      this.dots = Array.from(this.querySelectorAll('[data-carousel-dot]'));
+      this.slides = Array.from(this.querySelectorAll('[data-carousel-slide]'));
+
+      if (!this.track || !this.viewport || this.slides.length === 0) return;
+
+      // Detect reduced motion preference
+      const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      this.prefersReducedMotion = mql.matches;
+      mql.addEventListener('change', (e) => {
+        this.prefersReducedMotion = e.matches;
+        this.updateTrackTransition();
+      });
+
+      this.updateTrackTransition();
+
+      // Button listeners
+      this.prevBtn?.addEventListener('click', () => this.goToPrev());
+      this.nextBtn?.addEventListener('click', () => this.goToNext());
+      this.playPauseBtn?.addEventListener('click', () => this.togglePlayPause());
+
+      // Dot listeners
+      this.dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          const index = Number(dot.dataset.slideIndex);
+          this.goToSlide(index);
+        });
+      });
+
+      // Focus/blur for pausing autoplay
+      this.addEventListener('focusin', () => {
+        this.isFocused = true;
+        this.resetAutoplay();
+      });
+      this.addEventListener('focusout', () => {
+        this.isFocused = false;
+        this.resetAutoplay();
+      });
+
+      // Keyboard navigation
+      this.addEventListener('keydown', (e: KeyboardEvent) => {
+        switch (e.key) {
+          case 'ArrowLeft':
+            e.preventDefault();
+            this.goToPrev();
+            break;
+          case 'ArrowRight':
+            e.preventDefault();
+            this.goToNext();
+            break;
+          case 'Home':
+            e.preventDefault();
+            this.goToSlide(0);
+            break;
+          case 'End':
+            e.preventDefault();
+            this.goToSlide(this.slides.length - 1);
+            break;
+        }
+      });
+
+      // Touch/drag support
+      let startX = 0;
+      let dragging = false;
+      this.viewport.addEventListener('touchstart', (e) => {
+        dragging = true;
+        startX = e.touches[0].clientX;
+      }, { passive: true });
+      this.viewport.addEventListener('touchend', (e) => {
+        if (!dragging) return;
+        dragging = false;
+        const diff = e.changedTouches[0].clientX - startX;
+        const threshold = 50;
+        if (diff < -threshold) this.goToNext();
+        else if (diff > threshold) this.goToPrev();
+      }, { passive: true });
+
+      // Start autoplay
+      this.resetAutoplay();
+    }
+
+    disconnectedCallback() {
+      this.clearAutoplay();
+    }
+
+    private updateTrackTransition() {
+      if (!this.track) return;
+      if (this.prefersReducedMotion) {
+        this.track.style.transition = 'opacity 500ms ease';
+      } else {
+        this.track.style.transition = 'transform 700ms ease-out';
+      }
+    }
+
+    private goToSlide(index: number) {
+      if (index < 0 || index >= this.slides.length || !this.track) return;
+      this.currentSlide = index;
+
+      // Move track
+      this.track.style.transform = `translateX(-${index * 100}%)`;
+
+      // Update slide tabindex
+      this.slides.forEach((slide, i) => {
+        slide.tabIndex = i === index ? 0 : -1;
+      });
+
+      // Update dots
+      this.dots.forEach((dot, i) => {
+        const isActive = i === index;
+        dot.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        dot.className = `h-2 w-2 rounded-full transition-all ${
+          isActive ? 'bg-gray-900' : 'bg-gray-400 hover:bg-gray-600'
+        }`;
+      });
+
+      this.resetAutoplay();
+    }
+
+    private goToNext() {
+      const next = (this.currentSlide + 1) % this.slides.length;
+      this.goToSlide(next);
+    }
+
+    private goToPrev() {
+      const prev = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+      this.goToSlide(prev);
+    }
+
+    private togglePlayPause() {
+      this.isPlaying = !this.isPlaying;
+
+      if (this.pauseIcon && this.playIcon && this.playPauseBtn) {
+        this.pauseIcon.classList.toggle('hidden', !this.isPlaying);
+        this.playIcon.classList.toggle('hidden', this.isPlaying);
+        this.playPauseBtn.setAttribute(
+          'aria-label',
+          this.isPlaying ? 'Pause carousel' : 'Play carousel'
+        );
+      }
+
+      this.resetAutoplay();
+    }
+
+    private resetAutoplay() {
+      this.clearAutoplay();
+      if (this.isPlaying && !this.isFocused) {
+        this.autoplayInterval = setInterval(() => this.goToNext(), 15000);
+      }
+    }
+
+    private clearAutoplay() {
+      if (this.autoplayInterval) {
+        clearInterval(this.autoplayInterval);
+        this.autoplayInterval = null;
+      }
+    }
+  }
+
+  customElements.define('astro-carousel', AstroCarousel);
+</script>

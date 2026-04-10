@@ -1,12 +1,8 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { HeaderIsland } from "./Header.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
-const { page } = useSitecore();
-const isEditing = page?.mode?.isEditing ?? false;
 
 const variant = params?.FieldNames || params?.Variant || 'Default';
 const styles = params?.styles || '';
@@ -15,7 +11,7 @@ const sf = (f: any) => f?.value ?? '';
 const si = (f: any) => ({ src: f?.value?.src ?? '', alt: f?.value?.alt ?? '' });
 const sl = (f: any) => ({ href: f?.value?.href ?? '', text: f?.value?.text ?? '', target: f?.value?.target ?? '' });
 
-const fieldData = fields ? {
+const f = fields ? {
   Tagline: sf(fields.Tagline),
   Heading: sf(fields.Heading),
   Body: sf(fields.Body),
@@ -24,16 +20,103 @@ const fieldData = fields ? {
   Image: si(fields.Image),
   FormDisclaimer: sf(fields.FormDisclaimer),
 } : null;
+
+const cfg: Record<string, any> = {
+  Default: {}, Header1: { centered: true }, Header2: { withColumns: true },
+  Header3: { withBackgroundImage: true }, Header4: { centered: true, withBackgroundImage: true },
+  Header5: { withColumns: true, withBackgroundImage: true }, Header6: { withForm: true },
+  Header7: { centered: true, withForm: true }, Header8: { withColumns: true, withForm: true },
+};
+
+const c = cfg[variant] || {};
+const centered = c.centered || false;
+const withColumns = c.withColumns || false;
+const withBackgroundImage = c.withBackgroundImage || false;
+const withForm = c.withForm || false;
+const isSpecialVariant = variant === 'Header9' || variant === 'Header10';
 ---
 
-{fieldData ? (
-  <HeaderIsland
-    client:visible
-    variant={variant}
-    styles={styles}
-    fields={fieldData}
-    isEditing={isEditing}
-  />
+{f ? (
+  variant === 'Header9' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid gap-4 items-center lg:grid-cols-2 fade-section fade-up" data-fade-section>
+          <div>
+            {f.Tagline && <p class="text-xs font-semibold tracking-widest uppercase mb-4">{f.Tagline}</p>}
+            <h1 class="text-6xl font-medium mb-6">{f.Heading}</h1>
+            {f.Body && <div class="text-lg" set:html={f.Body} />}
+            <div class="flex gap-4 mt-8">
+              {f.Link1.href && <a href={f.Link1.href} target={f.Link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground ring-offset-background transition-colors hover:bg-secondary/80">{f.Link1.text}</a>}
+              {f.Link2.href && <a href={f.Link2.href} target={f.Link2.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground">{f.Link2.text}</a>}
+            </div>
+          </div>
+          <div><div class="backdrop-blur-lg p-6 rounded-2xl">{f.Image.src && <img src={f.Image.src} alt={f.Image.alt} class="w-full h-auto rounded-2xl" loading="lazy" />}</div></div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'Header10' ? (
+    <section class={`relative py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {f.Tagline && <p class="text-xs font-semibold tracking-widest uppercase mb-4">{f.Tagline}</p>}
+          <h2 class="text-4xl font-bold mb-6">{f.Heading}</h2>
+          {f.Body && <div class="text-base" set:html={f.Body} />}
+          <div class="flex gap-4 mt-8">
+            {f.Link1.href && <a href={f.Link1.href} class="flex items-center gap-2 text-base text-primary font-medium">{f.Link1.text} &rsaquo;</a>}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class={`relative py-24 px-4 ${styles}`} data-class-change>
+      {withBackgroundImage && (
+        <div class="absolute inset-0 h-full w-full z-1">
+          {f.Image.src && <img src={f.Image.src} alt={f.Image.alt} class="h-full w-full object-cover brightness-50" loading="lazy" />}
+        </div>
+      )}
+      <div class={`container mx-auto ${withBackgroundImage ? 'relative text-white z-2' : ''}`}>
+        <div class={`${withColumns ? 'grid gap-x-12 lg:grid-cols-2' : 'max-w-3xl flex flex-col'} ${centered ? 'mx-auto items-center text-center max-w-4xl' : ''} fade-section fade-up`} data-fade-section>
+          <div>
+            {f.Tagline && <p class="text-xs font-semibold tracking-widest uppercase mb-4">{f.Tagline}</p>}
+            <h1 class="text-5xl font-medium mb-6">{f.Heading}</h1>
+          </div>
+          <div>
+            {f.Body && <div class="text-base" set:html={f.Body} />}
+            {withForm ? (
+              <div class={`flex w-full ${centered ? 'justify-center' : ''} gap-2 mt-8`}>
+                <div class="max-w-[30rem]">
+                  <div class="flex gap-4">
+                    <input type="email" placeholder="Enter your email" class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+                    <button type="submit" class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">Subscribe</button>
+                  </div>
+                  {f.FormDisclaimer && <div class="text-xs mt-3" set:html={f.FormDisclaimer} />}
+                </div>
+              </div>
+            ) : (
+              <div class={`flex ${centered ? 'justify-center' : ''} gap-4 mt-8`}>
+                {f.Link1.href && <a href={f.Link1.href} target={f.Link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground ring-offset-background transition-colors hover:bg-secondary/80">{f.Link1.text}</a>}
+                {f.Link2.href && <a href={f.Link2.href} target={f.Link2.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground">{f.Link2.text}</a>}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 ) : (
   <div class="is-empty-hint">Header</div>
 )}
+
+<script>
+  document.querySelectorAll('[data-fade-section]').forEach((el) => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          el.classList.add('is-visible');
+          observer.unobserve(el);
+        }
+      });
+    });
+    observer.observe(el);
+  });
+</script>

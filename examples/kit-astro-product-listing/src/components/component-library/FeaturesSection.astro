@@ -1,7 +1,6 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
 import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { FeaturesSectionIsland } from "./FeaturesSection.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -29,7 +28,7 @@ const features = (datasource?.children?.results ?? []).map((f: any) => ({
   featureLink2: sl(f.featureLink2),
 }));
 
-const sectionData = {
+const d = {
   heading: sf(datasource?.heading),
   tagLine: sf(datasource?.tagLine),
   body: sf(datasource?.body),
@@ -37,18 +36,946 @@ const sectionData = {
   link1: sl(datasource?.link1),
   link2: sl(datasource?.link2),
 };
+
+const firstId = features[0]?.id || '';
 ---
 
 {datasource ? (
-  <FeaturesSectionIsland
-    client:visible
-    variant={variant}
-    styles={styles}
-    renderingId={id}
-    sectionData={sectionData}
-    features={features}
-    isEditing={isEditing}
-  />
+  variant === 'Default' || variant === 'FeaturesSection1' || variant === 'FeaturesSection2' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 items-center gap-x-20 gap-y-12">
+          <div>
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+            {d.body && <div class="text-lg" set:html={d.body} />}
+            <div class={`${variant === 'FeaturesSection2' ? 'grid gap-y-4' : 'grid md:grid-cols-2 gap-x-8 gap-y-12'} my-8`}>
+              {features.map((f) => (
+                variant === 'FeaturesSection1' ? (
+                  <div class="flex gap-4 items-start">
+                    {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 w-[30px] h-[30px]" loading="lazy" />}
+                    <div>
+                      <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                      <p>{f.featureDescription}</p>
+                    </div>
+                  </div>
+                ) : variant === 'FeaturesSection2' ? (
+                  <div>
+                    <div class="flex gap-4 items-start">
+                      {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="w-5 h-5" loading="lazy" />}
+                      <h3>{f.featureDescription}</h3>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                    <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                    <p>{f.featureDescription}</p>
+                  </div>
+                )
+              ))}
+            </div>
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+          <div>
+            {d.image.src && <img src={d.image.src} alt={d.image.alt} class="aspect-square object-cover" loading="lazy" />}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection3' || variant === 'FeaturesSection4' || variant === 'FeaturesSection5' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-4">
+          <div>
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-bold">{d.heading}</h2>
+          </div>
+          <div>
+            {d.body && <div class="text-lg" set:html={d.body} />}
+            <div class={`${variant === 'FeaturesSection5' ? 'grid gap-y-4' : 'grid md:grid-cols-2 gap-x-8 gap-y-12'} my-8`}>
+              {features.map((f) => (
+                variant === 'FeaturesSection4' ? (
+                  <div class="flex gap-4 items-start">
+                    {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 w-[30px] h-[30px]" loading="lazy" />}
+                    <div>
+                      <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                      <p>{f.featureDescription}</p>
+                    </div>
+                  </div>
+                ) : variant === 'FeaturesSection5' ? (
+                  <div>
+                    <div class="flex gap-4 items-start">
+                      {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="w-5 h-5" loading="lazy" />}
+                      <h3>{f.featureDescription}</h3>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                    <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                    <p>{f.featureDescription}</p>
+                  </div>
+                )
+              ))}
+            </div>
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+        </div>
+        {d.image.src && <img src={d.image.src} alt={d.image.alt} class="w-full aspect-16/9 object-cover mt-20" loading="lazy" />}
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection6' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-4">
+          <div>
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+            {d.body && <div class="text-lg mb-8" set:html={d.body} />}
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+          <div>
+            <div class="grid gap-y-4">
+              {features.map((f, i) => (
+                <div class="flex gap-8 py-10">
+                  <div class="shrink-0 relative">
+                    {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 w-10 h-10" loading="lazy" />}
+                    {i !== features.length - 1 && <span class="absolute top-18 bottom-0 left-[calc(50%-1px)] w-[2px] h-full bg-black"></span>}
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                    <p>{f.featureDescription}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection7' || variant === 'FeaturesSection8' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-16">
+          {features.map((f) => (
+            variant === 'FeaturesSection8' ? (
+              <div>
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="aspect-3/2 w-full object-cover mb-4" loading="lazy" />}
+                <p class="font-semibold mb-4">{f.featureTagLine}</p>
+                <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                <p class="mb-6">{f.featureDescription}</p>
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                  {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                </div>
+              </div>
+            ) : (
+              <div>
+                {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                <p class="mb-6">{f.featureDescription}</p>
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                  {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                </div>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection9' || variant === 'FeaturesSection10' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-12">
+          <div>
+            {d.image.src && <img src={d.image.src} alt={d.image.alt} class="w-full h-full object-cover" loading="lazy" />}
+          </div>
+          <div class={`${variant === 'FeaturesSection9' ? 'grid md:grid-cols-2 gap-x-8 gap-y-12' : 'grid gap-x-8 gap-y-12'} py-8`}>
+            {features.map((f) => (
+              variant === 'FeaturesSection10' ? (
+                <div class="flex gap-4 items-start">
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 w-[30px] h-[30px]" loading="lazy" />}
+                  <div>
+                    <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                    <p>{f.featureDescription}</p>
+                    <div class="flex flex-wrap gap-6 mt-4">
+                      {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                      {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                  <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                  <p>{f.featureDescription}</p>
+                  <div class="flex flex-wrap gap-6 mt-4">
+                    {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                    {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                  </div>
+                </div>
+              )
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection11' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg" set:html={d.body} />}
+        </div>
+        <div class="grid grid-flow-dense md:grid-cols-3 gap-x-20 gap-y-12 my-12">
+          {d.image.src && <img src={d.image.src} alt={d.image.alt} class="w-full h-full object-cover md:row-span-2 md:col-start-2" loading="lazy" />}
+          {features.map((f) => (
+            <div class="flex flex-col items-center text-center my-4">
+              {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+              <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+              <p>{f.featureDescription}</p>
+            </div>
+          ))}
+        </div>
+        <div class="flex justify-center">
+          <div class="flex flex-wrap gap-6 mt-4">
+            {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+            {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection12' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change data-feature-click-panels data-active-id={firstId}>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-12">
+          <div>
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+            {d.body && <div class="text-lg" set:html={d.body} />}
+            <div class="grid my-8">
+              {features.map((f) => (
+                <div data-click-panel-trigger={f.id} class={`ps-6 py-4 cursor-pointer border-s-2 ${f.id !== firstId ? 'border-transparent' : ''}`}>
+                  <h3 class="text-2xl font-bold mb-2">{f.featureHeading}</h3>
+                  <p>{f.featureDescription}</p>
+                </div>
+              ))}
+            </div>
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+          <div class="relative min-h-80">
+            {features.map((f) => (
+              <div data-click-panel-image={f.id} class={`absolute inset-0 transition-opacity duration-300 ${f.id !== firstId ? 'opacity-0' : 'opacity-100'}`}>
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="w-full h-full object-cover" loading="lazy" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection13' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change data-feature-accordion-panels data-active-id={firstId}>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex justify-center">
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 items-center gap-x-20 gap-y-12 mt-20">
+          <div class="relative aspect-square">
+            {features.map((f) => (
+              <div data-accordion-panel-image={f.id} class={`absolute inset-0 transition-opacity duration-300 ${f.id !== firstId ? 'opacity-0' : 'opacity-100'}`}>
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="absolute inset-0 w-full h-full object-cover" loading="lazy" />}
+              </div>
+            ))}
+          </div>
+          <div class="grid my-8">
+            {features.map((f) => (
+              <details data-feature-accordion-tab={f.id} class={`group py-4 border-b transition-opacity duration-300 ${f.id !== firstId ? 'opacity-25' : ''}`} open={f.id === firstId}>
+                <summary class="cursor-pointer list-none hover:no-underline">
+                  <div class="flex gap-6 items-center justify-between">
+                    <div class="flex gap-6">
+                      {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 w-8 h-8" loading="lazy" />}
+                      <h3 class="text-3xl font-bold mb-2">{f.featureHeading}</h3>
+                    </div>
+                    <svg class="shrink-0 w-4 h-4 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
+                </summary>
+                <p class="ps-14 pt-2">{f.featureDescription}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection14' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex justify-center">
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-8 mt-12">
+          {features.map((f) => (
+            <div class={`relative flex flex-col justify-center ${features.length < 3 ? 'p-12' : 'p-8'} text-white`}>
+              {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="absolute w-full h-full object-cover inset-0 brightness-50 z-10" loading="lazy" />}
+              <div class="relative z-20">
+                {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class={`inline-block ${features.length < 3 ? 'mb-6' : 'mb-4'} w-12 h-12`} loading="lazy" />}
+                <h3 class={`${features.length < 3 ? 'text-4xl' : 'text-3xl'} font-bold ${features.length < 3 ? 'mb-6' : 'mb-4'}`}>{f.featureHeading}</h3>
+                <p class={features.length < 3 ? 'mb-6' : ''}>{f.featureDescription}</p>
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                  {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection15' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex justify-center">
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-flow-dense gap-8 md:grid-cols-4 mt-12">
+          {features.map((f, i) => {
+            const isLarge = i === 0 || i === 3;
+            return (
+              <div class={`relative flex flex-col justify-center ${isLarge ? 'p-12' : 'p-8'} text-white ${i === 0 ? 'md:col-span-2 md:row-span-2' : ''} ${i === 3 ? 'md:col-span-2' : ''}`}>
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="absolute w-full h-full object-cover inset-0 brightness-50 z-10" loading="lazy" />}
+                <div class="relative z-20">
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class={`inline-block ${isLarge ? 'mb-6' : 'mb-4'} w-12 h-12`} loading="lazy" />}
+                  <h3 class={`${isLarge ? 'text-4xl' : 'text-3xl'} font-bold ${isLarge ? 'mb-6' : 'mb-4'}`}>{f.featureHeading}</h3>
+                  <p class={isLarge ? 'mb-6' : ''}>{f.featureDescription}</p>
+                  <div class="flex flex-wrap gap-6 mt-4">
+                    {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                    {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection16' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="relative basis-[150%] p-12">
+            {d.image.src && <img src={d.image.src} alt={d.image.alt} class="absolute inset-0 w-full h-full object-cover brightness-50 z-10" loading="lazy" />}
+            <div class="relative h-full flex flex-col justify-center max-w-2xl mx-auto text-white text-center z-20">
+              {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+              <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+              {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+              <div class="flex justify-center">
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+                  {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid gap-8 basis-[100%]">
+            {features.map((f) => (
+              <div class="flex flex-col items-center text-center border p-8">
+                {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                <p class="mb-6">{f.featureDescription}</p>
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                  {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection17' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex flex-wrap gap-6 mt-4">
+            {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+            {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+          </div>
+        </div>
+        <div data-feature-tabs class="grid md:grid-cols-3 mt-20">
+          <div role="tablist" class="flex flex-col">
+            {features.map((f, i) => (
+              <button data-tab-trigger={f.id} class={`text-left px-6 py-4 border-b md:border-b-0 md:border-e ${i === 0 ? 'md:border-e-transparent' : ''} ${i === features.length - 1 ? 'md:border-b' : ''}`} aria-selected={i === 0 ? 'true' : 'false'}>
+                <p class="text-xl font-bold">{f.featureTagLine}</p>
+              </button>
+            ))}
+          </div>
+          {features.map((f, i) => (
+            <div data-tab-panel={f.id} class={`md:border-t md:border-s-0 md:col-span-2 md:p-16 p-6 ${i !== 0 ? 'hidden' : ''}`}>
+              <div class="max-w-2xl">
+                {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-[50px] h-[50px]" loading="lazy" />}
+                <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                <p class="mb-6">{f.featureDescription}</p>
+                <div class="flex flex-wrap gap-6 mt-4">
+                  {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                  {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection18' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex flex-wrap gap-6 mt-4">
+            {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+            {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+          </div>
+        </div>
+        <div data-feature-tabs class="mt-20">
+          <div role="tablist" class="flex border-b">
+            {features.map((f, i) => (
+              <button data-tab-trigger={f.id} class={`px-6 py-4 border-b-2 ${i === 0 ? 'border-current' : 'border-transparent'}`} aria-selected={i === 0 ? 'true' : 'false'}>
+                <p class="text-xl font-bold">{f.featureTagLine}</p>
+              </button>
+            ))}
+          </div>
+          {features.map((f, i) => (
+            <div data-tab-panel={f.id} class={`py-8 ${i !== 0 ? 'hidden' : ''}`}>
+              <div class="grid md:grid-cols-2 items-center gap-8">
+                <div>
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-[50px] h-[50px]" loading="lazy" />}
+                  <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                  <p class="mb-6">{f.featureDescription}</p>
+                  <div class="flex flex-wrap gap-6 mt-4">
+                    {f.featureLink1.href && <a href={f.featureLink1.href} target={f.featureLink1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{f.featureLink1.text}</a>}
+                    {f.featureLink2.href && <a href={f.featureLink2.href} target={f.featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{f.featureLink2.text}</a>}
+                  </div>
+                </div>
+                <div>
+                  {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="w-full mb-4" loading="lazy" />}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection19' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change data-feature-horizontal-accordion>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+          {d.body && <div class="text-lg mb-6" set:html={d.body} />}
+          <div class="flex flex-wrap gap-6 mt-4">
+            {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+            {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row mt-20">
+          {features.map((f, i) => (
+            <div data-h-accordion-item={f.id} class={`flex flex-col md:flex-row border border-b-0 md:border-b md:border-e-0 md:last:border-e last:border-b ${i === 0 ? 'md:basis-full' : ''}`}>
+              <button data-h-accordion-trigger={f.id} class="px-10 py-8 cursor-pointer hover:no-underline text-left">
+                <div class="flex md:flex-col items-center gap-6 w-full md:h-full">
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="shrink-0 md:mb-auto w-6 h-6" loading="lazy" />}
+                  <p class="text-2xl font-bold mx-auto md:mx-0 md:[writing-mode:vertical-rl] md:rotate-180">{f.featureTagLine}</p>
+                </div>
+              </button>
+              <div data-h-accordion-content={f.id} class={`w-full px-10 py-12 ${i !== 0 ? 'hidden' : ''}`}>
+                <div class="max-w-2xl">
+                  <h3 class="text-4xl font-bold mb-6">{f.featureHeading}</h3>
+                  <p>{f.featureDescription}</p>
+                  {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="mt-10 max-w-full" loading="lazy" />}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection20' ? (
+    <section class={`py-12 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <ul class="flex flex-wrap justify-center gap-8">
+          {features.map((f) => (
+            <li class="flex flex-col items-center gap-4">
+              {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="w-10 h-10" loading="lazy" />}
+              {f.featureLink1.href && <a href={f.featureLink1.href} class="text-base text-primary font-medium underline text-center">{f.featureLink1.text}</a>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection21' ? (
+    <section class={`py-24 px-4 ${styles}`} id={id || undefined} data-class-change data-feature-accordion-panels data-active-id={firstId}>
+      <div class="container mx-auto">
+        <div data-fade-section class="fade-section fade-up">
+          {d.tagLine && <p class="text-xs font-semibold tracking-widest uppercase mb-4">{d.tagLine}</p>}
+          <h2 class="text-5xl font-medium">{d.heading}</h2>
+        </div>
+        <div data-fade-section class="grid md:grid-cols-3 items-center gap-x-4 gap-y-12 mt-4 fade-section fade-up">
+          <div class="grid my-8">
+            {features.map((f) => (
+              <details data-feature-accordion-tab={f.id} class={`group relative py-4 ms-12 border-b ${f.id !== firstId ? 'opacity-25' : ''}`} open={f.id === firstId}>
+                <span data-accordion-bar={f.id} class={`absolute top-0 bottom-0 -left-12 w-[2px] bg-black transition-all duration-300 ${f.id === firstId ? 'opacity-100' : 'opacity-0'}`}></span>
+                <summary class="cursor-pointer list-none hover:no-underline">
+                  <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-semibold mb-2">{f.featureHeading}</h3>
+                    <svg class="shrink-0 w-4 h-4 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
+                </summary>
+                <p class="text-base pt-2">{f.featureDescription}</p>
+              </details>
+            ))}
+          </div>
+          <div class="relative aspect-3/2 md:col-span-2">
+            {features.map((f) => (
+              <div data-accordion-panel-image={f.id} class={`absolute inset-0 transition-opacity duration-300 ${f.id !== firstId ? 'opacity-0' : 'opacity-100'}`}>
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="absolute inset-0 w-full h-full object-contain" loading="lazy" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection22' ? (
+    <section class={`py-24 px-4 ${styles}`} id={id || undefined} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-3 gap-y-8 gap-x-4">
+          {features[0] && (
+            <div class="md:col-span-3 grid md:grid-cols-2 gap-8 p-2 rounded-3xl bg-white shadow-md transition-all hover:shadow-lg">
+              <div class="flex flex-col p-4">
+                <p class="font-semibold text-xs mb-auto">{features[0].featureTagLine}</p>
+                <h3 class="text-3xl font-medium mb-6 mt-4">{features[0].featureHeading}</h3>
+                <p class="text-base mb-4">{features[0].featureDescription}</p>
+                <div class="mt-auto">
+                  {features[0].featureLink1.href && <a href={features[0].featureLink1.href} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground mr-2">{features[0].featureLink1.text}</a>}
+                  {features[0].featureLink2.href && <a href={features[0].featureLink2.href} target={features[0].featureLink2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{features[0].featureLink2.text}</a>}
+                </div>
+              </div>
+              {features[0].featureImage.src && <img src={features[0].featureImage.src} alt={features[0].featureImage.alt} class="w-full h-auto rounded-2xl" loading="lazy" />}
+            </div>
+          )}
+          {features.slice(1).map((f) => (
+            <div class="group flex flex-col p-2 rounded-3xl bg-white shadow-md transition-all hover:shadow-lg">
+              <div class="w-full h-full rounded-2xl overflow-hidden mb-4">
+                {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="w-full aspect-7/3 object-cover rounded-2xl transition-transform duration-1000 ease-in-out group-hover:scale-115" loading="lazy" />}
+              </div>
+              <div class="flex flex-col basis-full p-4">
+                <p class="font-semibold text-xs mb-2">{f.featureTagLine}</p>
+                <h3 class="text-xl font-medium mb-4">{f.featureHeading}</h3>
+                <p class="text-base mb-6">{f.featureDescription}</p>
+                <div class="mt-auto">
+                  <div class="flex flex-wrap items-center gap-6 mt-4">
+                    {f.featureLink1.href && (
+                      <a href={f.featureLink1.href} class="flex items-center gap-2 text-sm font-bold">
+                        <span class="p-2 bg-black rounded-md"><svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+                        {f.featureLink1.text}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection23' || variant === 'FeaturesSection24' ? (
+    <section class={`py-24 ${styles}`} id={id || undefined} data-class-change>
+      <div class="container px-4 pb-4 mx-auto">
+        <div class="flex flex-wrap justify-between">
+          <div data-fade-section class="fade-section fade-up">
+            {d.tagLine && <p class="text-xs font-semibold tracking-widest uppercase mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-medium mb-6">{d.heading}</h2>
+          </div>
+          <div>
+            {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium">{d.link1.text}</a>}
+          </div>
+        </div>
+      </div>
+      <div class="overflow-hidden" data-fade-section>
+        <astro-features-carousel class="container mx-auto block">
+          <div data-carousel-viewport class="overflow-hidden">
+            <div data-carousel-track class="flex px-4 gap-4 transition-transform duration-300">
+              {features.map((f, i) => (
+                <div data-carousel-slide class="min-w-0 shrink-0 basis-full md:basis-1/2 lg:basis-1/3">
+                  {variant === 'FeaturesSection24' ? (
+                    <div class={`flex flex-col p-2 rounded-3xl bg-white shadow-md transition-all hover:shadow-lg h-full fade-section fade-side`} style={!isEditing ? `transform: translateX(${i * 200}px)` : ''}>
+                      <div class="self-start border p-3 m-4 mb-0 rounded-md">
+                        {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="aspect-square w-6 object-contain" loading="lazy" />}
+                      </div>
+                      <div class="flex flex-col basis-full p-4">
+                        <p class="font-semibold text-xs mb-2">{f.featureTagLine}</p>
+                        <h3 class="text-xl font-medium mb-4">{f.featureHeading}</h3>
+                        <div class="mt-auto">
+                          <div class="flex flex-wrap items-center gap-6 mt-4">
+                            {f.featureLink1.href && (
+                              <a href={f.featureLink1.href} class="flex items-center gap-2 text-sm font-bold">
+                                <span class="p-2 bg-black rounded-md"><svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+                                {f.featureLink1.text}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div class={`group flex flex-col p-2 rounded-3xl bg-white shadow-md transition-all hover:shadow-lg h-full fade-section fade-side`} style={!isEditing ? `transform: translateX(${i * 200}px)` : ''}>
+                      <div class="w-full h-full rounded-2xl overflow-hidden mb-4">
+                        {f.featureImage.src && <img src={f.featureImage.src} alt={f.featureImage.alt} class="w-full aspect-7/3 object-cover rounded-2xl transition-transform duration-1000 ease-in-out group-hover:scale-115" loading="lazy" />}
+                      </div>
+                      <div class="flex flex-col basis-full p-4">
+                        <p class="font-semibold text-xs mb-2">{f.featureTagLine}</p>
+                        <h3 class="text-xl font-medium mb-4">{f.featureHeading}</h3>
+                        <p class="text-base mb-6">{f.featureDescription}</p>
+                        <div class="mt-auto">
+                          <div class="flex flex-wrap items-center gap-6 mt-4">
+                            {f.featureLink1.href && (
+                              <a href={f.featureLink1.href} class="flex items-center gap-2 text-sm font-bold">
+                                <span class="p-2 bg-black rounded-md"><svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>
+                                {f.featureLink1.text}
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="static flex items-center gap-2 px-4 pt-8">
+            <button data-carousel-prev class="inline-flex items-center justify-center border border-black w-12 h-12 rounded-full bg-transparent hover:bg-transparent hover:text-black">
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button data-carousel-next class="inline-flex items-center justify-center border border-black w-12 h-12 rounded-full bg-transparent hover:bg-transparent hover:text-black">
+              <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </astro-features-carousel>
+      </div>
+    </section>
+  ) :
+
+  variant === 'FeaturesSection25' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto bg-[#FFF8F3]">
+        <div class="grid lg:grid-cols-3 gap-x-20 gap-y-4 px-16 py-12">
+          <div class="max-w-[20rem]">
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-3xl font-semibold">{d.heading}</h2>
+            {d.body && <div class="text-lg mb-8" set:html={d.body} />}
+            {d.link1.href && <a href={d.link1.href} class="flex items-center gap-2 text-base text-primary font-medium">{d.link1.text} &rsaquo;</a>}
+          </div>
+          <div class="md:col-span-2">
+            <ul class="grid md:grid-cols-4 gap-x-8 gap-y-12 my-8">
+              {features.map((f) => (
+                <li class="flex flex-col items-center gap-4">
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="w-[30px] h-[30px]" loading="lazy" />}
+                  <h3 class="text-sm font-semibold text-center">{f.featureHeading}</h3>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) :
+
+  (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 items-center gap-x-20 gap-y-12">
+          <div>
+            {d.tagLine && <p class="font-semibold mb-4">{d.tagLine}</p>}
+            <h2 class="text-5xl font-bold mb-6">{d.heading}</h2>
+            {d.body && <div class="text-lg" set:html={d.body} />}
+            <div class="grid md:grid-cols-2 gap-x-8 gap-y-12 my-8">
+              {features.map((f) => (
+                <div>
+                  {f.featureIcon.src && <img src={f.featureIcon.src} alt={f.featureIcon.alt} class="mb-4 w-12 h-12" loading="lazy" />}
+                  <h3 class="text-xl font-bold mb-4">{f.featureHeading}</h3>
+                  <p>{f.featureDescription}</p>
+                </div>
+              ))}
+            </div>
+            <div class="flex flex-wrap gap-6 mt-4">
+              {d.link1.href && <a href={d.link1.href} target={d.link1.target || undefined} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">{d.link1.text}</a>}
+              {d.link2.href && <a href={d.link2.href} target={d.link2.target || undefined} class="inline-flex items-center px-0 text-sm font-medium underline-offset-4 hover:underline">{d.link2.text}</a>}
+            </div>
+          </div>
+          <div>
+            {d.image.src && <img src={d.image.src} alt={d.image.alt} class="aspect-square object-cover" loading="lazy" />}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 ) : (
   <div class="is-empty-hint">Features Section</div>
 )}
+
+<script>
+  // --- Tab switching (FeaturesSection17, FeaturesSection18) ---
+  document.querySelectorAll('[data-feature-tabs]').forEach((tabRoot) => {
+    const triggers = tabRoot.querySelectorAll<HTMLButtonElement>('[data-tab-trigger]');
+    const panels = tabRoot.querySelectorAll<HTMLElement>('[data-tab-panel]');
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const id = trigger.getAttribute('data-tab-trigger')!;
+        triggers.forEach((t) => {
+          t.setAttribute('aria-selected', t === trigger ? 'true' : 'false');
+          // For vertical tabs (section17): toggle border-e-transparent
+          if (t.classList.contains('md:border-e')) {
+            t.classList.toggle('md:border-e-transparent', t === trigger);
+          }
+          // For horizontal tabs (section18): toggle border color
+          if (t.classList.contains('border-b-2')) {
+            t.classList.toggle('border-current', t === trigger);
+            t.classList.toggle('border-transparent', t !== trigger);
+          }
+        });
+        panels.forEach((p) => {
+          p.classList.toggle('hidden', p.getAttribute('data-tab-panel') !== id);
+        });
+      });
+    });
+  });
+
+  // --- Click-to-switch panels (FeaturesSection12) ---
+  document.querySelectorAll('[data-feature-click-panels]').forEach((root) => {
+    const triggers = root.querySelectorAll<HTMLElement>('[data-click-panel-trigger]');
+    const images = root.querySelectorAll<HTMLElement>('[data-click-panel-image]');
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const id = trigger.getAttribute('data-click-panel-trigger')!;
+        triggers.forEach((t) => {
+          t.classList.toggle('border-transparent', t.getAttribute('data-click-panel-trigger') !== id);
+          t.classList.toggle('border-s-2', true);
+        });
+        images.forEach((img) => {
+          const isActive = img.getAttribute('data-click-panel-image') === id;
+          img.classList.toggle('opacity-0', !isActive);
+          img.classList.toggle('opacity-100', isActive);
+        });
+      });
+    });
+  });
+
+  // --- Accordion + image switching (FeaturesSection13, FeaturesSection21) ---
+  document.querySelectorAll('[data-feature-accordion-panels]').forEach((root) => {
+    const accordions = root.querySelectorAll<HTMLDetailsElement>('[data-feature-accordion-tab]');
+    const images = root.querySelectorAll<HTMLElement>('[data-accordion-panel-image]');
+    const bars = root.querySelectorAll<HTMLElement>('[data-accordion-bar]');
+
+    accordions.forEach((details) => {
+      details.addEventListener('toggle', () => {
+        if (!details.open) return;
+        const id = details.getAttribute('data-feature-accordion-tab')!;
+
+        // Close other accordions
+        accordions.forEach((d) => {
+          if (d !== details) d.open = false;
+          d.classList.toggle('opacity-25', d !== details);
+          d.classList.remove('opacity-25');
+        });
+        // Set opacity on non-active items
+        accordions.forEach((d) => {
+          if (d !== details) {
+            d.style.opacity = '0.25';
+          } else {
+            d.style.opacity = '1';
+          }
+        });
+
+        // Switch images
+        images.forEach((img) => {
+          const isActive = img.getAttribute('data-accordion-panel-image') === id;
+          img.classList.toggle('opacity-0', !isActive);
+          img.classList.toggle('opacity-100', isActive);
+        });
+
+        // Toggle side bars (FeaturesSection21)
+        bars.forEach((bar) => {
+          const isActive = bar.getAttribute('data-accordion-bar') === id;
+          bar.classList.toggle('opacity-0', !isActive);
+          bar.classList.toggle('opacity-100', isActive);
+        });
+      });
+    });
+  });
+
+  // --- Horizontal accordion (FeaturesSection19) ---
+  document.querySelectorAll('[data-feature-horizontal-accordion]').forEach((root) => {
+    const triggers = root.querySelectorAll<HTMLButtonElement>('[data-h-accordion-trigger]');
+    const contents = root.querySelectorAll<HTMLElement>('[data-h-accordion-content]');
+    const items = root.querySelectorAll<HTMLElement>('[data-h-accordion-item]');
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const id = trigger.getAttribute('data-h-accordion-trigger')!;
+        contents.forEach((c) => {
+          c.classList.toggle('hidden', c.getAttribute('data-h-accordion-content') !== id);
+        });
+        items.forEach((item) => {
+          item.classList.toggle('md:basis-full', item.getAttribute('data-h-accordion-item') === id);
+        });
+      });
+    });
+  });
+
+  // --- Carousel (FeaturesSection23, FeaturesSection24) ---
+  class AstroFeaturesCarousel extends HTMLElement {
+    connectedCallback() {
+      const track = this.querySelector<HTMLElement>('[data-carousel-track]');
+      const prevBtn = this.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+      const nextBtn = this.querySelector<HTMLButtonElement>('[data-carousel-next]');
+      const slides = this.querySelectorAll<HTMLElement>('[data-carousel-slide]');
+      if (!track || !prevBtn || !nextBtn || slides.length === 0) return;
+
+      let current = 0;
+      const getVisible = () => {
+        const w = window.innerWidth;
+        if (w >= 1024) return 3;
+        if (w >= 768) return 2;
+        return 1;
+      };
+
+      const update = () => {
+        const visible = getVisible();
+        const max = Math.max(0, slides.length - visible);
+        current = Math.min(current, max);
+        const pct = (current / slides.length) * 100;
+        track.style.transform = `translateX(-${pct}%)`;
+      };
+
+      prevBtn.addEventListener('click', () => { current = Math.max(0, current - 1); update(); });
+      nextBtn.addEventListener('click', () => { const visible = getVisible(); current = Math.min(slides.length - visible, current + 1); update(); });
+      window.addEventListener('resize', update);
+    }
+  }
+  if (!customElements.get('astro-features-carousel')) {
+    customElements.define('astro-features-carousel', AstroFeaturesCarousel);
+  }
+
+  // --- IntersectionObserver for fade-in (FeaturesSection21, 23, 24) ---
+  const fadeSections = document.querySelectorAll('[data-fade-section]');
+  if (fadeSections.length > 0) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            // Also reveal child fade-side/fade-up elements
+            entry.target.querySelectorAll('.fade-section').forEach((el) => el.classList.add('is-visible'));
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    fadeSections.forEach((el) => observer.observe(el));
+  }
+</script>
+
+<style>
+  .fade-section {
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up {
+    transform: translateY(20px);
+  }
+  .fade-side {
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-section.is-visible {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+</style>

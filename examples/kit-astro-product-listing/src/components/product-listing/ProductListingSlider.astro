@@ -1,7 +1,6 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
 import { useDictionary } from "@exdst-sitecore-content-sdk/astro/context";
-import { ProductListingIsland } from "./ProductListing.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -23,21 +22,88 @@ const products = (datasource?.products?.targetItems ?? []).map((item: any) => ({
 }));
 
 const styles = params?.styles || "";
+const d = {
+  drivingRange: t("Demo2_ProductListing_DrivingRange") || "Driving Range",
+  seeFullSpecs: t("Demo2_ProductListing_SeeFullSpecs") || "See Full Specs",
+  price: t("Demo2_ProductListing_Price") || "Starting at",
+};
+const viewAllHref = viewAllLink.href || "";
+const viewAllText = viewAllLink.text || "";
 ---
 
 {products.length > 0 && (
-  <ProductListingIsland
-    client:visible
-    variant="Slider"
-    title={title}
-    products={products}
-    viewAllLinkHref={viewAllLink.href || ""}
-    viewAllLinkText={viewAllLink.text || ""}
-    styles={styles}
-    dictionary={{
-      drivingRange: t("Demo2_ProductListing_DrivingRange") || "Driving Range",
-      seeFullSpecs: t("Demo2_ProductListing_SeeFullSpecs") || "See Full Specs",
-      price: t("Demo2_ProductListing_Price") || "Starting at",
-    }}
-  />
+  <section
+    class={`@container transform-gpu border-b-2 border-t-2 [.border-b-2+&]:border-t-0 ${styles}`}
+    aria-labelledby="product-listing-slider-heading"
+    data-product-spotlight
+  >
+    <div class="@md:py-20 @lg:py-28 py-12">
+      <div class="@xl:px-0 @md:pb-0 mx-auto max-w-screen-xl px-0 pb-10 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6">
+        <div>
+          <h2 id="product-listing-slider-heading" class="@md:w-1/2 w-full">{title}</h2>
+        </div>
+      </div>
+      <div class="flex gap-6 overflow-x-auto px-6 pb-4">
+        {products.map((product) => (
+          <div class="max-w-[546px] flex-shrink-0 transition-all duration-500 ease-in-out h-full" data-spotlight-card>
+            <div class="rounded-default duration-400 bg-secondary group relative self-stretch transition-all h-full w-full">
+              <div class="relative z-[2] flex h-full w-full transition-all duration-300">
+                <article class="@md:px-12 @md:py-12 font-heading relative z-10 flex w-full flex-col gap-8 px-6 py-10">
+                  <div class="relative overflow-hidden">
+                    {product.productThumbnail && <img src={product.productThumbnail} alt={product.productThumbnailAlt} class="mx-auto" />}
+                  </div>
+                  <div class="space-y-6">
+                    <div class="space-y-2">
+                      <h3 class="text-secondary-foreground text-2xl font-semibold">{product.productName}</h3>
+                      {product.productBasePrice && <p class="text-muted-foreground text-base font-light">{d.price} {product.productBasePrice}</p>}
+                    </div>
+                    <div class="border-muted-foreground border-t pt-4">
+                      <h4 class="text-secondary-foreground font-regular text-xl mb-2">{product.productFeatureTitle}</h4>
+                      <p class="text-muted-foreground text-sm font-light whitespace-pre-line">{product.productFeatureText}</p>
+                    </div>
+                    <div class="border-muted-foreground border-t pt-4">
+                      <h4 class="text-secondary-foreground font-regular text-xl">{product.productDrivingRange}</h4>
+                      <p class="text-muted-foreground text-sm font-light">{d.drivingRange}</p>
+                    </div>
+                    <div class="space-y-2 pt-2">
+                      {viewAllHref && <a href={viewAllHref} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground w-full">{viewAllText}</a>}
+                      {product.url && <a href={product.url} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-transparent px-4 py-2 text-sm font-medium w-full">{d.seeFullSpecs}</a>}
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
 )}
+
+<script>
+  document.querySelectorAll('[data-product-spotlight]').forEach((section) => {
+    const cards = section.querySelectorAll('[data-spotlight-card]');
+    cards.forEach((card) => {
+      card.addEventListener('mouseenter', () => {
+        cards.forEach((c) => {
+          if (c !== card) {
+            (c as HTMLElement).style.opacity = '0.5';
+            (c as HTMLElement).style.transform = 'scale(0.95)';
+            (c as HTMLElement).style.filter = 'blur(2px)';
+          } else {
+            (c as HTMLElement).style.transform = 'scale(1.02)';
+            (c as HTMLElement).style.zIndex = '10';
+          }
+        });
+      });
+      card.addEventListener('mouseleave', () => {
+        cards.forEach((c) => {
+          (c as HTMLElement).style.opacity = '';
+          (c as HTMLElement).style.transform = '';
+          (c as HTMLElement).style.filter = '';
+          (c as HTMLElement).style.zIndex = '';
+        });
+      });
+    });
+  });
+</script>

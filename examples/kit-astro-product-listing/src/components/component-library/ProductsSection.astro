@@ -1,6 +1,5 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { ProductsSectionIsland } from "./ProductsSection.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -23,20 +22,157 @@ const products = (datasource?.children?.results ?? []).map((p: any) => ({
   productDiscountedPrice: sf(p.productDiscountedPrice),
 }));
 
-const sectionData = {
+const d = {
   heading: sf(datasource?.heading),
   link: sl(datasource?.link),
 };
 ---
 
 {datasource ? (
-  <ProductsSectionIsland
-    client:visible
-    styles={styles}
-    renderingId={id}
-    sectionData={sectionData}
-    products={products}
-  />
+  <section class={`py-24 ${styles}`} id={id || undefined} data-class-change>
+    <div class="container px-4 mx-auto">
+      <div class="mb-8">
+        <h2 class="text-4xl font-medium mb-4">{d.heading}</h2>
+        <div class="flex gap-8">
+          <p class="text-base" data-products-count>Showing 1 through {Math.min(4, products.length)} of {products.length} items</p>
+          {d.link.href && <a href={d.link.href} class="flex items-center gap-2 text-base text-primary font-medium">{d.link.text} &rsaquo;</a>}
+        </div>
+      </div>
+      <astro-products-carousel class="block relative px-12" data-total={products.length}>
+        <div class="overflow-hidden" data-carousel-viewport>
+          <div class="flex transition-transform duration-300 ease-in-out py-4" data-carousel-track>
+            {products.map((p) => (
+              <div class="flex-shrink-0 w-full sm:w-1/2 lg:w-1/4 px-2" data-carousel-item>
+                <div class="flex flex-col items-start justify-end h-full shadow-md">
+                  {p.productImage.src && <img src={p.productImage.src} alt={p.productImage.alt} class="w-full h-auto object-cover" loading="lazy" />}
+                  <div class="flex-1 relative pt-4 px-6">
+                    {p.productTagLine && <div class="inline-block text-base font-bold px-2 py-1 mb-2 bg-[#ffb900]">{p.productTagLine}</div>}
+                    <h3 class="mb-2 text-base font-bold text-primary underline">
+                      {p.productLink.href ? <a href={p.productLink.href}>{p.productLink.text}</a> : p.productLink.text}
+                    </h3>
+                    <div class="text-base mb-4">
+                      <span>From</span>{' '}
+                      <span class={p.productDiscountedPrice ? 'opacity-70 line-through' : 'font-bold'}>{p.productPrice}</span>{' '}
+                      {p.productDiscountedPrice && <span class="font-bold">{p.productDiscountedPrice}</span>}
+                    </div>
+                    <p class="text-base mb-4">{p.productDescription}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <button data-carousel-prev class="absolute left-0 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-2 hover:bg-accent disabled:opacity-50" aria-label="Previous">
+          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button data-carousel-next class="absolute right-0 top-1/2 -translate-y-1/2 inline-flex items-center justify-center p-2 hover:bg-accent disabled:opacity-50" aria-label="Next">
+          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </astro-products-carousel>
+    </div>
+  </section>
 ) : (
   <div class="is-empty-hint">Products Section</div>
 )}
+
+<script>
+  class AstroProductsCarousel extends HTMLElement {
+    private track: HTMLElement | null = null;
+    private prevBtn: HTMLButtonElement | null = null;
+    private nextBtn: HTMLButtonElement | null = null;
+    private currentSlide = 0;
+    private total = 0;
+
+    connectedCallback() {
+      this.track = this.querySelector('[data-carousel-track]');
+      this.prevBtn = this.querySelector('[data-carousel-prev]');
+      this.nextBtn = this.querySelector('[data-carousel-next]');
+      this.total = parseInt(this.getAttribute('data-total') || '0', 10);
+
+      if (!this.track) return;
+
+      this.updateButtons();
+      this.prevBtn?.addEventListener('click', () => this.go(this.currentSlide - 1));
+      this.nextBtn?.addEventListener('click', () => this.go(this.currentSlide + 1));
+
+      let startX = 0;
+      let prevTranslate = 0;
+      let dragging = false;
+      const viewport = this.querySelector('[data-carousel-viewport]');
+
+      viewport?.addEventListener('touchstart', (e: Event) => {
+        dragging = true;
+        startX = (e as TouchEvent).touches[0].clientX;
+        if (this.track) this.track.style.transition = 'none';
+      }, { passive: true });
+
+      viewport?.addEventListener('touchmove', (e: Event) => {
+        if (!dragging || !this.track) return;
+        const diff = (e as TouchEvent).touches[0].clientX - startX;
+        this.track.style.transform = `translateX(${prevTranslate + diff}px)`;
+      }, { passive: true });
+
+      viewport?.addEventListener('touchend', () => {
+        if (!dragging || !this.track) return;
+        dragging = false;
+        this.track.style.transition = 'transform 300ms ease-in-out';
+        const current = new DOMMatrix(getComputedStyle(this.track).transform).m41;
+        const diff = current - prevTranslate;
+        const threshold = this.getSlideWidth() / 4;
+        if (diff < -threshold) this.go(this.currentSlide + 1);
+        else if (diff > threshold) this.go(this.currentSlide - 1);
+        else this.go(this.currentSlide);
+        prevTranslate = -this.currentSlide * this.getSlideWidth();
+      });
+
+      window.addEventListener('resize', () => {
+        this.go(this.currentSlide);
+        this.updateCount();
+      });
+    }
+
+    getSlidesPerView(): number {
+      if (window.innerWidth < 640) return 1;
+      if (window.innerWidth < 1024) return 2;
+      return 4;
+    }
+
+    getSlideWidth(): number {
+      if (!this.track) return 0;
+      const item = this.track.querySelector('[data-carousel-item]') as HTMLElement;
+      return item ? item.getBoundingClientRect().width : 0;
+    }
+
+    getMaxSlide(): number {
+      const perView = this.getSlidesPerView();
+      return Math.max(0, Math.ceil(this.total / perView) - 1);
+    }
+
+    go(index: number) {
+      const maxSlide = this.getMaxSlide();
+      this.currentSlide = Math.max(0, Math.min(index, maxSlide));
+      const perView = this.getSlidesPerView();
+      const offset = -this.currentSlide * perView * this.getSlideWidth();
+      if (this.track) {
+        this.track.style.transform = `translateX(${offset}px)`;
+      }
+      this.updateButtons();
+      this.updateCount();
+    }
+
+    updateButtons() {
+      if (this.prevBtn) this.prevBtn.disabled = this.currentSlide <= 0;
+      if (this.nextBtn) this.nextBtn.disabled = this.currentSlide >= this.getMaxSlide();
+    }
+
+    updateCount() {
+      const perView = this.getSlidesPerView();
+      const start = this.currentSlide * perView + 1;
+      const end = Math.min(start + perView - 1, this.total);
+      const countEl = this.closest('section')?.querySelector('[data-products-count]');
+      if (countEl) countEl.textContent = `Showing ${start} through ${end} of ${this.total} items`;
+    }
+  }
+
+  customElements.define('astro-products-carousel', AstroProductsCarousel);
+</script>

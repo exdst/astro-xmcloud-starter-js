@@ -1,7 +1,5 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { VideoPlayer } from "./VideoPlayer.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -9,19 +7,59 @@ const fields = rendering?.fields;
 const videoUrl = fields?.video?.value?.href || "";
 const darkPlayIcon = (params as any)?.darkPlayIcon || "0";
 const playIconColor = darkPlayIcon === "1" ? "text-black" : "text-white";
+
+function extractVideoId(url: string): string {
+  if (!url) return "";
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+  );
+  return match ? match[1] : "";
+}
+
+const videoId = extractVideoId(videoUrl);
 ---
 
 {videoUrl ? (
-  <VideoPlayer
-    client:visible
-    videoUrl={videoUrl}
-    isPlaying={false}
-    onPlay={() => {}}
-    fullScreen={true}
-    btnClasses={`absolute inset-0 z-20 flex cursor-pointer items-center justify-center ${playIconColor}`}
-  />
+  <astro-video-player class="block relative inset-0 aspect-video" data-video-id={videoId}>
+    <button
+      class={`absolute inset-0 z-20 flex cursor-pointer items-center justify-center ${playIconColor}`}
+      aria-label="Play video"
+      data-play-btn
+    >
+      <svg class="h-[65px] w-[65px] transition-transform hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+        <polygon points="5,3 19,12 5,21" />
+      </svg>
+    </button>
+    <div class="h-full w-full hidden" data-video-container></div>
+  </astro-video-player>
 ) : (
   <p class="bg-secondary flex aspect-video items-center justify-center border">
     <span class="font-bold">Please add video</span>
   </p>
 )}
+
+<script>
+  class AstroVideoPlayer extends HTMLElement {
+    connectedCallback() {
+      const playBtn = this.querySelector('[data-play-btn]') as HTMLElement;
+      const container = this.querySelector('[data-video-container]') as HTMLElement;
+      const videoId = this.getAttribute('data-video-id');
+
+      if (!playBtn || !container || !videoId) return;
+
+      playBtn.addEventListener('click', () => {
+        playBtn.style.display = 'none';
+        container.classList.remove('hidden');
+        container.innerHTML = `<iframe
+          src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=0&controls=1&modestbranding=1&rel=0"
+          class="w-full h-full"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>`;
+      });
+    }
+  }
+
+  customElements.define('astro-video-player', AstroVideoPlayer);
+</script>

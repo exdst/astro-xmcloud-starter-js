@@ -1,7 +1,6 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
 import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { ImageCarouselIsland } from "./ImageCarousel.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
@@ -20,14 +19,179 @@ const slides = (datasource?.imageItems?.results ?? []).map((item: any) => ({
 }));
 
 const styles = params?.styles || "";
+const hasPagesPositionStyles = styles ? styles.includes("position-") : false;
+const containerPositionClass = hasPagesPositionStyles ? "" : "position-left";
 ---
 
-{slides.length > 0 && (
-  <ImageCarouselIsland
-    client:visible
-    variant={isEditing ? "EditMode" : "FeaturedImageLeft"}
-    title={title}
-    slides={slides}
-    styles={styles}
-  />
+{slides.length > 0 && !isEditing && (
+  <div
+    class:list={[
+      "@container bg-background text-foreground group relative flex w-full flex-col items-center justify-center overflow-hidden py-[60px]",
+      containerPositionClass,
+      styles,
+    ]}
+    role="region"
+    aria-roledescription="carousel"
+    data-component="ImageCarouselFeaturedImageLeft"
+    data-slides-json={JSON.stringify(slides)}
+  >
+    <div class="sr-only" aria-live="polite" aria-atomic="true" data-carousel-live></div>
+    <div class="mx-auto w-full max-w-screen-2xl">
+      <div class="@md:flex-row @md:justify-between flex w-full flex-col items-end justify-start">
+        <h2 class="font-heading @md:text-7xl max-w-[760px] text-pretty text-5xl font-light leading-none tracking-normal antialiased">
+          {title}
+        </h2>
+        <div class="@md:mt-0 @md:justify-center mt-8 flex w-full items-center justify-start @md:w-auto">
+          {slides[0]?.linkHref && (
+            <a
+              href={slides[0].linkHref}
+              class="inline-flex items-center justify-center rounded-md bg-foreground text-background px-4 py-2 text-sm font-medium hover:bg-foreground/80 mb-6"
+              data-carousel-active-link
+            >
+              {slides[0].linkText}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div class="h-full w-full py-6">
+      <div class="mx-auto w-full max-w-screen-2xl">
+        <div class="mb-6 flex overflow-visible h-[532px] items-end">
+          <div data-component="slide deck" class="relative flex h-full w-full items-end overflow-visible" data-carousel-deck>
+            {slides.map((slide, index) => (
+              <div
+                class:list={[
+                  "absolute flex-shrink-0 transition-all duration-600 ease-in-out",
+                ]}
+                data-carousel-item
+                data-index={index}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${index === 0 ? "Current slide" : "Slide"} ${index + 1} of ${slides.length}`}
+                style={`
+                  width: ${index === 0 ? 941 : 333}px;
+                  height: ${index === 0 ? 526 : 186}px;
+                  left: ${index === 0 ? 0 : 941 + (index - 1) * 333}px;
+                  top: ${index === 0 ? 0 : 526 - 186}px;
+                  z-index: ${index === 0 ? 10 : 5 - index};
+                `}
+              >
+                <div class="relative overflow-hidden shadow-lg h-full w-full">
+                  {slide.image && (
+                    <img
+                      src={slide.image}
+                      alt={slide.imageAlt}
+                      class="object-cover h-full w-full"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div class="@md:mt-8 mt-4 flex justify-center">
+          <button
+            class="inline-flex items-center justify-center rounded-md border border-foreground/20 text-foreground px-4 py-2 text-sm font-medium hover:bg-foreground/10 transition-colors"
+            data-carousel-next
+          >
+            Next Image
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 )}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-component="ImageCarouselFeaturedImageLeft"]').forEach((container) => {
+    const items = Array.from(container.querySelectorAll<HTMLElement>('[data-carousel-item]'));
+    const liveRegion = container.querySelector<HTMLElement>('[data-carousel-live]');
+    const nextBtn = container.querySelector<HTMLElement>('[data-carousel-next]');
+    const activeLink = container.querySelector<HTMLAnchorElement>('[data-carousel-active-link]');
+    const slidesData = JSON.parse(container.getAttribute('data-slides-json') || '[]');
+
+    if (!items.length) return;
+
+    const total = items.length;
+    // Track the order of slide indices (like React's slideOrder)
+    let slideOrder = Array.from({ length: total }, (_, i) => i);
+    let isAnimating = false;
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function layoutSlides() {
+      slideOrder.forEach((slideIndex, position) => {
+        const el = items[slideIndex];
+        const isActive = position === 0;
+        const width = isActive ? 941 : 333;
+        const height = isActive ? 526 : 186;
+        const left = isActive ? 0 : 941 + (position - 1) * 333;
+        const top = isActive ? 0 : 526 - 186;
+        const zIndex = isActive ? 10 : 5 - position;
+
+        el.style.width = `${width}px`;
+        el.style.height = `${height}px`;
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
+        el.style.zIndex = `${zIndex}`;
+        el.setAttribute('aria-label', `${isActive ? "Current slide" : "Slide"} ${slideIndex + 1} of ${total}`);
+      });
+
+      // Update link
+      const activeSlideIndex = slideOrder[0];
+      if (activeLink && slidesData[activeSlideIndex]) {
+        const slide = slidesData[activeSlideIndex];
+        if (slide.linkHref) {
+          activeLink.href = slide.linkHref;
+          activeLink.textContent = slide.linkText;
+          activeLink.style.display = '';
+        } else {
+          activeLink.style.display = 'none';
+        }
+      }
+
+      if (liveRegion) {
+        liveRegion.textContent = `Showing slide ${slideOrder[0] + 1} of ${total}`;
+      }
+    }
+
+    function handleNext() {
+      if (isAnimating || total <= 1) return;
+      isAnimating = true;
+
+      // Animate: the second item grows to active size, first shrinks
+      const nextSlideIndex = slideOrder[1];
+      const nextEl = items[nextSlideIndex];
+      nextEl.style.zIndex = '20';
+      nextEl.style.width = '941px';
+      nextEl.style.height = '526px';
+      nextEl.style.left = '0px';
+      nextEl.style.top = '0px';
+
+      const duration = isReducedMotion ? 0 : 600;
+      setTimeout(() => {
+        // Rotate the order
+        const first = slideOrder.shift()!;
+        slideOrder.push(first);
+        layoutSlides();
+        isAnimating = false;
+      }, duration);
+    }
+
+    nextBtn?.addEventListener('click', handleNext);
+
+    container.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); handleNext(); }
+    });
+
+    // Initial layout (no transition initially)
+    items.forEach(el => el.style.transition = 'none');
+    layoutSlides();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        items.forEach(el => el.style.transition = 'all 600ms ease-in-out');
+      });
+    });
+  });
+</script>

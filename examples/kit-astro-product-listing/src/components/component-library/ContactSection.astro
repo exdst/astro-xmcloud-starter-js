@@ -1,55 +1,249 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { ContactSectionIsland } from "./ContactSection.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const fields = rendering?.fields;
-const { page } = useSitecore();
-const isEditing = page?.mode?.isEditing ?? false;
 
 const variant = params?.FieldNames || params?.Variant || 'Default';
 const styles = params?.styles || '';
 
 const datasource = fields?.data?.datasource;
 
-const serializeField = (field: any) => field?.jsonValue?.value ?? '';
-const serializeImage = (field: any) => ({
-  src: field?.jsonValue?.value?.src ?? '',
-  alt: field?.jsonValue?.value?.alt ?? '',
-});
-const serializeLink = (field: any) => ({
-  href: field?.jsonValue?.value?.href ?? '',
-  text: field?.jsonValue?.value?.text ?? '',
-  target: field?.jsonValue?.value?.target ?? '',
-});
+const sf = (f: any) => f?.jsonValue?.value ?? '';
+const si = (f: any) => ({ src: f?.jsonValue?.value?.src ?? '', alt: f?.jsonValue?.value?.alt ?? '' });
+const sl = (f: any) => ({ href: f?.jsonValue?.value?.href ?? '', text: f?.jsonValue?.value?.text ?? '', target: f?.jsonValue?.value?.target ?? '' });
 
 const contacts = (datasource?.children?.results ?? []).map((c: any) => ({
   id: c.id || '',
-  image: serializeImage(c.image),
-  heading: serializeField(c.heading),
-  description: serializeField(c.description),
-  contactLink: serializeLink(c.contactLink),
-  buttonLink: serializeLink(c.buttonLink),
+  image: si(c.image),
+  heading: sf(c.heading),
+  description: sf(c.description),
+  contactLink: sl(c.contactLink),
+  buttonLink: sl(c.buttonLink),
 }));
 
 const sectionData = {
-  tagLine: serializeField(datasource?.tagLine),
-  heading: serializeField(datasource?.heading),
-  body: serializeField(datasource?.body),
-  image: serializeImage(datasource?.image),
+  tagLine: sf(datasource?.tagLine),
+  heading: sf(datasource?.heading),
+  body: sf(datasource?.body),
+  image: si(datasource?.image),
 };
 ---
 
 {datasource ? (
-  <ContactSectionIsland
-    client:visible
-    variant={variant}
-    styles={styles}
-    sectionData={sectionData}
-    contacts={contacts}
-    isEditing={isEditing}
-  />
+  variant === 'ContactSection1' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="flex flex-col md:flex-row gap-x-8 gap-y-12 mt-20">
+          {contacts.map((c) => (
+            <div class="basis-full flex flex-col items-center text-center">
+              <div class="w-12 h-12">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full object-contain" loading="lazy" />}</div>
+              <h3 class="text-3xl font-bold mt-6 mb-4">{c.heading}</h3>
+              {c.description && <p class="mb-6">{c.description}</p>}
+              <div class="grid gap-4 justify-items-center">
+                {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : variant === 'ContactSection2' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="grid md:grid-cols-3 gap-x-20 gap-y-12 mt-20">
+          <div class="flex flex-col gap-x-8 gap-y-12">
+            {contacts.map((c) => (
+              <div class="basis-full flex flex-col items-start">
+                <div class="w-6 h-6">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full object-contain" loading="lazy" />}</div>
+                <h3 class="text-xl font-bold mt-4 mb-2">{c.heading}</h3>
+                {c.description && <p class="mb-2">{c.description}</p>}
+                <div class="grid gap-2 justify-items-start">
+                  {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                  {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="relative md:col-span-2 min-h-80">
+            {sectionData.image.src && <img src={sectionData.image.src} alt={sectionData.image.alt} class="absolute inset-0 w-full h-full object-cover" loading="lazy" />}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'ContactSection3' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-5 gap-x-12 gap-y-20">
+          <div class="max-w-3xl md:col-span-3">
+            {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+            <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+            {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+          </div>
+          <div class="flex flex-col gap-x-8 gap-y-12 md:col-span-2">
+            {contacts.map((c) => (
+              <div class="basis-full flex gap-4 items-start">
+                <div class="w-6 h-6">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full object-contain" loading="lazy" />}</div>
+                <div class="flex flex-col items-start">
+                  <h3 class="text-xl font-bold mb-2">{c.heading}</h3>
+                  {c.description && <p class="mb-2">{c.description}</p>}
+                  <div class="grid gap-2 justify-items-start">
+                    {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                    {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {sectionData.image.src && <img src={sectionData.image.src} alt={sectionData.image.alt} class="w-full h-full aspect-16/9 object-cover mt-20" loading="lazy" />}
+      </div>
+    </section>
+  ) : variant === 'ContactSection4' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="flex flex-col md:flex-row gap-x-8 gap-y-12 mt-20">
+          {contacts.map((c) => (
+            <div class="basis-full flex flex-col items-start">
+              <div class="w-full">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full aspect-[3/2] object-cover" loading="lazy" />}</div>
+              <h3 class="text-4xl font-bold mt-8 mb-4">{c.heading}</h3>
+              {c.description && <p class="mb-6">{c.description}</p>}
+              <div class="grid gap-2 justify-items-start">
+                {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : variant === 'ContactSection5' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mx-auto text-center">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="flex flex-col md:flex-row gap-x-8 gap-y-12 mt-20">
+          {contacts.map((c) => (
+            <div class="basis-full flex flex-col items-center text-center">
+              <div class="w-full">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full aspect-[3/2] object-cover" loading="lazy" />}</div>
+              <h3 class="text-4xl font-bold mt-8 mb-4">{c.heading}</h3>
+              {c.description && <p class="mb-6">{c.description}</p>}
+              <div class="grid gap-2 justify-items-center">
+                {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : variant === 'ContactSection6' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="grid md:grid-cols-3 gap-8 mt-20" data-contact-tabs>
+          <div class="grid gap-10">
+            {contacts.map((c, i) => (
+              <div
+                data-contact-tab={c.id}
+                class={`ps-8 cursor-pointer border-s-2 ${i !== 0 ? 'border-transparent' : ''}`}
+              >
+                <div class="flex flex-col items-start">
+                  <h3 class="text-2xl font-bold mb-2">{c.heading}</h3>
+                  {c.description && <p class="mb-2">{c.description}</p>}
+                  <div class="grid gap-2 justify-items-start">
+                    {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                    {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div class="relative md:col-span-2 min-h-80">
+            {contacts.map((c, i) => (
+              <div data-contact-panel={c.id} class={`absolute inset-0 transition-opacity duration-300 ${i !== 0 ? 'opacity-0' : 'opacity-100'}`}>
+                {c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full object-cover" loading="lazy" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    /* Default */
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          {sectionData.tagLine && <p class="font-semibold mb-4">{sectionData.tagLine}</p>}
+          <h2 class="text-5xl font-bold mb-4">{sectionData.heading}</h2>
+          {sectionData.body && <div class="text-lg" set:html={sectionData.body} />}
+        </div>
+        <div class="flex flex-col md:flex-row gap-x-8 gap-y-12 mt-20">
+          {contacts.map((c) => (
+            <div class="basis-full flex flex-col items-start">
+              <div class="w-12 h-12">{c.image.src && <img src={c.image.src} alt={c.image.alt} class="w-full h-full object-contain" loading="lazy" />}</div>
+              <h3 class="text-3xl font-bold mt-6 mb-4">{c.heading}</h3>
+              {c.description && <p class="mb-6">{c.description}</p>}
+              <div class="grid gap-4 justify-items-start">
+                {c.contactLink.href && <a href={c.contactLink.href} class="underline">{c.contactLink.text}</a>}
+                {c.buttonLink.href && <a href={c.buttonLink.href} class="inline-flex items-center px-0 text-sm font-medium hover:underline">{c.buttonLink.text} &rsaquo;</a>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 ) : (
   <div class="is-empty-hint">Contact Section</div>
 )}
+
+<script>
+  document.querySelectorAll('[data-contact-tabs]').forEach((container) => {
+    const tabs = container.querySelectorAll('[data-contact-tab]');
+    const panels = container.querySelectorAll('[data-contact-panel]');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const id = tab.getAttribute('data-contact-tab');
+
+        tabs.forEach((t) => {
+          t.classList.toggle('border-transparent', t !== tab);
+        });
+
+        panels.forEach((p) => {
+          if (p.getAttribute('data-contact-panel') === id) {
+            p.classList.remove('opacity-0');
+            p.classList.add('opacity-100');
+          } else {
+            p.classList.remove('opacity-100');
+            p.classList.add('opacity-0');
+          }
+        });
+      });
+    });
+  });
+</script>

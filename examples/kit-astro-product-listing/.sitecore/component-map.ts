@@ -114,7 +114,7 @@ import LogoTabsWrapper from "@/components/logo-tabs/LogoTabsWrapper.astro";
 import MediaSection from "@/components/media-section/MediaSection.astro";
 import MegaMenuItem from "@/components/site-three/MegaMenuItem.astro";
 import MegaMenuItemWrapper from "@/components/site-three/MegaMenuItemWrapper.astro";
-import meteors from "@/components/magicui/meteors.astro";
+import Meteors from "@/components/magicui/Meteors.astro";
 import MiniCart from "@/components/site-three/non-sitecore/MiniCart.astro";
 import MobileMenuWrapper from "@/components/site-three/MobileMenuWrapper.astro";
 import modeToggle from "@/components/mode-toggle/mode-toggle.astro";
@@ -325,7 +325,7 @@ const components = new Map<string, any>([
   ["MediaSection", MediaSection],
   ["MegaMenuItem", MegaMenuItem],
   ["MegaMenuItemWrapper", MegaMenuItemWrapper],
-  ["meteors", meteors],
+  ["Meteors", Meteors],
   ["MiniCart", MiniCart],
   ["MobileMenuWrapper", MobileMenuWrapper],
   ["mode-toggle", modeToggle],

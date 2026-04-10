@@ -1,7 +1,6 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
 import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
-import { TextSliderSTIsland } from "./TextSliderST.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const styles = params?.styles || "";
@@ -10,11 +9,67 @@ const { page } = useSitecore();
 const isEditing = page?.mode?.isEditing ?? false;
 
 const text = (fields as any)?.Text?.value || "";
+const phrase = text || "No text in field";
 ---
 
-<TextSliderSTIsland
-  client:visible
-  styles={styles}
-  text={text}
-  isEditing={isEditing}
-/>
+<astro-text-slider
+  class={`relative block w-full h-18 lg:h-34 whitespace-nowrap overflow-hidden ${styles}`}
+  data-phrase={phrase}
+  data-editing={isEditing ? 'true' : 'false'}
+  data-class-change
+>
+  <h2 class="absolute top-0 invisible whitespace-nowrap uppercase text-3xl lg:text-7xl" data-measure>{phrase}</h2>
+  <div class="flex absolute top-1/2 -translate-y-1/2 animate-marquee will-change-transform whitespace-nowrap uppercase" data-marquee style="opacity: 0">
+    <h2 class="text-3xl lg:text-7xl" data-marquee-content></h2>
+  </div>
+</astro-text-slider>
+
+<script>
+  class AstroTextSlider extends HTMLElement {
+    connectedCallback() {
+      const isEditing = this.getAttribute('data-editing') === 'true';
+      if (isEditing) {
+        const marquee = this.querySelector('[data-marquee]') as HTMLElement;
+        if (marquee) marquee.style.opacity = '1';
+        const content = this.querySelector('[data-marquee-content]');
+        if (content) content.innerHTML = `<span>${this.getAttribute('data-phrase')}</span>`;
+        return;
+      }
+
+      const calculate = () => {
+        const measure = this.querySelector('[data-measure]') as HTMLElement;
+        const marquee = this.querySelector('[data-marquee]') as HTMLElement;
+        const content = this.querySelector('[data-marquee-content]');
+        if (!measure || !marquee || !content) return;
+
+        const phraseWidth = measure.offsetWidth;
+        const containerWidth = this.offsetWidth;
+        if (phraseWidth === 0 || containerWidth === 0) return;
+
+        const minTotalWidth = containerWidth * 4;
+        const repeatCount = Math.ceil(minTotalWidth / phraseWidth);
+        const phrase = this.getAttribute('data-phrase') || '';
+
+        let html = '';
+        for (let i = 0; i < repeatCount; i++) {
+          html += `<span class="font-[inherit] [.bg-gradient-secondary_&:nth-child(4n-3)]:text-white [.bg-gradient-secondary_&:nth-child(4n-2)]:text-white">${phrase}<span class="font-[inherit] text-primary">. </span></span>`;
+        }
+        content.innerHTML = html;
+
+        const totalChars = phrase.repeat(repeatCount).length;
+        marquee.style.animationDuration = `${(totalChars / 5).toFixed(2)}s`;
+        marquee.style.opacity = '1';
+      };
+
+      const init = async () => {
+        if (document.fonts?.ready) await document.fonts.ready;
+        requestAnimationFrame(calculate);
+      };
+
+      init();
+      window.addEventListener('resize', calculate);
+    }
+  }
+
+  customElements.define('astro-text-slider', AstroTextSlider);
+</script>

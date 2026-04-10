@@ -1,6 +1,5 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { HeroSTIsland } from "./HeroST.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const variant = params?.FieldNames || "Default";
@@ -15,18 +14,111 @@ const link1Href = fields?.Link1?.value?.href || "";
 const link1Text = fields?.Link1?.value?.text || "";
 const link2Href = fields?.Link2?.value?.href || "";
 const link2Text = fields?.Link2?.value?.text || "";
+
+function hasValidLink(href: string): boolean {
+  return !!(href && href !== "#" && !href.startsWith("http://#"));
+}
+
+const linkAriaLabel = title ? `Learn more about ${title}` : undefined;
 ---
 
-<HeroSTIsland
-  client:load
-  variant={variant}
-  styles={styles}
-  eyebrow={eyebrow}
-  title={title}
-  image1Src={image1Src}
-  image1Alt={image1Alt}
-  link1Href={link1Href}
-  link1Text={link1Text}
-  link2Href={link2Href}
-  link2Text={link2Text}
-/>
+{variant === "SplitScreen" ? (
+  <section class={`relative bg-primary border-8 lg:border-16 border-background ${styles}`} data-class-change>
+    <div class="flex flex-col lg:flex-row lg:min-h-[50rem]">
+      <div class="p-8 lg:basis-full lg:self-center lg:p-14">
+        <h1 class="text-xl lg:text-3xl pb-4 uppercase">{eyebrow}</h1>
+        <h1 class="text-4xl lg:text-6xl uppercase">{title}</h1>
+        <div class="mt-8">
+          {hasValidLink(link1Href) ? <a href={link1Href} class="btn btn-secondary mr-4" aria-label={linkAriaLabel}>{link1Text}</a> : link1Text?.trim() ? <span class="btn btn-secondary mr-4">{link1Text}</span> : null}
+          {hasValidLink(link2Href) ? <a href={link2Href} class="btn btn-secondary" aria-label={linkAriaLabel}>{link2Text}</a> : link2Text?.trim() ? <span class="btn btn-secondary">{link2Text}</span> : null}
+        </div>
+      </div>
+      <div class="relative aspect-3/2 lg:basis-full lg:aspect-auto">
+        <img src={image1Src} alt={image1Alt} class="absolute inset-0 w-full h-full object-cover" />
+        <div class="relative h-full backdrop-blur-[20px] bg-[linear-gradient(136deg,_rgba(255,255,255,0.21)_2.61%,_rgba(255,255,255,0.42)_73.95%)] z-20">
+          <div class="absolute inset-8 lg:inset-14">
+            <img src={image1Src} alt={image1Alt} class="absolute inset-0 w-full h-full object-cover" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+) : variant === "Stacked" ? (
+  <section class={`relative flex flex-col bg-primary lg:flex-row lg:items-center lg:min-h-[50rem] lg:bg-transparent ${styles}`} data-class-change>
+    <div class="container px-4 mx-auto">
+      <div class="relative lg:w-1/2 px-6 py-12 bg-primary z-20">
+        <h1 class="text-xl lg:text-3xl pb-4 uppercase">{eyebrow}</h1>
+        <h1 class="text-4xl lg:text-6xl uppercase">{title}</h1>
+        <div class="mt-8">
+          {hasValidLink(link1Href) ? <a href={link1Href} class="btn btn-secondary mr-4" aria-label={linkAriaLabel}>{link1Text}</a> : link1Text?.trim() ? <span class="btn btn-secondary mr-4">{link1Text}</span> : null}
+          {hasValidLink(link2Href) ? <a href={link2Href} class="btn btn-secondary" aria-label={linkAriaLabel}>{link2Text}</a> : link2Text?.trim() ? <span class="btn btn-secondary">{link2Text}</span> : null}
+        </div>
+      </div>
+    </div>
+    <div class="relative aspect-3/2 lg:absolute lg:aspect-auto inset-0 flex z-10">
+      <div class="relative w-1/3">
+        <img src={image1Src} alt={image1Alt} class="absolute w-full h-full inset-0 object-cover" />
+      </div>
+      <div class="relative w-2/3">
+        <img src={image1Src} alt={image1Alt} class="absolute w-full h-full inset-0 object-cover z-10" />
+        <div class="absolute inset-0 backdrop-blur-[20px] bg-[linear-gradient(136deg,_rgba(255,255,255,0.21)_2.61%,_rgba(255,255,255,0.42)_73.95%)] z-20">
+          <img src={image1Src} alt={image1Alt} class="absolute w-[calc(100%-5rem)] h-full left-20 top-0 right-0 bottom-0 object-cover" />
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  /* Default, Right, Centered - use data attributes for JS offset calculation */
+  <astro-hero-st
+    class="block"
+    data-variant={variant}
+  >
+    <section class={`relative flex items-center border-8 lg:border-16 border-background ${styles}`} data-class-change>
+      <div class="absolute inset-0 z-10">
+        <img src={image1Src} alt={image1Alt} class="w-full h-full object-cover" />
+      </div>
+      <div class={`relative lg:container w-full lg:flex mx-auto z-20 ${variant === "Right" ? "lg:flex-row-reverse" : ""}`} data-hero-container>
+        <div class={`flex flex-col justify-center mt-10 lg:mt-0 lg:min-h-[50rem] px-4 py-8 lg:p-8 backdrop-blur-[20px] bg-[linear-gradient(136deg,_rgba(255,255,255,0.21)_2.61%,_rgba(255,255,255,0.42)_73.95%)] ${variant === "Centered" ? "lg:relative lg:left-1/6 lg:w-2/3" : "lg:w-2/3"}`}>
+          <div class={`lg:max-w-3xl ${variant === "Right" ? "lg:ml-auto text-right" : variant === "Centered" ? "lg:mx-auto text-center" : ""}`}>
+            <h1 class="text-primary text-xl lg:text-3xl pb-4 uppercase">{eyebrow}</h1>
+            <h1 class="text-4xl lg:text-7xl uppercase">{title}</h1>
+            <div class="mt-8">
+              {hasValidLink(link1Href) ? <a href={link1Href} class="btn btn-primary mr-4" aria-label={linkAriaLabel}>{link1Text}</a> : link1Text?.trim() ? <span class="btn btn-primary mr-4">{link1Text}</span> : null}
+              {hasValidLink(link2Href) ? <a href={link2Href} class="btn btn-secondary" aria-label={linkAriaLabel}>{link2Text}</a> : link2Text?.trim() ? <span class="btn btn-secondary">{link2Text}</span> : null}
+            </div>
+          </div>
+        </div>
+        <div data-hero-overflow class={`aspect-7/4 lg:aspect-auto ${variant === "Right" ? "lg:absolute top-0 bottom-0 right-2/3" : variant === "Centered" ? "lg:absolute top-0 bottom-0 left-5/6" : "lg:absolute top-0 bottom-0 left-2/3"}`}>
+          <img src={image1Src} alt={image1Alt} class="w-full h-full object-cover" />
+        </div>
+      </div>
+    </section>
+  </astro-hero-st>
+)}
+
+<script>
+  class AstroHeroST extends HTMLElement {
+    connectedCallback() {
+      const variant = this.getAttribute('data-variant') || 'Default';
+      const container = this.querySelector('[data-hero-container]') as HTMLElement;
+      const overflow = this.querySelector('[data-hero-overflow]') as HTMLElement;
+      if (!container || !overflow) return;
+
+      const update = () => {
+        const rect = container.getBoundingClientRect();
+        if (variant === 'Right') {
+          const leftOffset = rect.left;
+          overflow.style.left = `-${leftOffset - 16}px`;
+        } else {
+          const rightOffset = document.documentElement.clientWidth - rect.right;
+          overflow.style.right = `-${rightOffset - 16}px`;
+        }
+      };
+
+      update();
+      window.addEventListener('resize', update);
+    }
+  }
+
+  customElements.define('astro-hero-st', AstroHeroST);
+</script>

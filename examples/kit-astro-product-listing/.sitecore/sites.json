@@ -23,5 +23,10 @@
     "name": "basic",
     "hostName": "*",
     "language": "en"
+  },
+  {
+    "name": "sync",
+    "hostName": "*",
+    "language": "en"
   }
 ]

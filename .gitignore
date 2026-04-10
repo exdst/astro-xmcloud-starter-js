@@ -57,3 +57,4 @@ packages/
 /examples/kit-astro-location-finder/node_modules
 /examples/kit-astro-location-finder/backstop
 /examples/kit-astro-product-listing/node_modules
+/examples/kit-astro-product-listing/dist

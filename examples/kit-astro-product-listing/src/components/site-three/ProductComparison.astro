@@ -1,6 +1,5 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { ProductComparisonSTIsland } from "./ProductComparisonST.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const styles = params?.styles || "";
@@ -10,7 +9,6 @@ const fields = rendering?.fields;
 const title = fields?.Title?.value || "";
 const rawProducts = (fields as any)?.Products ?? [];
 
-// Transform product data - extract specs in order
 function transformProducts(products: any[]) {
   if (!products || !Array.isArray(products) || products.length === 0) return [];
 
@@ -58,16 +56,89 @@ function transformProducts(products: any[]) {
 }
 
 const products = transformProducts(rawProducts);
+const basis = products.length < 3 ? products.length : 3;
 ---
 
 {products.length > 0 ? (
-  <ProductComparisonSTIsland
-    client:visible
-    styles={styles}
-    title={title}
-    products={products}
-    showButton={showButton}
-  />
+  <section class={`relative ${styles}`} data-class-change>
+    <div class="container mx-auto px-4">
+      <h2 class="max-w-3xl mx-auto text-center text-2xl lg:text-5xl uppercase mb-16">{title}</h2>
+
+      <astro-comparison-carousel class="block relative text-center">
+        <div class="overflow-hidden" data-carousel-viewport>
+          <div class="flex transition-transform duration-300 ease-in-out -ml-10" data-carousel-track>
+            {products.map((product) => (
+              <div class={`flex-shrink-0 w-full lg:w-1/${basis} pl-10`} data-carousel-item>
+                <div class="grid gap-4">
+                  <div class="px-10">
+                    {product.imageSrc && <img src={product.imageSrc} alt={product.imageAlt} class="aspect-square w-full h-full object-contain max-w-2xs mx-auto" />}
+                  </div>
+                  <h3 class="text-xl lg:text-2xl mt-8 mb-3">{product.name}</h3>
+                  <p class="text-xl lg:text-2xl">{product.price}</p>
+                  {showButton && <a href={product.url} class="btn btn-primary mt-3 justify-self-center">Buy Now</a>}
+                  <hr class="border-border my-10" />
+                  <p class="text-lg lg:text-xl font-medium">{product.ampPower}</p>
+                  {product.specs.map((spec: string) => (
+                    <p class="text-sm lg:text-base">{spec}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <button data-carousel-prev class="absolute left-0 top-1/2 -translate-y-1/2 disabled:hidden h-10 w-10 inline-flex items-center justify-center bg-secondary hover:bg-secondary-hover border-0 rounded-full" aria-label="Previous">
+          <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button data-carousel-next class="absolute right-0 top-1/2 -translate-y-1/2 disabled:hidden h-10 w-10 inline-flex items-center justify-center bg-secondary hover:bg-secondary-hover border-0 rounded-full" aria-label="Next">
+          <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </astro-comparison-carousel>
+    </div>
+  </section>
 ) : (
   <div class="is-empty-hint">Product Comparison</div>
 )}
+
+<script>
+  class AstroComparisonCarousel extends HTMLElement {
+    private track: HTMLElement | null = null;
+    private prevBtn: HTMLButtonElement | null = null;
+    private nextBtn: HTMLButtonElement | null = null;
+    private currentSlide = 0;
+    private itemCount = 0;
+
+    connectedCallback() {
+      this.track = this.querySelector('[data-carousel-track]');
+      this.prevBtn = this.querySelector('[data-carousel-prev]');
+      this.nextBtn = this.querySelector('[data-carousel-next]');
+
+      if (!this.track) return;
+      this.itemCount = this.track.querySelectorAll('[data-carousel-item]').length;
+      this.updateButtons();
+
+      this.prevBtn?.addEventListener('click', () => this.go(this.currentSlide - 1));
+      this.nextBtn?.addEventListener('click', () => this.go(this.currentSlide + 1));
+      window.addEventListener('resize', () => this.go(this.currentSlide));
+    }
+
+    getSlideWidth(): number {
+      if (!this.track) return 0;
+      const item = this.track.querySelector('[data-carousel-item]') as HTMLElement;
+      return item ? item.getBoundingClientRect().width : 0;
+    }
+
+    go(index: number) {
+      this.currentSlide = Math.max(0, Math.min(index, this.itemCount - 1));
+      const offset = -this.currentSlide * this.getSlideWidth();
+      if (this.track) this.track.style.transform = `translateX(${offset}px)`;
+      this.updateButtons();
+    }
+
+    updateButtons() {
+      if (this.prevBtn) this.prevBtn.disabled = this.currentSlide <= 0;
+      if (this.nextBtn) this.nextBtn.disabled = this.currentSlide >= this.itemCount - 1;
+    }
+  }
+
+  customElements.define('astro-comparison-carousel', AstroComparisonCarousel);
+</script>

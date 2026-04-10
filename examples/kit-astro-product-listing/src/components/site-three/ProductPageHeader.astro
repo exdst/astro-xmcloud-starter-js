@@ -1,6 +1,5 @@
 ---
 import type { ComponentProps } from "@/lib/component-props";
-import { ProductPageHeaderSTIsland } from "./ProductPageHeaderST.tsx";
 
 const { rendering, params } = Astro.props as ComponentProps;
 const styles = params?.styles || "";
@@ -25,18 +24,140 @@ const warrantyLinkHref = (fields as any)?.WarrantyLink?.value?.href || "";
 const warrantyLinkText = (fields as any)?.WarrantyLink?.value?.text || "";
 const shippingLinkHref = (fields as any)?.ShippingLink?.value?.href || "";
 const shippingLinkText = (fields as any)?.ShippingLink?.value?.text || "";
+
+const productImages = images.length === 2 ? [...images, ...images] : images;
+const firstColor = colors[0] || null;
 ---
 
-<ProductPageHeaderSTIsland
-  client:load
-  styles={styles}
-  productName={productName}
-  description={description}
-  price={price}
-  colors={colors}
-  images={images}
-  warrantyLinkHref={warrantyLinkHref}
-  warrantyLinkText={warrantyLinkText}
-  shippingLinkHref={shippingLinkHref}
-  shippingLinkText={shippingLinkText}
-/>
+<section
+  class={`relative flex flex-col lg:justify-end lg:items-end lg:pt-12 lg:min-h-[50rem] overflow-hidden ${styles}`}
+  data-class-change
+>
+  <div class="lg:absolute inset-0 z-10 h-128 lg:h-full">
+    <astro-pph-carousel class="block relative h-full">
+      <div class="overflow-hidden h-full" data-carousel-viewport>
+        <div class="flex h-full transition-transform duration-300 ease-in-out" data-carousel-track>
+          {productImages.map((image) => (
+            <div
+              class={`flex-shrink-0 bg-cover bg-center h-full ${productImages.length === 1 ? 'w-full' : 'basis-[calc(100%-3.5rem)] lg:basis-1/2'}`}
+              style={`background-image: url(${image.url})`}
+              data-carousel-item
+            />
+          ))}
+        </div>
+      </div>
+      <div class="absolute bottom-6 lg:bottom-14 left-0 h-10 w-full lg:w-1/2 flex items-center justify-center gap-2">
+        <button data-carousel-prev class="h-10 w-10 inline-flex items-center justify-center bg-secondary hover:bg-secondary-hover border-0 rounded-full disabled:hidden" aria-label="Previous">
+          <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button data-carousel-next class="h-10 w-10 inline-flex items-center justify-center bg-secondary hover:bg-secondary-hover border-0 rounded-full disabled:hidden" aria-label="Next">
+          <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+      </div>
+    </astro-pph-carousel>
+  </div>
+
+  <div class="relative flex flex-col gap-6 p-10 lg:w-1/3 lg:max-w-md bg-white z-20">
+    <h1 class="text-2xl">{productName}</h1>
+    <p class="text-sm">{description}</p>
+    <p class="border-t border-b border-border font-(family-name:--font-accent) font-medium text-base py-6">{price}</p>
+
+    <div class="flex items-center gap-4" data-color-picker>
+      <div class="flex gap-3">
+        {colors.map((color, i: number) => (
+          <div
+            data-color-swatch={color.id}
+            data-color-name={color.displayName}
+            class="relative w-9 h-9 rounded-full cursor-pointer border"
+            style={`border-color: ${i === 0 ? color.value : 'transparent'}`}
+          >
+            <div class="absolute inset-[2px] rounded-full" style={`background-color: ${color.value}`} />
+          </div>
+        ))}
+      </div>
+      {firstColor && <span class="text-sm font-(family-name:--font-accent) font-medium" data-color-label>{firstColor.displayName}</span>}
+    </div>
+
+    <button class="btn btn-primary btn-sharp cursor-pointer">Add to cart</button>
+
+    <div class="flex flex-col items-start gap-4 border-t border-border pt-6 text-sm">
+      {warrantyLinkHref && (
+        <a href={warrantyLinkHref} class="flex items-center gap-2">
+          {warrantyLinkText}
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      )}
+      {shippingLinkHref && (
+        <a href={shippingLinkHref} class="flex items-center gap-2">
+          {shippingLinkText}
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </a>
+      )}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Color picker
+  document.querySelectorAll('[data-color-picker]').forEach((picker) => {
+    const swatches = picker.querySelectorAll('[data-color-swatch]');
+    const label = picker.querySelector('[data-color-label]');
+
+    swatches.forEach((swatch) => {
+      swatch.addEventListener('click', () => {
+        const colorName = swatch.getAttribute('data-color-name') || '';
+        const innerDiv = swatch.querySelector('div') as HTMLElement;
+        const colorValue = innerDiv ? getComputedStyle(innerDiv).backgroundColor : '';
+
+        swatches.forEach((s) => {
+          (s as HTMLElement).style.borderColor = s === swatch ? (innerDiv?.style.backgroundColor || '') : 'transparent';
+        });
+
+        if (label) label.textContent = colorName;
+      });
+    });
+  });
+
+  // Image carousel
+  class AstroPphCarousel extends HTMLElement {
+    private track: HTMLElement | null = null;
+    private prevBtn: HTMLButtonElement | null = null;
+    private nextBtn: HTMLButtonElement | null = null;
+    private currentSlide = 0;
+    private itemCount = 0;
+
+    connectedCallback() {
+      this.track = this.querySelector('[data-carousel-track]');
+      this.prevBtn = this.querySelector('[data-carousel-prev]');
+      this.nextBtn = this.querySelector('[data-carousel-next]');
+
+      if (!this.track) return;
+      this.itemCount = this.track.querySelectorAll('[data-carousel-item]').length;
+      this.updateButtons();
+
+      this.prevBtn?.addEventListener('click', () => this.go(this.currentSlide - 1));
+      this.nextBtn?.addEventListener('click', () => this.go(this.currentSlide + 1));
+      window.addEventListener('resize', () => this.go(this.currentSlide));
+    }
+
+    getSlideWidth(): number {
+      if (!this.track) return 0;
+      const item = this.track.querySelector('[data-carousel-item]') as HTMLElement;
+      return item ? item.getBoundingClientRect().width : 0;
+    }
+
+    go(index: number) {
+      this.currentSlide = Math.max(0, Math.min(index, this.itemCount - 1));
+      const offset = -this.currentSlide * this.getSlideWidth();
+      if (this.track) this.track.style.transform = `translateX(${offset}px)`;
+      this.updateButtons();
+    }
+
+    updateButtons() {
+      if (this.prevBtn) this.prevBtn.disabled = this.currentSlide <= 0;
+      if (this.nextBtn) this.nextBtn.disabled = this.currentSlide >= this.itemCount - 1;
+    }
+  }
+
+  customElements.define('astro-pph-carousel', AstroPphCarousel);
+</script>

@@ -1,20 +1,88 @@
 ---
 /**
- * VideoModal Astro wrapper.
- * The modal is typically triggered from within the Video.astro component.
- * This wrapper exists for standalone use if needed.
+ * VideoModal - Pure Astro implementation using native <dialog>
  */
-import { VideoModal } from "./VideoModal.tsx";
-
-const { videoUrl = "", isOpen = false } = Astro.props as {
+const { videoUrl = "" } = Astro.props as {
   videoUrl?: string;
   isOpen?: boolean;
 };
+
+function extractVideoId(url: string): string {
+  if (!url) return "";
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+  );
+  return match ? match[1] : "";
+}
+
+const videoId = extractVideoId(videoUrl);
 ---
 
-<VideoModal
-  client:visible
-  isOpen={isOpen}
-  onClose={() => {}}
-  videoUrl={videoUrl}
-/>
+<dialog
+  data-video-modal
+  data-video-id={videoId}
+  class="fixed inset-0 z-[999] w-full h-full max-w-full max-h-full m-0 p-0 bg-black border-none backdrop:bg-black"
+>
+  <div class="relative flex items-center justify-center w-full h-full">
+    <button
+      data-modal-close
+      class="fixed right-4 top-4 z-[110] bg-white text-black hover:bg-gray-200 rounded-md p-2 transition-opacity duration-1000"
+      aria-label="Close modal"
+    >
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    <div
+      class="relative h-[calc(100vh-2rem)] max-h-[calc((100vw-4rem)*9/16)] w-[calc(100%-4rem)] max-w-[calc(100vh*16/9)]"
+      data-video-container
+    ></div>
+  </div>
+</dialog>
+
+<script>
+  document.querySelectorAll('[data-video-modal]').forEach((dialog) => {
+    const modal = dialog as HTMLDialogElement;
+    const closeBtn = modal.querySelector('[data-modal-close]') as HTMLElement;
+    const container = modal.querySelector('[data-video-container]') as HTMLElement;
+    const videoId = modal.getAttribute('data-video-id');
+    let hideTimer: ReturnType<typeof setTimeout>;
+
+    const resetTimer = () => {
+      if (closeBtn) {
+        closeBtn.style.opacity = '1';
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => { closeBtn.style.opacity = '0'; }, 3000);
+      }
+    };
+
+    modal.addEventListener('close', () => {
+      container.innerHTML = '';
+      clearTimeout(hideTimer);
+    });
+
+    closeBtn?.addEventListener('click', () => modal.close());
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || (e.target as HTMLElement).closest('[data-video-container]') === null) {
+        modal.close();
+      }
+    });
+
+    // Expose open method
+    (modal as any).openModal = () => {
+      if (!videoId) return;
+      container.innerHTML = `<iframe
+        src="https://www.youtube.com/embed/${videoId}?autoplay=1&playsinline=0&controls=1&modestbranding=1&rel=0"
+        class="w-full h-full"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>`;
+      modal.showModal();
+      resetTimer();
+      window.addEventListener('mousemove', resetTimer);
+      window.addEventListener('keydown', resetTimer);
+    };
+  });
+</script>

@@ -1,6 +1,4 @@
 ---
-import { Meteors } from "./Meteors.tsx";
-
 const props = Astro.props as any;
 
 const number = props.number ?? 20;
@@ -13,14 +11,81 @@ const className = props.class ?? props.className ?? "";
 const size = props.size ?? "1";
 ---
 
-<Meteors
-  client:visible
-  number={number}
-  minDelay={minDelay}
-  maxDelay={maxDelay}
-  minDuration={minDuration}
-  maxDuration={maxDuration}
-  angle={angle}
-  className={className}
-  size={size}
-/>
+<astro-meteors
+  class={`absolute inset-0 overflow-hidden ${className}`}
+  data-number={number}
+  data-min-delay={minDelay}
+  data-max-delay={maxDelay}
+  data-min-duration={minDuration}
+  data-max-duration={maxDuration}
+  data-angle={angle}
+  data-size={size}
+>
+</astro-meteors>
+
+<style>
+  @keyframes meteorAnimation {
+    0% {
+      transform: rotate(var(--meteor-angle)) translateX(0);
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: rotate(var(--meteor-angle)) translateX(-500px);
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  class AstroMeteors extends HTMLElement {
+    connectedCallback() {
+      this.generate();
+      window.addEventListener('resize', () => this.generate());
+    }
+
+    generate() {
+      this.innerHTML = '';
+      const count = parseInt(this.getAttribute('data-number') || '20', 10);
+      const minDelay = parseFloat(this.getAttribute('data-min-delay') || '0.2');
+      const maxDelay = parseFloat(this.getAttribute('data-max-delay') || '1.2');
+      const minDuration = parseFloat(this.getAttribute('data-min-duration') || '2');
+      const maxDuration = parseFloat(this.getAttribute('data-max-duration') || '10');
+      const angle = parseFloat(this.getAttribute('data-angle') || '215');
+      const size = this.getAttribute('data-size') || '1';
+      const containerWidth = this.offsetWidth || window.innerWidth;
+      const tailHeight = Math.max(1, parseInt(size) / 2);
+
+      for (let i = 0; i < count; i++) {
+        const delay = (Math.random() * (maxDelay - minDelay) + minDelay).toFixed(2);
+        const duration = (Math.random() * (maxDuration - minDuration) + minDuration).toFixed(1);
+        const left = Math.floor(Math.random() * containerWidth);
+
+        const span = document.createElement('span');
+        span.style.cssText = `
+          position: absolute; top: -5px; left: ${left}px;
+          width: ${size}px; height: ${size}px;
+          background-color: rgba(var(--meteor-color, 255, 255, 255), var(--meteor-opacity, 1));
+          border-radius: 9999px; pointer-events: none; opacity: 1;
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+          animation: meteorAnimation ${duration}s linear ${delay}s infinite;
+          --meteor-angle: ${angle}deg;
+        `;
+
+        const tail = document.createElement('div');
+        tail.style.cssText = `
+          position: absolute; top: 50%; transform: translateY(-50%);
+          z-index: -1; pointer-events: none;
+          width: 100px; height: ${tailHeight}px;
+          background-image: linear-gradient(to right, rgba(var(--meteor-color, 255, 255, 255), var(--meteor-opacity, 1)), transparent);
+        `;
+        span.appendChild(tail);
+        this.appendChild(span);
+      }
+    }
+  }
+
+  customElements.define('astro-meteors', AstroMeteors);
+</script>
