@@ -1,0 +1,107 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@/components/shared/AppText.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const titleRequired = fields?.titleRequired;
+const descriptionOptional = fields?.descriptionOptional;
+
+// Dictionary entries
+const dictionary = fields?.data?.dictionary ?? {};
+const placeholderText =
+  dictionary?.placeholderText?.jsonValue?.value ||
+  dictionary?.placeholderText?.value ||
+  "Enter your email address";
+const submitButtonText =
+  dictionary?.submitButtonText?.jsonValue?.value ||
+  dictionary?.submitButtonText?.value ||
+  "Subscribe";
+const successMessage =
+  dictionary?.successMessage?.jsonValue?.value ||
+  dictionary?.successMessage?.value ||
+  "Thank you for subscribing!";
+const errorMessage =
+  dictionary?.errorMessage?.jsonValue?.value ||
+  dictionary?.errorMessage?.value ||
+  "Email format is invalid";
+
+const { styles = "", RenderingIdentifier: id } = params || {};
+---
+
+<div class={`component subscription-banner ${styles}`} id={id}>
+  <section class="mx-auto w-full px-4 py-16 text-center" data-subscription-banner>
+    <div class="@container mx-auto max-w-5xl">
+      {titleRequired && (
+        <Text
+          tag="h2"
+          field={titleRequired}
+          class="text-primary font-heading mb-6 font-normal leading-tight tracking-tight [font-size:clamp(theme(fontSize.3xl),5cqi,theme(fontSize.7xl))]"
+        />
+      )}
+      {descriptionOptional && (
+        <Text
+          tag="p"
+          field={descriptionOptional}
+          class="font-body text-secondary-foreground mb-12 text-lg"
+        />
+      )}
+      <form
+        class="mx-auto flex max-w-md flex-col items-center justify-center gap-6"
+        data-subscription-form
+      >
+        <div class="w-full">
+          <input
+            type="email"
+            placeholder={placeholderText}
+            class="bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 border text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 border-input w-full flex-1 rounded-full px-6 py-3"
+            data-subscription-email
+            required
+          />
+          <p class="text-destructive mt-2 text-sm hidden" data-subscription-error>
+            {errorMessage}
+          </p>
+        </div>
+        <button
+          type="submit"
+          class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary px-8 py-2.5 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          data-subscription-submit
+        >
+          {submitButtonText}
+        </button>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script define:vars={{ successMessage }}>
+  document.querySelectorAll('[data-subscription-form]').forEach((form) => {
+    const emailInput = form.querySelector('[data-subscription-email]');
+    const errorEl = form.querySelector('[data-subscription-error]');
+    const submitBtn = form.querySelector('[data-subscription-submit]');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = emailInput.value;
+      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+      if (!emailRegex.test(email)) {
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      errorEl.classList.add('hidden');
+      emailInput.value = successMessage;
+      emailInput.disabled = true;
+      submitBtn.disabled = true;
+    });
+
+    emailInput.addEventListener('input', () => {
+      errorEl.classList.add('hidden');
+    });
+  });
+</script>

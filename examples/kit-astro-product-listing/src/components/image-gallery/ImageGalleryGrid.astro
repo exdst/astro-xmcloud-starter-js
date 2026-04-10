@@ -1,0 +1,140 @@
+---
+import ImageWrapper from "@/components/image/ImageWrapper.astro";
+import Text from "@/components/shared/AppText.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import type { Field } from "@exdst-sitecore-content-sdk/astro";
+
+interface ImageGalleryFields {
+  title?: Field<string>;
+  description?: Field<string>;
+  image1: any;
+  image2: any;
+  image3: any;
+  image4: any;
+}
+
+interface Props extends ComponentProps {
+  fields: ImageGalleryFields;
+}
+
+const { fields, params } = Astro.props as Props;
+const { title, description, image1, image2, image3, image4 } = fields || {};
+const styles = params?.styles || "";
+const images = [image1, image2, image3, image4].filter(Boolean);
+---
+
+{fields ? (
+  <section
+    class:list={[
+      "@container relative min-h-[100vh] max-w-screen-xl transform-gpu overflow-hidden px-4 py-16",
+      styles,
+    ]}
+    aria-label="Image gallery"
+  >
+    <div class="@md:py-10 relative mx-auto mb-16 max-w-6xl py-0">
+      <!-- Centered header section -->
+      <div class="mb-16 text-center">
+        {title && <Text tag="h2" field={title} />}
+        <div class="mx-auto max-w-2xl">
+          {description && <Text tag="p" class="text-xl" field={description} />}
+        </div>
+      </div>
+
+      <!-- 2x2 Grid layout -->
+      <div class="@md:grid-cols-2 @md:gap-6 grid grid-cols-1 gap-4">
+        {image1 && (
+          <figure>
+            <button type="button" class="gallery-thumb w-full cursor-zoom-in" data-index="0">
+              <ImageWrapper image={image1} className="rounded-default h-auto w-full" />
+            </button>
+          </figure>
+        )}
+        {image2 && (
+          <figure>
+            <button type="button" class="gallery-thumb w-full cursor-zoom-in" data-index="1">
+              <ImageWrapper image={image2} className="rounded-default h-auto w-full" />
+            </button>
+          </figure>
+        )}
+        {image3 && (
+          <figure>
+            <button type="button" class="gallery-thumb w-full cursor-zoom-in" data-index="2">
+              <ImageWrapper image={image3} className="rounded-default h-auto w-full" />
+            </button>
+          </figure>
+        )}
+        {image4 && (
+          <figure>
+            <button type="button" class="gallery-thumb w-full cursor-zoom-in" data-index="3">
+              <ImageWrapper image={image4} className="rounded-default h-auto w-full" />
+            </button>
+          </figure>
+        )}
+      </div>
+    </div>
+
+    <!-- Lightbox dialog -->
+    <dialog class="gallery-lightbox backdrop:bg-black/80" aria-label="Image lightbox">
+      <div class="relative flex h-full w-full items-center justify-center">
+        <button type="button" class="lightbox-close absolute right-4 top-4 z-10 text-white text-3xl" aria-label="Close">&times;</button>
+        <button type="button" class="lightbox-prev absolute left-4 z-10 text-white text-3xl" aria-label="Previous">&#8249;</button>
+        <button type="button" class="lightbox-next absolute right-4 z-10 text-white text-3xl" aria-label="Next">&#8250;</button>
+        <img class="lightbox-img max-h-[90vh] max-w-[90vw] object-contain" src="" alt="" />
+      </div>
+    </dialog>
+  </section>
+) : (
+  <div class="component-no-data">ImageGalleryGrid: No data</div>
+)}
+
+<style>
+  .gallery-lightbox {
+    border: none;
+    background: transparent;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+  }
+  .gallery-lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.8);
+  }
+</style>
+
+<script>
+  function initGallery(section: HTMLElement) {
+    const dialog = section.querySelector<HTMLDialogElement>(".gallery-lightbox");
+    const img = section.querySelector<HTMLImageElement>(".lightbox-img");
+    const thumbs = section.querySelectorAll<HTMLButtonElement>(".gallery-thumb");
+    if (!dialog || !img || !thumbs.length) return;
+
+    const sources: string[] = [];
+    thumbs.forEach((thumb) => {
+      const imgEl = thumb.querySelector("img");
+      if (imgEl) sources.push(imgEl.src);
+    });
+
+    let current = 0;
+    function show(idx: number) {
+      current = (idx + sources.length) % sources.length;
+      img!.src = sources[current];
+      if (!dialog!.open) dialog!.showModal();
+    }
+
+    thumbs.forEach((thumb) => {
+      thumb.addEventListener("click", () => show(Number(thumb.dataset.index || 0)));
+    });
+
+    section.querySelector(".lightbox-close")?.addEventListener("click", () => dialog.close());
+    section.querySelector(".lightbox-prev")?.addEventListener("click", () => show(current - 1));
+    section.querySelector(".lightbox-next")?.addEventListener("click", () => show(current + 1));
+    dialog.addEventListener("click", (e) => { if (e.target === dialog) dialog.close(); });
+    dialog.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") show(current - 1);
+      if (e.key === "ArrowRight") show(current + 1);
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("section[aria-label='Image gallery']").forEach(initGallery);
+</script>

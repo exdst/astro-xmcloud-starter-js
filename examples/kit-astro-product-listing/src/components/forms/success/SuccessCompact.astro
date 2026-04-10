@@ -1,0 +1,36 @@
+---
+/**
+ * SuccessCompact - Astro equivalent of success-compact.dev.tsx
+ * Renders a compact success message with animated check icon.
+ */
+interface Props {
+  successMessage: string;
+}
+
+const { successMessage } = Astro.props as Props;
+---
+
+<div class="animate-fade-in w-full opacity-100 transition-all duration-300 ease-in-out">
+  <div class="flex h-12 items-center space-x-3 rounded-md px-2 group-[.position-center]:justify-center">
+    <div class="relative flex-shrink-0">
+      <span class="bg-primary-foreground absolute inset-0 inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+      <!-- CheckCircle icon -->
+      <svg
+        class="relative z-10 h-8 w-8"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+        <polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+    <p class="animate-fade-in font-medium">{successMessage}</p>
+  </div>
+</div>

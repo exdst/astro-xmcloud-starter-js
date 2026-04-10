@@ -1,0 +1,19 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+
+interface LogoProps {
+  logo?: any;
+  class?: string;
+}
+
+const { logo, class: className = '' } = Astro.props as LogoProps;
+---
+
+{logo?.value?.src ? (
+  <AstroImage
+    field={logo}
+    class={`w-full object-contain ${className}`}
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    alt="Home"
+  />
+) : null}

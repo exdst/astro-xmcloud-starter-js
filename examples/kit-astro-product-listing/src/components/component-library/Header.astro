@@ -1,0 +1,39 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { HeaderIsland } from "./Header.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const sf = (f: any) => f?.value ?? '';
+const si = (f: any) => ({ src: f?.value?.src ?? '', alt: f?.value?.alt ?? '' });
+const sl = (f: any) => ({ href: f?.value?.href ?? '', text: f?.value?.text ?? '', target: f?.value?.target ?? '' });
+
+const fieldData = fields ? {
+  Tagline: sf(fields.Tagline),
+  Heading: sf(fields.Heading),
+  Body: sf(fields.Body),
+  Link1: sl(fields.Link1),
+  Link2: sl(fields.Link2),
+  Image: si(fields.Image),
+  FormDisclaimer: sf(fields.FormDisclaimer),
+} : null;
+---
+
+{fieldData ? (
+  <HeaderIsland
+    client:visible
+    variant={variant}
+    styles={styles}
+    fields={fieldData}
+    isEditing={isEditing}
+  />
+) : (
+  <div class="is-empty-hint">Header</div>
+)}

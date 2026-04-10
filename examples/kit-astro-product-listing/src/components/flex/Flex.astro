@@ -1,0 +1,248 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const flexVariants: Record<string, Record<string, string>> = {
+  direction: {
+    row: 'flex-row',
+    'row-reverse': 'flex-row-reverse',
+    col: 'flex-col',
+  },
+  justify: {
+    start: 'justify-start',
+    center: 'justify-center',
+    end: 'justify-end',
+    between: 'justify-between',
+    around: 'justify-around',
+    evenly: 'justify-evenly',
+  },
+  align: {
+    start: 'items-start',
+    center: 'items-center',
+    end: 'items-end',
+    stretch: 'items-stretch',
+    baseline: 'items-baseline',
+  },
+  gap: {
+    '0': 'gap-0',
+    '1': 'gap-1',
+    '2': 'gap-2',
+    '3': 'gap-3',
+    '4': 'gap-4',
+    '5': 'gap-5',
+    '6': 'gap-6',
+    '7': 'gap-7',
+    '8': 'gap-8',
+  },
+  wrap: {
+    wrap: 'flex-wrap',
+    nowrap: 'flex-nowrap',
+    'wrap-reverse': 'flex-wrap-reverse',
+  },
+  grow: {
+    '0': 'grow-0',
+    '1': 'grow',
+  },
+  shrink: {
+    '0': 'shrink-0',
+    '1': 'shrink',
+  },
+  basis: {
+    auto: 'basis-auto',
+    full: 'basis-full',
+    '0': 'basis-0',
+    '1/2': 'basis-1/2',
+    '1/3': 'basis-1/3',
+    '2/3': 'basis-2/3',
+    '1/4': 'basis-1/4',
+    '2/4': 'basis-2/4',
+    '3/4': 'basis-3/4',
+    '1/5': 'basis-1/5',
+    '2/5': 'basis-2/5',
+    '3/5': 'basis-3/5',
+    '4/5': 'basis-4/5',
+    '1/6': 'basis-1/6',
+    '2/6': 'basis-2/6',
+    '3/6': 'basis-3/6',
+    '4/6': 'basis-4/6',
+    '5/6': 'basis-5/6',
+    '1/8': 'basis-1/8',
+    '2/8': 'basis-2/8',
+    '3/8': 'basis-3/8',
+    '4/8': 'basis-4/8',
+    '5/8': 'basis-5/8',
+    '6/8': 'basis-6/8',
+    '7/8': 'basis-7/8',
+    '1/10': 'basis-1/10',
+    '2/10': 'basis-2/10',
+    '3/10': 'basis-3/10',
+    '4/10': 'basis-4/10',
+    '5/10': 'basis-5/10',
+    '6/10': 'basis-6/10',
+    '7/10': 'basis-7/10',
+    '8/10': 'basis-8/10',
+    '9/10': 'basis-9/10',
+    '1/12': 'basis-1/12',
+    '2/12': 'basis-2/12',
+    '3/12': 'basis-3/12',
+    '4/12': 'basis-4/12',
+    '5/12': 'basis-5/12',
+    '6/12': 'basis-6/12',
+    '7/12': 'basis-7/12',
+    '8/12': 'basis-8/12',
+    '9/12': 'basis-9/12',
+    '10/12': 'basis-10/12',
+    '11/12': 'basis-11/12',
+    '1/14': 'basis-1/14',
+    '2/14': 'basis-2/14',
+    '3/14': 'basis-3/14',
+    '4/14': 'basis-4/14',
+    '5/14': 'basis-5/14',
+    '6/14': 'basis-6/14',
+    '7/14': 'basis-7/14',
+    '8/14': 'basis-8/14',
+    '9/14': 'basis-9/14',
+    '10/14': 'basis-10/14',
+    '11/14': 'basis-11/14',
+    '12/14': 'basis-12/14',
+    '13/14': 'basis-13/14',
+    '1/16': 'basis-1/16',
+    '2/16': 'basis-2/16',
+    '3/16': 'basis-3/16',
+    '4/16': 'basis-4/16',
+    '5/16': 'basis-5/16',
+    '6/16': 'basis-6/16',
+    '7/16': 'basis-7/16',
+    '8/16': 'basis-8/16',
+    '9/16': 'basis-9/16',
+    '10/16': 'basis-10/16',
+    '11/16': 'basis-11/16',
+    '12/16': 'basis-12/16',
+    '13/16': 'basis-13/16',
+    '14/16': 'basis-14/16',
+    '15/16': 'basis-15/16',
+  },
+  width: {
+    auto: 'w-auto',
+    full: 'w-full',
+    '0': 'w-0',
+    '1/2': 'w-1/2',
+    '1/3': 'w-1/3',
+    '2/3': 'w-2/3',
+    '1/4': 'w-1/4',
+    '2/4': 'w-2/4',
+    '3/4': 'w-3/4',
+    '1/5': 'w-1/5',
+    '2/5': 'w-2/5',
+    '3/5': 'w-3/5',
+    '4/5': 'w-4/5',
+    '1/6': 'w-1/6',
+    '2/6': 'w-2/6',
+    '3/6': 'w-3/6',
+    '4/6': 'w-4/6',
+    '5/6': 'w-5/6',
+    '1/8': 'w-1/8',
+    '2/8': 'w-2/8',
+    '3/8': 'w-3/8',
+    '4/8': 'w-4/8',
+    '5/8': 'w-5/8',
+    '6/8': 'w-6/8',
+    '7/8': 'w-7/8',
+    '1/10': 'w-1/10',
+    '2/10': 'w-2/10',
+    '3/10': 'w-3/10',
+    '4/10': 'w-4/10',
+    '5/10': 'w-5/10',
+    '6/10': 'w-6/10',
+    '7/10': 'w-7/10',
+    '8/10': 'w-8/10',
+    '9/10': 'w-9/10',
+    '1/12': 'w-1/12',
+    '2/12': 'w-2/12',
+    '3/12': 'w-3/12',
+    '4/12': 'w-4/12',
+    '5/12': 'w-5/12',
+    '6/12': 'w-6/12',
+    '7/12': 'w-7/12',
+    '8/12': 'w-8/12',
+    '9/12': 'w-9/12',
+    '10/12': 'w-10/12',
+    '11/12': 'w-11/12',
+    '1/14': 'w-1/14',
+    '2/14': 'w-2/14',
+    '3/14': 'w-3/14',
+    '4/14': 'w-4/14',
+    '5/14': 'w-5/14',
+    '6/14': 'w-6/14',
+    '7/14': 'w-7/14',
+    '8/14': 'w-8/14',
+    '9/14': 'w-9/14',
+    '10/14': 'w-10/14',
+    '11/14': 'w-11/14',
+    '12/14': 'w-12/14',
+    '13/14': 'w-13/14',
+    '1/16': 'w-1/16',
+    '2/16': 'w-2/16',
+    '3/16': 'w-3/16',
+    '4/16': 'w-4/16',
+    '5/16': 'w-5/16',
+    '6/16': 'w-6/16',
+    '7/16': 'w-7/16',
+    '8/16': 'w-8/16',
+    '9/16': 'w-9/16',
+    '10/16': 'w-10/16',
+    '11/16': 'w-11/16',
+    '12/16': 'w-12/16',
+    '13/16': 'w-13/16',
+    '14/16': 'w-14/16',
+    '15/16': 'w-15/16',
+  },
+  alignSelf: {
+    auto: 'self-auto',
+    'flex-start': 'self-flex-start',
+    'flex-end': 'self-flex-end',
+    center: 'self-center',
+    baseline: 'self-baseline',
+    stretch: 'self-stretch',
+  },
+};
+
+function getVariant(key: string, value: string | undefined): string {
+  if (!value) return '';
+  return flexVariants[key]?.[value] || '';
+}
+
+interface FlexComponentProps extends ComponentProps {
+  params: ComponentProps["params"] & {
+    DynamicPlaceholderId: string;
+  };
+}
+
+const { rendering, params } = Astro.props as FlexComponentProps;
+const fields = rendering?.fields as Record<string, any> | undefined;
+const { DynamicPlaceholderId } = params;
+
+const phKey = `flex-${DynamicPlaceholderId}`;
+
+const direction = fields?.direction?.value || 'col';
+const justify = fields?.justify?.value || 'start';
+const align = fields?.align?.value || 'center';
+const gap = fields?.gap?.value || '4';
+const customClassName = fields?.className?.value || '';
+const wrap = 'wrap';
+
+const flexClasses = [
+  '@xl:px-8 mx-auto max-w-screen-xl px-6',
+  'mx-auto flex md:flex-row',
+  getVariant('direction', direction),
+  getVariant('justify', justify),
+  getVariant('align', align),
+  getVariant('gap', gap),
+  getVariant('wrap', wrap),
+  customClassName,
+].filter(Boolean).join(' ');
+---
+
+<div class={flexClasses}>
+  <Placeholder name={phKey} rendering={rendering} />
+</div>

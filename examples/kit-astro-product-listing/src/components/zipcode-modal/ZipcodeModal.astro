@@ -1,0 +1,175 @@
+---
+/**
+ * ZipcodeModal - Astro equivalent of zipcode-modal.dev.tsx
+ * Uses HTML <dialog> element with vanilla JS for modal behavior.
+ */
+interface Props {
+  error?: string | null;
+}
+
+const { error = null } = Astro.props as Props;
+---
+
+<dialog
+  class="zipcode-modal m-auto w-full max-w-[425px] rounded-lg bg-background p-0 text-foreground shadow-lg backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+  data-zipcode-modal
+>
+  <div class="p-6">
+    <!-- Header -->
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold leading-none tracking-tight">Enter your zipcode</h2>
+      <p class="mt-2 text-sm text-muted-foreground" data-modal-description>
+        {error
+          ? `We couldn't access your location: ${error}. Please enter your zipcode manually or try again.`
+          : 'Please enter your zipcode to continue.'}
+      </p>
+    </div>
+
+    <!-- Close button -->
+    <button
+      class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      data-modal-close
+      aria-label="Close"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Form -->
+    <form class="space-y-4 py-4" data-zipcode-form>
+      <div class="space-y-2">
+        <input
+          id="zipcode"
+          type="text"
+          placeholder="Enter your zipcode (e.g., 10001)"
+          class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          data-zipcode-input
+        />
+        <p class="hidden text-sm text-red-500" data-zipcode-error></p>
+      </div>
+
+      <div class="pt-2">
+        <button
+          type="button"
+          class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          data-use-location
+        >
+          <!-- MapPin icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span data-location-text>Use my location</span>
+          <div class="ml-1 hidden h-4 w-4 animate-spin rounded-full border-b-2 border-primary" data-location-spinner></div>
+        </button>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button
+          type="submit"
+          class="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        >
+          Save zipcode
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+  document.querySelectorAll('[data-zipcode-modal]').forEach((dialog) => {
+    const modal = dialog as HTMLDialogElement;
+    const form = modal.querySelector('[data-zipcode-form]') as HTMLFormElement;
+    const input = modal.querySelector('[data-zipcode-input]') as HTMLInputElement;
+    const errorEl = modal.querySelector('[data-zipcode-error]') as HTMLElement;
+    const closeBtn = modal.querySelector('[data-modal-close]') as HTMLButtonElement;
+    const locationBtn = modal.querySelector('[data-use-location]') as HTMLButtonElement;
+    const locationText = modal.querySelector('[data-location-text]') as HTMLElement;
+    const locationSpinner = modal.querySelector('[data-location-spinner]') as HTMLElement;
+
+    function showError(msg: string) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove('hidden');
+      input.classList.add('border-red-500');
+    }
+
+    function clearError() {
+      errorEl.classList.add('hidden');
+      input.classList.remove('border-red-500');
+    }
+
+    closeBtn?.addEventListener('click', () => {
+      modal.close();
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+
+    input?.addEventListener('input', () => {
+      clearError();
+    });
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const zipcode = input.value.trim();
+
+      if (!zipcode) {
+        showError('Please enter a valid zipcode');
+        return;
+      }
+
+      const zipcodeRegex = /^\d{5}(-\d{4})?$/;
+      if (!zipcodeRegex.test(zipcode)) {
+        showError('Please enter a valid 5-digit zipcode');
+        return;
+      }
+
+      // Dispatch custom event with the zipcode
+      modal.dispatchEvent(new CustomEvent('zipcode-submit', {
+        detail: { zipcode },
+        bubbles: true,
+      }));
+
+      input.value = '';
+      clearError();
+      modal.close();
+    });
+
+    locationBtn?.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        showError('Geolocation is not supported by your browser');
+        return;
+      }
+
+      locationText.textContent = 'Getting location...';
+      locationSpinner.classList.remove('hidden');
+      locationBtn.disabled = true;
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          modal.dispatchEvent(new CustomEvent('zipcode-location', {
+            detail: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+            bubbles: true,
+          }));
+          locationText.textContent = 'Use my location';
+          locationSpinner.classList.add('hidden');
+          locationBtn.disabled = false;
+          modal.close();
+        },
+        (err) => {
+          const descEl = modal.querySelector('[data-modal-description]') as HTMLElement;
+          if (descEl) {
+            descEl.textContent = `We couldn't access your location: ${err.message}. Please enter your zipcode manually or try again.`;
+          }
+          locationText.textContent = 'Use my location';
+          locationSpinner.classList.add('hidden');
+          locationBtn.disabled = false;
+        }
+      );
+    });
+  });
+</script>

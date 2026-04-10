@@ -1,0 +1,66 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const heading = fields?.heading;
+const description = fields?.description;
+
+const hasPagesPositionStyles = params?.styles
+  ? (params.styles as string).includes('position-')
+  : false;
+
+const positionClass = !hasPagesPositionStyles ? 'position-left' : '';
+const stylesClass = params?.styles || '';
+---
+
+{fields ? (
+  <section
+    data-component="TextBanner"
+    data-class-change
+    class:list={[
+      'bg-primary text-foreground group relative w-full overflow-hidden border-b-2 border-t-2 [.border-b-2+&]:border-t-0',
+      positionClass,
+      stylesClass,
+    ]}
+  >
+    <div class="@container/textbanner">
+      <div class="@lg/textbanner:mx-auto @xl/textbanner:group-[.container--full-bleed]:px-8 @lg/textbanner:pt-28 @lg/textbanner:pb-24 @sm/textbanner:py-14 @lg/textbanner:px-20 @sm/textbanner:px-14 mx-auto max-w-screen-xl px-6 py-8">
+        {/* Title */}
+        <astro-animated-section
+          data-direction="left"
+          data-editing={isEditing ? "true" : undefined}
+        >
+          <Text
+            tag="h2"
+            field={heading}
+            class="text-box-trim-both-baseline font-heading @lg/textbanner:text-8xl relative text-balance text-right"
+          />
+        </astro-animated-section>
+        {/* Description */}
+        <astro-animated-section
+          data-direction="right"
+          data-delay="600"
+          data-editing={isEditing ? "true" : undefined}
+        >
+          <Text
+            tag="p"
+            field={description}
+            class="text-box-trim-both-baseline @lg/textbanner:mt-20 @md/textbanner:mt-16 @sm/textbanner:mt-12 mr-auto mt-10 max-w-[53.3855ch] text-pretty text-left leading-tight"
+          />
+        </astro-animated-section>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Text Banner</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

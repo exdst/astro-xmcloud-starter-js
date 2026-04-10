@@ -1,0 +1,92 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import AccordionBlockItem from "./AccordionBlockItem.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const heading = datasource?.heading?.jsonValue;
+const description = datasource?.description?.jsonValue;
+const link = datasource?.link?.jsonValue;
+const accordionItems = datasource?.children?.results ?? [];
+
+const leftColumnItems = accordionItems.slice(0, Math.ceil(accordionItems.length / 2));
+const rightColumnItems = accordionItems.slice(Math.ceil(accordionItems.length / 2));
+---
+
+{datasource ? (
+  <section
+    data-component="Accordion5050TitleAbove"
+    class={`@container @md:py-16 @lg:py-20 bg-background text-foreground border-b-2 border-t-2 py-10 [.border-b-2+&]:border-t-0 ${params?.styles || ''}`}
+    data-class-change
+    aria-labelledby={heading?.value ? 'accordion-5050-heading' : undefined}
+  >
+    <div
+      class="@xl:px-0 mx-auto grid max-w-screen-xl gap-6 px-0 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6"
+      data-component="AccordionBlockContentWrapper"
+    >
+      <div class="@md:grid @md:grid-cols-2 @md:gap-8 @lg:gap-12 @xl:gap-16 items-end">
+        <div>
+          {heading && (
+            <Text
+              tag="h2"
+              id="accordion-5050-heading"
+              class="font-heading @md:text-6xl @lg:text-7xl mb-8 max-w-screen-sm text-pretty text-5xl font-light leading-[1.1] tracking-tighter antialiased"
+              field={heading}
+            />
+          )}
+        </div>
+        {(isEditing || description?.value || link?.value?.href) && (
+          <div class="bg-primary @sm:flex-row @sm:text-start @md:flex-col @md:text-center @lg:flex-row @lg:text-start mt-6 flex flex-col flex-nowrap items-center gap-4 p-7 text-center">
+            <Text
+              tag="p"
+              class="text-primary-foreground font-heading text-lg font-light"
+              field={description}
+            />
+            {link && (
+              isEditing ? (
+                <Link
+                  field={link}
+                  class="inline-flex items-center justify-center whitespace-nowrap rounded-default bg-secondary px-8 py-2.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                />
+              ) : (
+                link?.value?.href && (
+                  <a
+                    href={link.value.href}
+                    class="inline-flex items-center justify-center whitespace-nowrap rounded-default bg-secondary px-8 py-2.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                  >
+                    {link.value.text}
+                  </a>
+                )
+              )
+            )}
+          </div>
+        )}
+      </div>
+
+      <div class="@md:grid @md:grid-cols-2 @md:gap-8 @lg:gap-12 @xl:gap-16 mt-8">
+        <div>
+          <div class="@md:gap-11 grid w-full gap-8 p-0">
+            {leftColumnItems.map((child: any) => (
+              <AccordionBlockItem child={child} isEditing={isEditing} />
+            ))}
+          </div>
+        </div>
+        <div>
+          <div class="@md:gap-11 grid w-full gap-8 p-0">
+            {rightColumnItems.map((child: any) => (
+              <AccordionBlockItem child={child} isEditing={isEditing} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Accordion 50/50 Title Above</div>
+)}

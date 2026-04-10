@@ -1,0 +1,83 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface ContainerTwoColumnProps extends ComponentProps {
+  params: ComponentProps["params"] & {
+    DynamicPlaceholderId: string;
+    excludeTopMargin?: string;
+  };
+}
+
+const { params, rendering } = Astro.props as ContainerTwoColumnProps;
+const {
+  styles = "",
+  DynamicPlaceholderId,
+  excludeTopMargin,
+} = params;
+
+const componentName = rendering?.componentName || "";
+const hasMargin = excludeTopMargin !== "1";
+
+// Map component names to placeholder fragments and basis classes
+const layoutMap: Record<string, { left: string; right: string; leftBasis: string; rightBasis: string; cssClass: string }> = {
+  Container5050: {
+    left: "container-fifty-left",
+    right: "container-fifty-right",
+    leftBasis: "basis-1/2",
+    rightBasis: "basis-1/2",
+    cssClass: "container--5050",
+  },
+  Container7030: {
+    left: "container-seventy-left",
+    right: "container-thirty-right",
+    leftBasis: "basis-7/10",
+    rightBasis: "basis-3/10",
+    cssClass: "container--7030",
+  },
+  Container3070: {
+    left: "container-thirty-left",
+    right: "container-seventy-right",
+    leftBasis: "basis-3/10",
+    rightBasis: "basis-7/10",
+    cssClass: "container--3070",
+  },
+  Container4060: {
+    left: "container-forty-left",
+    right: "container-sixty-right",
+    leftBasis: "basis-4/10",
+    rightBasis: "basis-6/10",
+    cssClass: "container--4060",
+  },
+  Container6040: {
+    left: "container-sixty-left",
+    right: "container-forty-right",
+    leftBasis: "basis-6/10",
+    rightBasis: "basis-4/10",
+    cssClass: "container--6040",
+  },
+};
+
+const layout = layoutMap[componentName] || layoutMap.Container5050;
+const leftPhKey = `${layout.left}-${DynamicPlaceholderId}`;
+const rightPhKey = `${layout.right}-${DynamicPlaceholderId}`;
+
+const sectionClasses = [
+  `@container ${layout.cssClass} group`,
+  hasMargin ? "mt-4" : "mt-0",
+  styles,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section class={sectionClasses}>
+  <div class="mx-auto max-w-screen-xl px-4 xl:px-8 flex md:flex-row flex-col justify-start items-center gap-4 flex-nowrap">
+    <div class={`grow-0 shrink ${layout.leftBasis} md:${layout.leftBasis} w-full`}>
+      <Placeholder name={leftPhKey} rendering={rendering} />
+    </div>
+    <div class={`grow-0 shrink ${layout.rightBasis} md:${layout.rightBasis} w-full`}>
+      <Placeholder name={rightPhKey} rendering={rendering} />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+---
+/**
+ * NavigationMenuToggle - Astro equivalent of NavigationMenuToggle.client.tsx
+ * Handles navigation menu toggle state (mobile hamburger) via vanilla JS.
+ */
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+---
+
+<div class={className} data-nav-menu-toggle data-is-editing={isEditing ? 'true' : undefined}>
+  <input
+    type="checkbox"
+    class="menu-mobile-navigate"
+    aria-label="Toggle navigation menu"
+    data-menu-checkbox
+  />
+  <slot />
+</div>
+
+<script>
+  document.querySelectorAll('[data-nav-menu-toggle]').forEach((container) => {
+    const checkbox = container.querySelector('[data-menu-checkbox]') as HTMLInputElement;
+    const isEditing = (container as HTMLElement).dataset.isEditing === 'true';
+
+    checkbox?.addEventListener('change', (e) => {
+      if (isEditing) {
+        e.preventDefault();
+        return;
+      }
+    });
+  });
+</script>

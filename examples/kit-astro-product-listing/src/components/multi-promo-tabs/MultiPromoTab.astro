@@ -1,0 +1,117 @@
+---
+/**
+ * MultiPromoTab - Astro equivalent of MultiPromoTab.dev.tsx
+ * Renders a tab panel with two linked images.
+ */
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Props {
+  link1?: {
+    jsonValue?: any;
+  };
+  link2?: {
+    jsonValue?: any;
+  };
+  image1?: {
+    jsonValue?: any;
+  };
+  image2?: {
+    jsonValue?: any;
+  };
+}
+
+const { link1, link2, image1, image2 } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const link1Href = link1?.jsonValue?.value?.href || '';
+const link1Text = link1?.jsonValue?.value?.text || 'Learn more';
+const link1External = link1?.jsonValue?.value?.target === '_blank';
+const link2Href = link2?.jsonValue?.value?.href || '';
+const link2Text = link2?.jsonValue?.value?.text || 'Learn more';
+const link2External = link2?.jsonValue?.value?.target === '_blank';
+---
+
+<div class="multi-promo-tab @md:grid-cols-2 @md:my-16 my-8 grid grid-cols-1 gap-6">
+  <div
+    class="group relative block overflow-hidden rounded-2xl"
+    data-multi-promo-tab-card
+    data-href={!isEditing ? link1Href : undefined}
+    data-external={!isEditing && link1External ? 'true' : undefined}
+  >
+    <div class="flex h-full w-full overflow-hidden">
+      {image1?.jsonValue && (
+        <AstroImage field={image1.jsonValue} class="h-full w-full object-cover" />
+      )}
+    </div>
+    {link1?.jsonValue && (
+      isEditing ? (
+        <Link
+          field={link1.jsonValue}
+          class="bg-popover hover:bg-popover hover:text-popover-foreground text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-normal backdrop-blur-sm transition-all duration-500 group-hover:translate-x-2"
+        />
+      ) : (
+        <a
+          href={link1Href}
+          target={link1External ? '_blank' : undefined}
+          class="bg-popover hover:bg-popover hover:text-popover-foreground text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-normal backdrop-blur-sm transition-all duration-500 group-hover:translate-x-2"
+        >
+          {link1Text}
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+          </svg>
+        </a>
+      )
+    )}
+  </div>
+
+  <div
+    class="group relative block overflow-hidden rounded-2xl"
+    data-multi-promo-tab-card
+    data-href={!isEditing ? link2Href : undefined}
+    data-external={!isEditing && link2External ? 'true' : undefined}
+  >
+    <div class="flex h-full w-full overflow-hidden">
+      {image2?.jsonValue && (
+        <AstroImage field={image2.jsonValue} class="h-full w-full object-cover" />
+      )}
+    </div>
+    {link2?.jsonValue && (
+      isEditing ? (
+        <Link
+          field={link2.jsonValue}
+          class="bg-popover hover:bg-popover hover:text-popover-foreground text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-normal backdrop-blur-sm transition-all duration-500 group-hover:translate-x-2"
+        />
+      ) : (
+        <a
+          href={link2Href}
+          target={link2External ? '_blank' : undefined}
+          class="bg-popover hover:bg-popover hover:text-popover-foreground text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-normal backdrop-blur-sm transition-all duration-500 group-hover:translate-x-2"
+        >
+          {link2Text}
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="7" y1="17" x2="17" y2="7" /><polyline points="7 7 17 7 17 17" />
+          </svg>
+        </a>
+      )
+    )}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-multi-promo-tab-card]').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      const el = card as HTMLElement;
+      const href = el.dataset.href;
+      if (!href) return;
+      const isExternal = el.dataset.external === 'true';
+      if (isExternal) {
+        window.open(href, '_blank');
+      } else {
+        window.location.href = href;
+      }
+    });
+  });
+</script>

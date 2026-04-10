@@ -1,0 +1,22 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import AccordionBlockDefault from "./AccordionBlockDefault.astro";
+import AccordionBlockCentered from "./AccordionBlockCentered.astro";
+import Accordion5050TitleAbove from "./Accordion5050TitleAbove.astro";
+import AccordionBlockTwoColumnTitleLeft from "./AccordionBlockTwoColumnTitleLeft.astro";
+import AccordionBlockOneColumnTitleLeft from "./AccordionBlockOneColumnTitleLeft.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: AccordionBlockDefault,
+  Centered: AccordionBlockCentered,
+  FiftyFiftyTitleAbove: Accordion5050TitleAbove,
+  TwoColumnTitleLeft: AccordionBlockTwoColumnTitleLeft,
+  OneColumnTitleLeft: AccordionBlockOneColumnTitleLeft,
+};
+
+const Component = variants[variant] || AccordionBlockDefault;
+---
+<Component {...Astro.props} />

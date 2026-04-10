@@ -1,0 +1,151 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+
+if (!fields) return;
+
+const title = fields?.title;
+const caption = fields?.caption;
+const video = fields?.video;
+const image = fields?.image;
+const image2 = fields?.image2;
+
+const videoUrl = video?.value?.href || "";
+const imageSrc = image?.value?.src || "";
+
+// Extract YouTube video ID
+function extractVideoId(url: string): string | null {
+  if (!url) return null;
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+  );
+  return match ? match[1] : null;
+}
+
+const videoId = extractVideoId(videoUrl);
+---
+
+{variant === "TextCenter" ? (
+  <section class={`relative ${styles}`} data-class-change>
+    <div class="flex flex-col items-center gap-4 max-w-3xl px-4 py-12 lg:py-16 mx-auto text-center">
+      <h3 class="lg:px-10 text-xl lg:text-3xl leading-loose tracking-normal uppercase">
+        <Text field={title} />
+      </h3>
+      <div class="text-base lg:text-lg leading-8 tracking-normal">
+        <Text field={caption} />
+      </div>
+    </div>
+    <div class="relative flex items-center justify-center">
+      <div class="absolute inset-0 z-10">
+        <AstroImage field={image2} class="w-full h-full object-cover" />
+      </div>
+      <div class="flex items-center justify-center w-full px-4 py-12 lg:py-16 backdrop-blur-md bg-[linear-gradient(136deg,rgba(255,255,255,0.08)_2.61%,rgba(255,255,255,0.15)_73.95%)] z-20">
+        <div class="container mx-auto">
+          <astro-video-st data-video-id={videoId} data-video-url={videoUrl}>
+            <div class="relative aspect-video w-full overflow-hidden">
+              <div class="absolute inset-0">
+                <div data-poster class="absolute inset-0">
+                  {imageSrc ? (
+                    <img src={imageSrc} alt="" class="h-full w-full object-cover" loading="lazy" />
+                  ) : videoId ? (
+                    <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" class="h-full w-full object-cover" loading="lazy" />
+                  ) : null}
+                </div>
+                <button data-play-btn class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center left-4 bottom-4 right-auto top-auto w-10 h-10 bg-primary rounded-none shadow" aria-label="Play video">
+                  <svg class="h-5 w-5 text-black" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
+                </button>
+                <div data-video-container class="absolute inset-0 hidden">
+                  {videoId && <iframe data-iframe width="100%" height="100%" src="" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="h-full w-full"></iframe>}
+                </div>
+              </div>
+            </div>
+          </astro-video-st>
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <!-- Default variant -->
+  <section class={`relative lg:mt-16 lg:py-16 ${styles}`} data-class-change>
+    <div class="container grid lg:grid-cols-2 gap-4 lg:gap-16 px-4 py-12 lg:py-16 mx-auto text-center lg:text-left">
+      <h3 class="text-xl lg:text-3xl leading-loose tracking-tight uppercase">
+        <Text field={title} />
+      </h3>
+      <div class="text-base lg:text-lg leading-8 tracking-normal">
+        <Text field={caption} />
+      </div>
+    </div>
+    <div class="relative flex items-center justify-center">
+      <div class="absolute inset-0 z-10">
+        <AstroImage field={image2} class="w-full h-full object-cover" />
+      </div>
+      <div class="flex items-center justify-center w-full px-4 py-12 lg:py-16 backdrop-blur-md bg-[linear-gradient(136deg,rgba(255,255,255,0.08)_2.61%,rgba(255,255,255,0.15)_73.95%)] z-20">
+        <div class="container mx-auto">
+          <astro-video-st data-video-id={videoId} data-video-url={videoUrl}>
+            <div class="relative aspect-video w-full overflow-hidden">
+              <div class="absolute inset-0">
+                <div data-poster class="absolute inset-0">
+                  {imageSrc ? (
+                    <img src={imageSrc} alt="" class="h-full w-full object-cover" loading="lazy" />
+                  ) : videoId ? (
+                    <img src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`} alt="" class="h-full w-full object-cover" loading="lazy" />
+                  ) : null}
+                </div>
+                <button data-play-btn class="absolute inset-0 z-20 flex cursor-pointer items-center justify-center left-4 bottom-4 right-auto top-auto w-10 h-10 bg-primary rounded-none shadow" aria-label="Play video">
+                  <svg class="h-5 w-5 text-black" fill="currentColor" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" /></svg>
+                </button>
+                <div data-video-container class="absolute inset-0 hidden">
+                  {videoId && <iframe data-iframe width="100%" height="100%" src="" title="Video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="h-full w-full"></iframe>}
+                </div>
+              </div>
+            </div>
+          </astro-video-st>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
+<script>
+  class AstroVideoST extends HTMLElement {
+    private videoId: string | null;
+    private videoUrl: string;
+    private playBtn: HTMLButtonElement | null;
+    private poster: HTMLElement | null;
+    private videoContainer: HTMLElement | null;
+    private iframe: HTMLIFrameElement | null;
+
+    constructor() {
+      super();
+      this.videoId = this.dataset.videoId || null;
+      this.videoUrl = this.dataset.videoUrl || "";
+      this.playBtn = this.querySelector("[data-play-btn]");
+      this.poster = this.querySelector("[data-poster]");
+      this.videoContainer = this.querySelector("[data-video-container]");
+      this.iframe = this.querySelector("[data-iframe]");
+    }
+
+    connectedCallback() {
+      this.playBtn?.addEventListener("click", () => this.play());
+    }
+
+    play() {
+      if (this.videoId && this.iframe) {
+        this.iframe.src = `https://www.youtube.com/embed/${this.videoId}?autoplay=1`;
+        this.videoContainer?.classList.remove("hidden");
+        this.poster?.classList.add("hidden");
+        this.playBtn?.classList.add("hidden");
+      } else if (this.videoUrl) {
+        window.open(this.videoUrl, "_blank");
+      }
+    }
+  }
+
+  customElements.define("astro-video-st", AstroVideoST);
+</script>

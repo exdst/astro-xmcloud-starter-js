@@ -1,0 +1,35 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { SubmissionFormIsland } from "./SubmissionForm.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const title = fields?.title?.value || "";
+const styles = params?.styles || "";
+
+const dictionary = {
+  firstNameLabel: "First name",
+  firstNamePlaceholder: "Enter your first name",
+  lastNameLabel: "Last name",
+  lastNamePlaceholder: "Enter your last (or family) name",
+  zipcodeLabel: "Zipcode",
+  zipcodePlaceholder: "Enter your zipcode",
+  emailLabel: "Email",
+  emailPlaceholder: "Enter your email address",
+  emailErrorMessage: "Please enter a valid email address",
+  phoneLabel: "Phone",
+  phonePlaceholder: "Enter your phone number",
+  buttonText: "Finish Booking",
+  successMessage: "Got it. Thank you! We will be in touch shortly.",
+};
+---
+
+<SubmissionFormIsland
+  client:visible
+  variant="Centered"
+  title={title}
+  styles={styles}
+  dictionary={dictionary}
+/>

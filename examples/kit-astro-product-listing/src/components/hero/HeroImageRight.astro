@@ -1,0 +1,155 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import ZipcodeSearchForm from "@/components/forms/zipcode/ZipcodeSearchForm.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = fields?.title;
+const description = fields?.description;
+const bannerText = fields?.bannerText;
+const bannerCTA = fields?.bannerCTA;
+const image = fields?.image;
+const dictionary = fields?.dictionary as Record<string, string> | undefined;
+const searchLink = fields?.searchLink;
+
+const hasPagesPositionStyles = params?.styles
+  ? (params.styles as string).includes('position-')
+  : false;
+
+const positionClass = !hasPagesPositionStyles ? 'position-left' : '';
+const stylesClass = params?.styles || '';
+
+const needsBanner = isEditing
+  ? true
+  : (bannerText?.value !== '' || bannerCTA?.value?.href !== '');
+---
+
+{fields ? (
+  <section
+    data-component="Hero"
+    class="@container/herowrapper bg-background text-foreground relative w-full overflow-hidden"
+  >
+    <div
+      class:list={[
+        '@lg/herowrapper:max-w-[1440px] @lg/herowrapper:mx-auto @md/herowrapper:flex-row group flex min-h-[600px] flex-col',
+        positionClass,
+        stylesClass,
+      ]}
+    >
+      {/* Left content */}
+      <div class="@container/herocontent @md/herowrapper:w-1/2 @sm/herowrapper:p-11 @[1200px]/herowrapper:p-24 flex flex-col items-center justify-center p-5 group-[.position-left]:items-start group-[.position-right]:items-end">
+        {/* Title */}
+        <astro-animated-section
+          data-direction="up"
+          data-editing={isEditing ? "true" : undefined}
+          class="relative z-20"
+        >
+          <Text
+            tag="h1"
+            field={title}
+            class="font-heading @md/herowrapper:text-[clamp(3rem,18cqi,6rem)] relative -ml-[2px] max-w-[15ch] text-balance text-[clamp(3rem,11cqi,4rem)] font-light leading-tight"
+          />
+        </astro-animated-section>
+
+        {/* Description */}
+        <astro-animated-section
+          data-direction="up"
+          data-delay="200"
+          data-editing={isEditing ? "true" : undefined}
+          class="mt-6"
+        >
+          {description && (
+            <Text
+              tag="p"
+              class="@xs/herocontent:text-xl max-w-[32ch] text-pretty leading-tight"
+              field={description}
+            />
+          )}
+        </astro-animated-section>
+
+        {/* Form */}
+        <astro-animated-section
+          data-direction="up"
+          data-delay="400"
+          data-editing={isEditing ? "true" : undefined}
+          class="mt-6 w-full"
+        >
+          <ZipcodeSearchForm
+            placeholder={dictionary?.ZipPlaceholder || 'Enter your zipcode.'}
+            buttonText={dictionary?.SubmitCTALabel || 'Find Availability'}
+            searchLinkHref={searchLink?.value?.href || ''}
+          />
+        </astro-animated-section>
+      </div>
+
+      {/* Image */}
+      <div class="@md/herowrapper:w-1/2 before:bg-foreground @md/herowrapper:before:w-[2px] @md/herowrapper:before:h-full @md/herowrapper:before:-left-[2px] @md/herowrapper:before:top-0 @md/herowrapper:before:bottom-0 relative before:absolute before:-top-[2px] before:left-0 before:right-0 before:z-10 before:block before:h-[2px] before:w-full">
+        {image?.value?.src && (
+          <div class="image-container max-h-[900px] relative w-full aspect-square @md/herowrapper:aspect-auto @md/herowrapper:absolute @md/herowrapper:top-0 @md/herowrapper:right-0 @md/herowrapper:bottom-0 @md/herowrapper:left-0">
+            <img
+              src={image.value.src}
+              alt={image.value.alt || ''}
+              class="absolute bottom-0 left-0 right-0 top-0 h-full w-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+        )}
+
+        {/* Banner overlay */}
+        {needsBanner && (
+          <div class="@container/herobanner bg-card-foreground @xs/herowrapper:bg-overlay text-primary-foreground @xs/herowrapper:absolute @xs/herowrapper:w-[calc(100%-40px)] @xs/herowrapper:bottom-5 @xs/herowrapper:left-5 @xs/herowrapper:group-[.position-right]:left-auto @xs/herowrapper:group-[.position-center]:left-1/2 @xs/herowrapper:group-[.position-center]:-translate-x-[50%] @xs/herowrapper:group-[.position-right]:right-5 @sm/herowrapper:w-[calc(100%-88px)] @sm/herowrapper:bottom-11 @sm/herowrapper:left-11 @sm/herowrapper:group-[.position-right]:right-11 relative z-10 w-full max-w-[27rem]">
+            <div class="@[35rem]/herobanner:flex-row @[35rem]/herobanner:items-center @[35rem]/herobanner:justify-between @[35rem]/herobanner:flex @[35rem]/herobanner:gap-10 @[35rem]/herobanner:text-left p-5">
+              {bannerText && (
+                <astro-animated-section
+                  data-direction="up"
+                  data-editing={isEditing ? "true" : undefined}
+                >
+                  <Text
+                    tag="p"
+                    class="font-heading @md/herowrapper:text-lg text-pretty font-light leading-tight"
+                    field={bannerText}
+                  />
+                </astro-animated-section>
+              )}
+              {bannerCTA?.value?.href && (
+                <astro-animated-section
+                  data-direction="up"
+                  data-delay="200"
+                  data-editing={isEditing ? "true" : undefined}
+                  class="@[35rem]/herobanner:mt-0 mt-6"
+                >
+                  {isEditing ? (
+                    <Link
+                      field={bannerCTA}
+                      class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                    />
+                  ) : (
+                    <a
+                      href={bannerCTA.value.href}
+                      class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                    >
+                      {bannerCTA.value.text}
+                    </a>
+                  )}
+                </astro-animated-section>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Hero</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

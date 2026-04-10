@@ -1,0 +1,22 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import HeroDefault from "./HeroDefault.astro";
+import HeroImageBackground from "./HeroImageBackground.astro";
+import HeroImageBottom from "./HeroImageBottom.astro";
+import HeroImageBottomInset from "./HeroImageBottomInset.astro";
+import HeroImageRight from "./HeroImageRight.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: HeroDefault,
+  ImageBackground: HeroImageBackground,
+  ImageBottom: HeroImageBottom,
+  ImageBottomInset: HeroImageBottomInset,
+  ImageRight: HeroImageRight,
+};
+
+const Component = variants[variant] || HeroDefault;
+---
+<Component {...Astro.props} />

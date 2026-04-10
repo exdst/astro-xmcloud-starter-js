@@ -1,0 +1,71 @@
+---
+interface Props {
+  placeholder?: string;
+  buttonText?: string;
+  searchLinkHref?: string;
+}
+
+const { placeholder = 'Enter your zip code', buttonText = 'Find Availability', searchLinkHref } = Astro.props as Props;
+---
+
+<astro-zipcode-form data-search-link={searchLinkHref || ''}>
+  <div class="@container/zipform w-full">
+    <form
+      data-zipcode-form
+      class="@[20rem]/zipform:flex-nowrap relative flex w-full flex-wrap gap-2 group-[.position-right]:justify-end group-[.position-center]:justify-center"
+    >
+      <div class="min-w-51 mt-0 flex-shrink basis-64 space-y-0">
+        <label class="sr-only" for="zipcode-input">Enter your zip code</label>
+        <input
+          id="zipcode-input"
+          type="tel"
+          name="zipcode"
+          placeholder={placeholder}
+          data-zipcode-input
+          class="border-input bg-foreground text-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring rounded-default font-heading flex h-10 w-full border px-3 py-2 text-base font-normal leading-none file:border-0 file:bg-transparent file:text-sm file:font-normal focus:placeholder-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+        />
+        <p data-zipcode-error class="absolute top-[100%] hidden pt-1 text-[#ff5252] text-sm"></p>
+      </div>
+      <button
+        type="submit"
+        class="bg-primary text-primary-foreground hover:bg-primary-hover inline-flex h-10 flex-shrink-0 items-center justify-center whitespace-nowrap rounded-default font-heading px-4 py-2.5 text-sm font-medium"
+      >
+        {buttonText}
+      </button>
+    </form>
+  </div>
+</astro-zipcode-form>
+
+<script>
+  import { USER_ZIPCODE } from '@/lib/constants';
+
+  class AstroZipcodeForm extends HTMLElement {
+    connectedCallback() {
+      const form = this.querySelector('[data-zipcode-form]') as HTMLFormElement;
+      const input = this.querySelector('[data-zipcode-input]') as HTMLInputElement;
+      const errorEl = this.querySelector('[data-zipcode-error]') as HTMLElement;
+      const searchLink = this.dataset.searchLink || '';
+
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const zipcode = input?.value?.trim() || '';
+        const isValid = /^(\d{5})$|^(\d{5}-\d{4})$/.test(zipcode);
+
+        if (!isValid) {
+          errorEl.textContent = 'Please enter a valid zip code';
+          errorEl.classList.remove('hidden');
+          return;
+        }
+
+        errorEl.classList.add('hidden');
+        sessionStorage.setItem(USER_ZIPCODE, zipcode);
+
+        if (searchLink) {
+          window.location.href = searchLink;
+        }
+      });
+    }
+  }
+
+  customElements.define('astro-zipcode-form', AstroZipcodeForm);
+</script>

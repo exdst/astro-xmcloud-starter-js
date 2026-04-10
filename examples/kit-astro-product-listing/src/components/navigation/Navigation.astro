@@ -1,0 +1,57 @@
+---
+import NavigationListItem from "./NavigationListItem.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface Fields {
+  Id: string;
+  DisplayName: string;
+  Title: { value?: string };
+  NavigationTitle: { value?: string };
+  Href: string;
+  Querystring: string;
+  Children: Array<Fields>;
+  Styles: string[];
+}
+
+interface NavigationProps extends ComponentProps {
+  fields: Fields;
+}
+
+const { params, fields } = Astro.props as NavigationProps;
+const { styles = "", RenderingIdentifier: id } = params;
+
+const navigationItems = fields ? Object.values(fields).filter(Boolean) as Fields[] : [];
+const isEmpty = navigationItems.length === 0;
+---
+
+<div class={`component navigation ${styles}`} id={id}>
+  {isEmpty ? (
+    <div class="component-content">[Navigation]</div>
+  ) : (
+    <label class="menu-mobile-navigate-wrapper">
+      <input
+        type="checkbox"
+        class="menu-mobile-navigate"
+        aria-label="Toggle navigation menu"
+      />
+      <div class="menu-humburger" />
+      <div class="component-content">
+        <nav>
+          <ul class="clearfix">
+            {navigationItems.map((item) => (
+              <NavigationListItem fields={item} relativeLevel={1} />
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </label>
+  )}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.navigation-title.child').forEach((el) => {
+    el.addEventListener('click', () => {
+      el.closest('li')?.classList.toggle('active');
+    });
+  });
+</script>

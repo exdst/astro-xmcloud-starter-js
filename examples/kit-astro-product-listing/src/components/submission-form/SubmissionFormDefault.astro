@@ -1,0 +1,36 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { SubmissionFormIsland } from "./SubmissionForm.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const title = fields?.title?.value || "";
+const styles = params?.styles || "";
+
+// Dictionary defaults (in production these would come from Sitecore dictionary)
+const dictionary = {
+  firstNameLabel: "First name",
+  firstNamePlaceholder: "First name",
+  lastNameLabel: "Last name",
+  lastNamePlaceholder: "Last name",
+  zipcodeLabel: "Zipcode",
+  zipcodePlaceholder: "Zipcode",
+  emailLabel: "Email",
+  emailPlaceholder: "Enter your email address",
+  emailErrorMessage: "Please enter a valid email address",
+  phoneLabel: "Phone",
+  phonePlaceholder: "Phone",
+  buttonText: "Finish Booking",
+  successMessage: "Got it. Thank you! We will be in touch shortly.",
+};
+---
+
+<SubmissionFormIsland
+  client:visible
+  variant="Default"
+  title={title}
+  styles={styles}
+  dictionary={dictionary}
+/>

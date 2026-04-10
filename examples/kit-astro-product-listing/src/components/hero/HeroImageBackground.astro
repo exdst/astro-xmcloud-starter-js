@@ -1,0 +1,160 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import ZipcodeSearchForm from "@/components/forms/zipcode/ZipcodeSearchForm.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = fields?.title;
+const description = fields?.description;
+const bannerText = fields?.bannerText;
+const bannerCTA = fields?.bannerCTA;
+const image = fields?.image;
+const dictionary = fields?.dictionary as Record<string, string> | undefined;
+const searchLink = fields?.searchLink;
+
+const hasPagesPositionStyles = params?.styles
+  ? (params.styles as string).includes('position-')
+  : false;
+
+const positionClass = !hasPagesPositionStyles ? 'position-left' : '';
+const stylesClass = params?.styles || '';
+
+const needsBanner = isEditing
+  ? true
+  : (bannerText?.value !== '' || bannerCTA?.value?.href !== '');
+---
+
+{fields ? (
+  <section
+    data-component="Hero"
+    class="@container/herowrapper bg-background text-foreground relative w-full overflow-hidden"
+  >
+    <div
+      class:list={[
+        'group relative',
+        positionClass,
+        stylesClass,
+      ]}
+    >
+      {/* Image */}
+      {image?.value?.src && (
+        <div class="image-container absolute w-full inset-0 scrim-background/50 scrim-l-full group-[.position-right]:scrim-r-full group-[.position-right]:scrim-l-0 group-[.position-center]:scrim-l-0 group-[.position-center]:scrim-b-full">
+          <img
+            src={image.value.src}
+            alt={image.value.alt || ''}
+            class="h-full w-full object-cover opacity-80"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      )}
+
+      {/* Blur effect for mobile */}
+      <div class="fade-to-transparent fade-to-transparent-bottom @md/herowrapper:hidden absolute inset-0 w-full backdrop-blur-sm"></div>
+
+      {/* Content */}
+      <div class="@container/herocontent @sm/herowrapper:px-5 @sm/herowrapper:pb-5 @md/herowrapper:px-10 @md/herowrapper:pb-10 @md/herowrapper:pt-20 @lg/herowrapper:px-24 @lg/herowrapper:pb-20 @lg/herowrapper:pt-36 relative z-10 mx-auto flex max-w-[1240px] flex-col pt-10 group-[.position-right]:items-end group-[.position-center]:items-center">
+        {/* Title */}
+        <astro-animated-section
+          data-direction="up"
+          data-editing={isEditing ? "true" : undefined}
+          class="relative z-20"
+        >
+          <Text
+            tag="h1"
+            field={title}
+            class="font-heading text-box-trim-both-baseline @lg/herowrapper:p-0 text-shadow text-shadow-blur-xl @sm/herowrapper:text-shadow-blur-3xl @sm/herowrapper:px-0 relative -ml-[2px] max-w-[13ch] text-balance px-5 text-[clamp(3rem,9cqi,6rem)] font-light leading-tight drop-shadow-[0_35px_35px_rgba(0,0,0,0.4)]"
+          />
+        </astro-animated-section>
+
+        {/* Line */}
+        <div class="@xl/herowrapper:py-10 py-8">
+          <div class="bg-foreground absolute left-1/2 h-[2px] w-[200vw] -translate-x-1/2"></div>
+        </div>
+
+        {/* Description */}
+        <astro-animated-section
+          data-direction="up"
+          data-delay="200"
+          data-editing={isEditing ? "true" : undefined}
+        >
+          {description && (
+            <Text
+              tag="p"
+              class="@xs/herocontent:text-xl @sm/herowrapper:px-0 text-shadow text-shadow-blur-xl max-w-[32ch] text-pretty px-5 leading-tight"
+              field={description}
+            />
+          )}
+        </astro-animated-section>
+
+        {/* Form */}
+        <astro-animated-section
+          data-direction="up"
+          data-delay="400"
+          data-editing={isEditing ? "true" : undefined}
+          class="@sm/herowrapper:px-0 @md/herowrapper:mt-7 mt-4 w-full px-5"
+        >
+          <ZipcodeSearchForm
+            placeholder={dictionary?.ZipPlaceholder || 'Enter your zipcode.'}
+            buttonText={dictionary?.SubmitCTALabel || 'Find Availability'}
+            searchLinkHref={searchLink?.value?.href || ''}
+          />
+        </astro-animated-section>
+
+        {/* Banner overlay */}
+        {needsBanner && (
+          <div class="@container/herobanner bg-overlay text-primary-foreground @md/herowrapper:mt-10 @xl/herowrapper:mt-16 z-10 mt-8 w-full max-w-[50rem]">
+            <div class="@[35rem]/herobanner:flex-row @[35rem]/herobanner:items-center @[35rem]/herobanner:justify-between @[35rem]/herobanner:flex @[35rem]/herobanner:gap-10 @[35rem]/herobanner:text-left p-5">
+              {bannerText && (
+                <astro-animated-section
+                  data-direction="up"
+                  data-editing={isEditing ? "true" : undefined}
+                >
+                  <Text
+                    tag="p"
+                    class="font-heading @md/herowrapper:text-lg text-pretty font-light leading-tight"
+                    field={bannerText}
+                  />
+                </astro-animated-section>
+              )}
+              {bannerCTA?.value?.href && (
+                <astro-animated-section
+                  data-direction="up"
+                  data-delay="200"
+                  data-editing={isEditing ? "true" : undefined}
+                  class="@[35rem]/herobanner:mt-0 mt-6"
+                >
+                  {isEditing ? (
+                    <Link
+                      field={bannerCTA}
+                      class="inline-flex items-center justify-center whitespace-nowrap rounded-default font-heading bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+                    />
+                  ) : (
+                    <a
+                      href={bannerCTA.value.href}
+                      class="inline-flex items-center justify-center whitespace-nowrap rounded-default font-heading bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
+                    >
+                      {bannerCTA.value.text}
+                    </a>
+                  )}
+                </astro-animated-section>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Hero</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

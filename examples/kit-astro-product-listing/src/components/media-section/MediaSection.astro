@@ -1,0 +1,98 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface MediaSectionProps {
+  video?: string;
+  image?: any;
+  priority?: boolean;
+  class?: string;
+  height?: number;
+  width?: number;
+  pause?: boolean;
+  reducedMotion?: boolean;
+}
+
+const {
+  video,
+  image,
+  class: className = '',
+  pause = false,
+  reducedMotion = false,
+} = Astro.props as MediaSectionProps;
+
+const { page } = useSitecore();
+
+const imageSrc = image?.value?.src
+  ? image.value.src.replace('http://cm/', '/')
+  : '';
+---
+
+{(!video && !image) ? null : (
+  <astro-media-section
+    class={`relative ${className}`}
+    data-pause={pause ? 'true' : undefined}
+    data-reduced-motion={reducedMotion ? 'true' : undefined}
+  >
+    {!reducedMotion && video && (
+      <video
+        class={`@lg:rounded-default inset-0 block h-full w-full rounded-md object-cover ${className}`}
+        playsinline
+        muted
+        loop
+        aria-hidden="true"
+        poster={imageSrc}
+        preload="metadata"
+        data-media-video
+      >
+        <source src={video} type="video/mp4" />
+      </video>
+    )}
+    {(reducedMotion && image) || (!video && image) ? (
+      <AstroImage
+        field={image}
+        class={`@lg:rounded-default inset-0 block h-full w-full rounded-md object-cover ${className}`}
+        alt=""
+      />
+    ) : null}
+  </astro-media-section>
+)}
+
+<script>
+  class AstroMediaSection extends HTMLElement {
+    private observer: IntersectionObserver | null = null;
+
+    connectedCallback() {
+      const isPaused = this.dataset.pause === 'true';
+      const isReducedMotion = this.dataset.reducedMotion === 'true';
+      const video = this.querySelector('[data-media-video]') as HTMLVideoElement | null;
+
+      if (!video || isReducedMotion) return;
+
+      this.observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (isPaused) {
+              video.pause();
+              return;
+            }
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+
+      this.observer.observe(this);
+    }
+
+    disconnectedCallback() {
+      this.observer?.disconnect();
+    }
+  }
+
+  customElements.define('astro-media-section', AstroMediaSection);
+</script>

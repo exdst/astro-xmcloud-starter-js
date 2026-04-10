@@ -1,0 +1,65 @@
+---
+/**
+ * MultiPromoItem - Astro equivalent of MultiPromoItem.dev.tsx
+ * Renders a single multi-promo card with image, title, and link.
+ */
+import Text from "@/components/shared/AppText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Props {
+  heading?: {
+    jsonValue?: any;
+  };
+  image?: {
+    jsonValue?: any;
+  };
+  link?: {
+    jsonValue?: any;
+  };
+}
+
+const { heading, image, link } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = heading?.jsonValue;
+const itemImage = image?.jsonValue;
+const itemLink = link?.jsonValue;
+---
+
+<article class="multi-promo-item">
+  {itemImage && (isEditing || itemImage?.value?.src) && (
+    <figure class="mb-7">
+      <div class="aspect-[131/121] w-full overflow-hidden rounded-3xl">
+        <AstroImage
+          field={itemImage}
+          class="aspect-[131/121] w-full object-cover"
+        />
+      </div>
+    </figure>
+  )}
+  {title && (isEditing || title?.value) && (
+    <Text
+      tag="h3"
+      field={title}
+      class="font-heading text-box-trim-both text-2xl font-medium leading-snug tracking-tighter antialiased"
+    />
+  )}
+  {itemLink && (isEditing || itemLink?.value?.href) && (
+    isEditing ? (
+      <Link
+        field={itemLink}
+        class="text-box-trim-both mt-4 inline-flex h-auto items-center justify-center gap-2 whitespace-nowrap text-pretty px-0 pt-0 text-[0.875rem] font-normal underline-offset-4 hover:underline last:pb-0"
+      />
+    ) : (
+      <a
+        href={itemLink.value.href}
+        class="text-box-trim-both mt-4 inline-flex h-auto items-center justify-center gap-2 whitespace-nowrap text-pretty px-0 pt-0 text-[0.875rem] font-normal underline-offset-4 hover:underline last:pb-0"
+      >
+        {itemLink.value.text || 'Learn more'}
+      </a>
+    )
+  )}
+</article>

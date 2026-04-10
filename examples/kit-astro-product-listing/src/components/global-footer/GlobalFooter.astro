@@ -1,0 +1,22 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import GlobalFooterDefault from "./GlobalFooterDefault.astro";
+import GlobalFooterBlackCompact from "./GlobalFooterBlackCompact.astro";
+import GlobalFooterBlackLarge from "./GlobalFooterBlackLarge.astro";
+import GlobalFooterBlueCentered from "./GlobalFooterBlueCentered.astro";
+import GlobalFooterBlueCompact from "./GlobalFooterBlueCompact.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: GlobalFooterDefault,
+  BlackCompactVariant: GlobalFooterBlackCompact,
+  BlackLargeVariant: GlobalFooterBlackLarge,
+  BlueCenteredVariant: GlobalFooterBlueCentered,
+  BlueCompactVariant: GlobalFooterBlueCompact,
+};
+
+const Component = variants[variant] || GlobalFooterDefault;
+---
+<Component {...Astro.props} />

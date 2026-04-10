@@ -1,0 +1,44 @@
+---
+/**
+ * LogoItem - Astro equivalent of LogoItem.tsx
+ * Renders a logo tab button.
+ */
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+
+interface Props {
+  logo?: {
+    jsonValue?: any;
+  };
+  title: {
+    jsonValue: {
+      value: string;
+    };
+  };
+  isActive: boolean;
+  id: string;
+  controls: string;
+  index: number;
+}
+
+const { logo, title, isActive, id, controls, index } = Astro.props as Props;
+---
+
+<button
+  role="tab"
+  id={id}
+  aria-selected={isActive ? 'true' : 'false'}
+  aria-controls={controls}
+  tabindex={isActive ? 0 : -1}
+  class:list={[
+    '@md:w-auto flex h-[58px] w-full items-center justify-center rounded-[20px] bg-white px-6 shadow-lg transition-all duration-300',
+    isActive
+      ? 'origin-center scale-[1.207] opacity-100'
+      : 'scale-100 opacity-50 hover:opacity-75',
+  ]}
+  data-logo-tab={index}
+>
+  <span class="sr-only">{title.jsonValue.value}</span>
+  {logo?.jsonValue?.value?.src && (
+    <AstroImage field={logo.jsonValue} class="h-6 w-auto" />
+  )}
+</button>

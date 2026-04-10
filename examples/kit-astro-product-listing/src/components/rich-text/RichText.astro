@@ -1,0 +1,24 @@
+---
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import type { Field } from "@exdst-sitecore-content-sdk/astro";
+
+interface RichTextProps extends ComponentProps {
+  fields: {
+    Text: Field<string>;
+  };
+}
+
+const { params, fields } = Astro.props as RichTextProps;
+const { RenderingIdentifier, styles } = params;
+---
+
+<div class={`component rich-text ${styles}`} id={RenderingIdentifier}>
+  <div class="component-content">
+    {fields ? (
+      <RichTextSDK field={fields.Text} />
+    ) : (
+      <span class="is-empty-hint">Rich text</span>
+    )}
+  </div>
+</div>

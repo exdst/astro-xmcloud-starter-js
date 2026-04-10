@@ -1,0 +1,113 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = datasource?.title?.jsonValue;
+const description = datasource?.description?.jsonValue;
+const children = datasource?.children?.results ?? [];
+const numColumns = (params as any)?.numColumns || '3';
+
+const hasPagesPositionStyles = params?.styles
+  ? params.styles.includes('position-')
+  : false;
+
+const containerClass = [
+  'mx-auto my-8 max-w-screen-xl md:my-16',
+  !hasPagesPositionStyles ? 'position-left' : '',
+  params?.styles || '',
+].filter(Boolean).join(' ');
+
+const itemBasis: Record<string, string> = {
+  '3': 'sm:basis-[45%] md:basis-[31%]',
+  '4': 'sm:basis-[45%] md:basis-[31%] xl:basis-[23%]',
+};
+---
+
+{datasource ? (
+  <div data-component="MultiPromo" class={containerClass}>
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between xl:gap-20">
+      {title && (
+        <div class="basis-full xl:basis-1/2">
+          <Text
+            tag="h2"
+            field={title}
+            class="font-heading -ml-1 max-w-[20ch] text-pretty text-4xl font-normal leading-[1.1333] tracking-tighter sm:text-5xl md:max-w-[17.5ch] lg:text-6xl"
+          />
+        </div>
+      )}
+      {description && (
+        <div class="basis-full xl:basis-1/2">
+          <RichTextSDK
+            class="text-body prose mt-6 max-w-[51.5ch] text-pretty text-lg leading-[1.444] tracking-tight"
+            field={description}
+          />
+        </div>
+      )}
+    </div>
+    {children.length > 0 && (
+      <div class="relative -ml-4 -mr-4 overflow-hidden sm:ml-0 sm:group-[.is-inset]:-mr-8 md:group-[.is-inset]:-mr-16 xl:-mr-0 xl:group-[.is-inset]:-mr-16 2xl:group-[.is-inset]:-mr-24">
+        <div class="mt-16 flex sm:-ml-8">
+          {children.map((item: any) => {
+            const itemTitle = item?.heading?.jsonValue;
+            const itemImage = item?.image?.jsonValue;
+            const itemLink = item?.link?.jsonValue;
+            // Generate descriptive link text like Next.js does
+            const linkText = itemLink?.value?.text;
+            const isGenericText = !linkText || ['learn more', 'read more', 'click here'].includes(linkText.toLowerCase());
+            const descriptiveLinkText = isGenericText && itemTitle?.value
+              ? `Read about ${itemTitle.value}`
+              : linkText;
+            const basisClass = numColumns === '4'
+              ? 'min-w-[238px] max-w-[416px] basis-3/4 pl-4 sm:basis-[45%] sm:pl-8 md:basis-[31%] xl:basis-[23%]'
+              : 'min-w-[238px] max-w-[416px] basis-3/4 pl-4 sm:basis-[45%] sm:pl-8 md:basis-[31%]';
+            return (
+              <div class={`flex flex-col shrink-0 ${basisClass}`}>
+                {(isEditing || itemImage?.value?.src) && (
+                  <div class="aspect-[131/121] w-full mb-7 overflow-hidden rounded-3xl">
+                    <AstroImage
+                      field={itemImage}
+                      class="aspect-[131/121] w-full object-cover"
+                    />
+                  </div>
+                )}
+                {(isEditing || itemTitle?.value) && (
+                  <Text
+                    tag="h3"
+                    field={itemTitle}
+                    class="font-heading text-box-trim-both text-box-edge-asc-desc text-2xl font-medium leading-snug tracking-tighter"
+                  />
+                )}
+                {(isEditing || itemLink?.value?.href) && (
+                  isEditing ? (
+                    <Link
+                      field={itemLink}
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap underline-offset-4 hover:underline py-2-5 text-box-edge-asc-desc mt-4 h-auto text-pretty px-0 pt-0 text-[0.875rem] font-normal last:pb-0"
+                    />
+                  ) : (
+                    <a
+                      href={itemLink.value.href}
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap underline-offset-4 hover:underline py-2-5 text-box-edge-asc-desc mt-4 h-auto text-pretty px-0 pt-0 text-[0.875rem] font-normal last:pb-0"
+                    >
+                      {descriptiveLinkText}
+                    </a>
+                  )
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    )}
+  </div>
+) : (
+  <div class="is-empty-hint">Multi Promo</div>
+)}

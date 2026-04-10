@@ -1,0 +1,94 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const image = fields?.image;
+const heading = fields?.heading;
+const description = fields?.description;
+const link = fields?.link;
+
+const hasLink = isEditing || link?.value?.href;
+---
+
+{fields ? (
+  <section
+    data-component="Promo Image"
+    class="@container border-b-2 border-t-2 [.border-b-2+&]:border-t-0"
+  >
+    <div class="@md:min-h-[760px] relative max-h-[759px] min-h-[450px] w-full overflow-hidden">
+      {image && (
+        <div class="absolute inset-0 h-full w-full">
+          <div class="w-full h-full">
+            <AstroImage
+              field={image}
+              class="h-full w-full object-cover"
+            />
+          </div>
+          {/* Vignette effect overlay */}
+          <div
+            class="pointer-events-none absolute inset-0"
+            style="box-shadow: inset 0 0 100px rgba(0,0,0,0.8); background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%);"
+          ></div>
+        </div>
+      )}
+
+      <div class="@xs:pl-8 @sm:pl-12 @md:pl-16 @lg:pl-[118px] @xs:pr-6 @sm:pr-12 @md:py-16 relative z-10 mx-auto flex h-full w-full max-w-screen-xl flex-col justify-center px-4 py-24">
+        <div class="@xs:max-w-[90%] @sm:max-w-[80%] @md:max-w-[60%] @lg:max-w-[50%]">
+          {heading && (
+            <astro-animated-section data-direction="right" data-editing={isEditing ? "true" : undefined}>
+              <Text
+                tag="h2"
+                class="font-heading @xs:text-3xl @sm:text-4xl @lg:text-5xl text-primary-foreground text-pretty text-2xl"
+                field={heading}
+              />
+            </astro-animated-section>
+          )}
+
+          {description && (
+            <astro-animated-section data-direction="right" data-delay="600" data-editing={isEditing ? "true" : undefined}>
+              <RichTextSDK
+                class="text-body text-primary-foreground @xs:text-lg @md:text-xl mt-6 max-w-[51.5ch] font-normal tracking-tight antialiased"
+                field={description}
+              />
+            </astro-animated-section>
+          )}
+
+          {hasLink && (
+            <astro-animated-section data-direction="right" data-delay="1200" data-editing={isEditing ? "true" : undefined}>
+              <div class="mt-8">
+                {isEditing ? (
+                  <Link
+                    field={link}
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-primary text-primary-foreground hover:bg-primary-hover px-4 py-2-5 text-sm"
+                  />
+                ) : link?.value?.href ? (
+                  <a
+                    href={link.value.href}
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-primary text-primary-foreground hover:bg-primary-hover px-4 py-2-5 text-sm"
+                  >
+                    {link.value.text}
+                  </a>
+                ) : null}
+              </div>
+            </astro-animated-section>
+          )}
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Promo Image</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

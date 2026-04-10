@@ -1,0 +1,164 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering } = Astro.props as ComponentProps;
+const item = rendering?.fields?.data?.item;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const logo = item?.logo?.jsonValue;
+const links = item?.primaryNavigationLinks?.targetItems ?? item?.children?.results ?? [];
+const headerContact = item?.headerContact?.jsonValue;
+---
+
+<astro-global-header>
+  <header
+    class="bg-background/80 @container sticky top-0 z-50 flex h-[96px] w-full items-center justify-center border-b backdrop-blur-md"
+    data-header
+  >
+    <div class="@xl:px-8 mx-auto flex h-16 w-full max-w-screen-2xl items-center px-4">
+      {/* Logo */}
+      <div class="mr-8">
+        <div class="flex w-[112px] items-stretch space-x-2">
+          {isEditing ? (
+            <AstroImage field={logo} class="w-full object-contain" />
+          ) : (
+            logo?.value?.src && (
+              <a href="/" class="flex items-stretch">
+                <img src={logo.value.src} alt={logo.value.alt || 'Home'} class="w-full object-contain" />
+              </a>
+            )
+          )}
+        </div>
+      </div>
+      {/* Desktop Navigation */}
+      <nav class="@lg:flex @lg:flex-[2] hidden" aria-label="Primary navigation">
+        <ul class="flex w-full justify-between">
+          {links.map((item: any) => {
+            const linkField = item.link?.jsonValue;
+            const href = linkField?.value?.href;
+            const text = linkField?.value?.text;
+            return isEditing ? (
+              <li>
+                <Link field={linkField} class="font-body inline-flex items-center justify-center gap-2 whitespace-nowrap bg-transparent px-8 py-2.5 text-base font-medium hover:bg-transparent" />
+              </li>
+            ) : (
+              href && (
+                <li>
+                  <a href={href} class="font-body inline-flex items-center justify-center gap-2 whitespace-nowrap bg-transparent px-8 py-2.5 text-base font-medium hover:bg-transparent">
+                    {text}
+                  </a>
+                </li>
+              )
+            );
+          })}
+        </ul>
+      </nav>
+      {/* Desktop CTA */}
+      {isEditing ? (
+        <div class="@lg:flex @lg:items-center @lg:justify-end @lg:flex-1 hidden">
+          <Link field={headerContact} class="font-heading inline-flex items-center justify-center whitespace-nowrap rounded-default bg-primary px-8 py-2.5 text-base font-medium text-primary-foreground hover:bg-primary/90" />
+        </div>
+      ) : (
+        headerContact?.value?.href && (
+          <div class="@lg:flex @lg:items-center @lg:justify-end @lg:flex-1 hidden">
+            <a href={headerContact.value.href} class="font-heading inline-flex items-center justify-center whitespace-nowrap rounded-default bg-primary px-8 py-2.5 text-base font-medium text-primary-foreground hover:bg-primary/90">
+              {headerContact.value.text}
+            </a>
+          </div>
+        )
+      )}
+      {/* Mobile Menu Toggle */}
+      <div class="@lg:hidden flex flex-1 justify-end">
+        <button data-menu-toggle class="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent" aria-label="Toggle menu">
+          <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  {/* Mobile Menu Dialog */}
+  <dialog data-mobile-menu class="fixed inset-0 z-[100] m-0 h-full w-full max-w-full bg-white p-0 backdrop:bg-black/50">
+    <div class="flex h-full flex-col">
+      <div class="flex items-center justify-end p-4">
+        <button data-menu-close class="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent" aria-label="Close menu">
+          <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <nav class="mt-8 flex flex-col space-y-4 px-6">
+        {links.map((item: any) => {
+          const linkField = item.link?.jsonValue;
+          const href = linkField?.value?.href;
+          const text = linkField?.value?.text;
+          return href && (
+            <a href={href} class="flex justify-center rounded-md px-4 py-3 text-lg font-medium hover:bg-accent">
+              {text}
+            </a>
+          );
+        })}
+        {headerContact?.value?.href && (
+          <a href={headerContact.value.href} class="mt-4 flex justify-center rounded-default bg-primary px-4 py-3 text-center text-lg font-medium text-primary-foreground hover:bg-primary/90">
+            {headerContact.value.text}
+          </a>
+        )}
+      </nav>
+    </div>
+  </dialog>
+</astro-global-header>
+
+<script>
+  class AstroGlobalHeader extends HTMLElement {
+    private header: HTMLElement | null;
+    private menuToggle: HTMLButtonElement | null;
+    private menuClose: HTMLButtonElement | null;
+    private dialog: HTMLDialogElement | null;
+    private prevScrollY = 0;
+
+    constructor() {
+      super();
+      this.header = this.querySelector('[data-header]');
+      this.menuToggle = this.querySelector('[data-menu-toggle]');
+      this.menuClose = this.querySelector('[data-menu-close]');
+      this.dialog = this.querySelector('[data-mobile-menu]');
+    }
+
+    connectedCallback() {
+      // Scroll hide/show
+      window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
+
+      // Mobile menu
+      this.menuToggle?.addEventListener('click', () => {
+        this.dialog?.showModal();
+      });
+      this.menuClose?.addEventListener('click', () => {
+        this.dialog?.close();
+      });
+      // Close on link click
+      this.dialog?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => this.dialog?.close());
+      });
+    }
+
+    handleScroll() {
+      if (!this.header) return;
+      const currentScrollY = window.scrollY;
+      if (currentScrollY < 10) {
+        this.header.style.opacity = '1';
+      } else if (currentScrollY < this.prevScrollY) {
+        this.header.style.opacity = '1';
+      } else if (currentScrollY > 10 && currentScrollY > this.prevScrollY) {
+        this.header.style.opacity = '0';
+      }
+      this.prevScrollY = currentScrollY;
+    }
+  }
+
+  customElements.define('astro-global-header', AstroGlobalHeader);
+</script>

@@ -1,0 +1,15 @@
+---
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+---
+
+{isEditing ? (
+  <div class="bg-primary absolute bottom-4 right-4 rounded-md opacity-50 ring-4 ring-offset-2 hover:opacity-100">
+    <span class="nowrap hover:bg-primary absolute bottom-4 left-2/4 -translate-x-2/4 whitespace-nowrap inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
+      Update Background
+    </span>
+    <slot />
+  </div>
+) : null}

@@ -1,0 +1,20 @@
+---
+/**
+ * VideoModal Astro wrapper.
+ * The modal is typically triggered from within the Video.astro component.
+ * This wrapper exists for standalone use if needed.
+ */
+import { VideoModal } from "./VideoModal.tsx";
+
+const { videoUrl = "", isOpen = false } = Astro.props as {
+  videoUrl?: string;
+  isOpen?: boolean;
+};
+---
+
+<VideoModal
+  client:visible
+  isOpen={isOpen}
+  onClose={() => {}}
+  videoUrl={videoUrl}
+/>

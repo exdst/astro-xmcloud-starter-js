@@ -1,0 +1,46 @@
+---
+/**
+ * CardSpotlight - Astro equivalent of card-spotlight.dev.tsx
+ * Replaces Framer Motion mouse tracking with CSS hover effects.
+ */
+interface Props {
+  class?: string;
+  radius?: number;
+  color?: string;
+}
+
+const {
+  class: className = '',
+  radius = 350,
+  color = 'rgba(255, 255, 255, 0.1)',
+} = Astro.props as Props;
+---
+
+<div
+  class:list={[
+    'card-spotlight rounded-default duration-400 bg-secondary group relative h-full self-stretch transition-all',
+    className,
+  ]}
+  tabindex="0"
+  data-component="CardSpotlight"
+  data-spotlight-radius={radius}
+  data-spotlight-color={color}
+>
+  <!-- Spotlight effect overlay - visible on hover/focus via CSS -->
+  <div
+    class="card-spotlight__overlay pointer-events-none absolute -inset-px z-0 rounded-[inherit] opacity-0 transition duration-300 group-hover:opacity-100 group-focus:opacity-100"
+    style={`background-color: ${color};`}
+  />
+
+  <!-- Children wrapper -->
+  <div class="relative z-[2] flex h-full w-full transition-all duration-300">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .card-spotlight:hover,
+  .card-spotlight:focus-within {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+  }
+</style>

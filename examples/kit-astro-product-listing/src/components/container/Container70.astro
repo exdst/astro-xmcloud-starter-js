@@ -1,0 +1,39 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface Container70Props extends ComponentProps {
+  params: ComponentProps["params"] & {
+    DynamicPlaceholderId: string;
+    excludeTopMargin?: string;
+  };
+}
+
+const { params, rendering } = Astro.props as Container70Props;
+const {
+  styles = "",
+  DynamicPlaceholderId,
+  excludeTopMargin,
+} = params;
+
+const phKey = `container-seventy-${DynamicPlaceholderId}`;
+const hasMargin = excludeTopMargin !== "1";
+
+const sectionClasses = [
+  "@container container--70 group",
+  hasMargin ? "mt-4" : "mt-0",
+  styles,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section class={sectionClasses}>
+  <div class="mx-auto max-w-screen-xl px-4 xl:px-8 flex md:flex-row flex-col justify-start items-center gap-4 flex-wrap">
+    <div class="grow-0 shrink basis-full md:w-full w-full">
+      <div class="mx-auto md:max-w-[70%]">
+        <Placeholder name={phKey} rendering={rendering} />
+      </div>
+    </div>
+  </div>
+</section>

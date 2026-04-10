@@ -1,0 +1,107 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+
+if (!fields) return;
+
+const title = fields?.Title;
+const body = fields?.Body;
+const image = fields?.Image;
+---
+
+{variant === "TextRight" ? (
+  <section
+    class={`relative min-h-[20rem] lg:min-h-[40rem] flex items-center py-18 ${styles}`}
+    data-class-change
+  >
+    <div class="absolute inset-0 z-10">
+      <AstroImage field={image} class="w-full h-full object-cover" />
+    </div>
+    <div class="relative container px-4 mx-auto z-20">
+      <div class="grid gap-12 max-w-[36rem]">
+        <h1 class="text-primary text-4xl lg:text-7xl">
+          <Text field={title} />
+        </h1>
+        <div class="text-white text-xl lg:text-3xl font-medium">
+          <RichText field={body} />
+        </div>
+      </div>
+    </div>
+  </section>
+) : variant === "SplitScreen" ? (
+  <section
+    class={`relative min-h-[20rem] lg:min-h-[40rem] flex flex-col lg:flex-row items-center pb-18 lg:py-18 bg-primary ${styles}`}
+    data-class-change
+  >
+    <div class="w-full mb-18 lg:absolute lg:inset-0 lg:mb-0 lg:z-10">
+      <AstroImage field={image} class="w-full h-[20rem] lg:h-full object-cover lg:w-1/2 lg:ml-auto" />
+    </div>
+    <div class="relative container px-4 mx-auto z-20">
+      <div class="grid gap-8 lg:max-w-[50%] pr-8">
+        <h1 class="text-foreground text-4xl lg:text-7xl">
+          <Text field={title} />
+        </h1>
+        <div class="text-foreground text-xl lg:text-3xl font-medium">
+          <RichText field={body} />
+        </div>
+      </div>
+    </div>
+  </section>
+) : variant === "Stacked" ? (
+  <section class={`relative py-18 ${styles}`} data-class-change>
+    <div class="container px-4 mx-auto">
+      <div class="grid gap-x-12 gap-y-8 items-center w-full lg:grid-cols-2">
+        <h1 class="text-4xl lg:text-7xl">
+          <Text field={title} />
+        </h1>
+        <div class="text-xl lg:text-3xl font-medium">
+          <RichText field={body} />
+        </div>
+      </div>
+    </div>
+    <AstroImage field={image} class="w-full h-[20rem] object-cover mt-18 lg:h-[33rem]" />
+  </section>
+) : variant === "TwoColumn" ? (
+  <section class={`relative pt-18 bg-primary ${styles}`} data-class-change>
+    <div class="container px-4 mx-auto">
+      <div class="grid gap-x-12 gap-y-8 w-full lg:grid-cols-2">
+        <div>
+          <h1 class="text-4xl lg:text-7xl mb-8">
+            <Text field={title} />
+          </h1>
+          <div class="text-xl lg:text-3xl font-medium">
+            <RichText field={body} />
+          </div>
+        </div>
+        <AstroImage field={image} class="w-full h-full aspect-3/2 object-cover lg:aspect-square" />
+      </div>
+    </div>
+  </section>
+) : (
+  <!-- Default variant -->
+  <section
+    class={`relative min-h-[20rem] lg:min-h-[40rem] flex items-center py-18 ${styles}`}
+    data-class-change
+  >
+    <div class="absolute inset-0 z-10">
+      <AstroImage field={image} class="w-full h-full object-cover" />
+    </div>
+    <div class="relative container px-4 mx-auto z-20">
+      <div class="grid gap-12 items-center w-full lg:grid-cols-2">
+        <h1 class="text-primary text-4xl lg:text-7xl">
+          <Text field={title} />
+        </h1>
+        <div class="text-white text-xl lg:text-3xl font-medium">
+          <RichText field={body} />
+        </div>
+      </div>
+    </div>
+  </section>
+)}

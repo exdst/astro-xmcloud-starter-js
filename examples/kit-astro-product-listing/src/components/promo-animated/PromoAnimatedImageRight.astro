@@ -1,0 +1,139 @@
+---
+/**
+ * PromoAnimatedImageRight - Astro equivalent of PromoAnimatedImageRight.dev.tsx
+ * Renders the promo animated layout with image on the right, content on the left.
+ */
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const image = fields?.image;
+const title = fields?.title;
+const description = fields?.description;
+const primaryLink = fields?.primaryLink;
+const secondaryLink = fields?.secondaryLink;
+
+const colorScheme = (params as any)?.colorScheme || 'primary';
+const hasLinks = primaryLink?.value?.href || secondaryLink?.value?.href;
+
+const imageBgClass = colorScheme === 'secondary' ? 'bg-accent' : 'bg-primary';
+const spriteClass = colorScheme === 'secondary' ? 'bg-primary' : 'bg-accent';
+---
+
+{fields ? (
+  <section class="promo-animated @container my-10" data-component="PromoAnimatedImageRight" data-promo-image-right>
+    <div class="promo-animated__content-wrapper @md:grid-cols-2 @md:items-center @md:gap-10 @xl:gap-[135px] grid grid-cols-1">
+      <div class="promo-animated__content @md:order-1 @md:flex @md:flex-col @md:justify-center @md:items-end min-w-0">
+        {title && (
+          <astro-animated-section data-direction="up" data-editing={isEditing ? 'true' : undefined}>
+            <Text
+              tag="h2"
+              class="font-heading @sm:text-5xl @lg:text-6xl -ml-1 mt-6 max-w-[15.5ch] text-right text-4xl font-normal leading-[1.1333] tracking-tighter antialiased"
+              field={title}
+            />
+          </astro-animated-section>
+        )}
+
+        {description && (
+          <astro-animated-section data-direction="up" data-delay="300" data-editing={isEditing ? 'true' : undefined}>
+            <RichTextSDK
+              class="text-body text-secondary-foreground prose mt-6 max-w-[51.5ch] text-right text-lg tracking-tight antialiased"
+              field={description}
+            />
+          </astro-animated-section>
+        )}
+
+        {hasLinks && (
+          <astro-animated-section data-direction="up" data-delay="600" data-editing={isEditing ? 'true' : undefined}>
+            <div class="@md:mb-0 mb-6 mt-10 flex flex-wrap justify-end gap-2">
+              {primaryLink?.value?.href && (
+                isEditing ? (
+                  <Link
+                    field={primaryLink}
+                    class="inline-flex items-center justify-center rounded-default bg-primary px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  />
+                ) : (
+                  <a
+                    href={primaryLink.value.href}
+                    class="inline-flex items-center justify-center rounded-default bg-primary px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  >
+                    {primaryLink.value.text}
+                  </a>
+                )
+              )}
+              {secondaryLink?.value?.href && (
+                isEditing ? (
+                  <Link
+                    field={secondaryLink}
+                    class="inline-flex items-center justify-center rounded-default bg-secondary px-8 py-2-5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                  />
+                ) : (
+                  <a
+                    href={secondaryLink.value.href}
+                    class="inline-flex items-center justify-center rounded-default bg-secondary px-8 py-2-5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                  >
+                    {secondaryLink.value.text}
+                  </a>
+                )
+              )}
+            </div>
+          </astro-animated-section>
+        )}
+      </div>
+
+      <div class="promo-animated__image @md:flex @md:justify-start @md:order-2 w-full">
+        {image && (
+          <div class="@md:max-w-[452px] @xs:mx-0 relative mx-auto aspect-square h-full w-full max-w-[350px] rounded-r-full">
+            <div class={`promo-animated__image-bg-extension absolute bottom-0 top-0 left-1/2 w-[100vw] ${imageBgClass}`}></div>
+            <div class="relative aspect-square w-full">
+              <AstroImage
+                field={image}
+                class="@md:max-w-[452px] aspect-square w-full rounded-full object-cover"
+              />
+            </div>
+            <astro-animated-section
+              data-animation-type="rotate"
+              data-editing={isEditing ? 'true' : undefined}
+              class="pointer-events-none absolute bottom-0 aspect-square h-full w-full"
+            >
+              <div
+                class={`promo-animated__sprite h-full w-full rounded-full pointer-events-none ${spriteClass}`}
+                style="clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);"
+              ></div>
+            </astro-animated-section>
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Promo Animated: Image Right</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+
+  // Prevent horizontal scrollbar by adding overflow:hidden to the nearest full-bleed container
+  document.querySelectorAll('[data-promo-image-right]').forEach((el) => {
+    let parent = el.parentElement;
+    while (parent) {
+      if (
+        parent.className.includes('container--full-bleed') ||
+        parent.tagName.toLowerCase() === 'main' ||
+        parent.tagName.toLowerCase() === 'body'
+      ) {
+        (parent as HTMLElement).style.overflow = 'hidden';
+        break;
+      }
+      parent = parent.parentElement;
+    }
+  });
+</script>

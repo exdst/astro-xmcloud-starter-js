@@ -1,0 +1,42 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { ProductsSectionIsland } from "./ProductsSection.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const styles = params?.styles || '';
+const id = params?.RenderingIdentifier || '';
+
+const datasource = fields?.data?.datasource;
+
+const sf = (f: any) => f?.jsonValue?.value ?? '';
+const si = (f: any) => ({ src: f?.jsonValue?.value?.src ?? '', alt: f?.jsonValue?.value?.alt ?? '' });
+const sl = (f: any) => ({ href: f?.jsonValue?.value?.href ?? '', text: f?.jsonValue?.value?.text ?? '', target: f?.jsonValue?.value?.target ?? '' });
+
+const products = (datasource?.children?.results ?? []).map((p: any) => ({
+  id: p.id || '',
+  productImage: si(p.productImage),
+  productTagLine: sf(p.productTagLine),
+  productLink: sl(p.productLink),
+  productDescription: sf(p.productDescription),
+  productPrice: sf(p.productPrice),
+  productDiscountedPrice: sf(p.productDiscountedPrice),
+}));
+
+const sectionData = {
+  heading: sf(datasource?.heading),
+  link: sl(datasource?.link),
+};
+---
+
+{datasource ? (
+  <ProductsSectionIsland
+    client:visible
+    styles={styles}
+    renderingId={id}
+    sectionData={sectionData}
+    products={products}
+  />
+) : (
+  <div class="is-empty-hint">Products Section</div>
+)}

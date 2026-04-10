@@ -1,0 +1,79 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import AccordionBlockItem from "./AccordionBlockItem.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const heading = datasource?.heading?.jsonValue;
+const description = datasource?.description?.jsonValue;
+const link = datasource?.link?.jsonValue;
+const accordionItems = datasource?.children?.results ?? [];
+---
+
+{datasource ? (
+  <section
+    data-component="AccordionBlock"
+    class={`@container @md:py-16 @lg:py-20 border-b-2 border-t-2 py-10 [.border-b-2+&]:border-t-0 ${params?.styles || ''}`}
+    data-class-change
+    aria-labelledby={heading?.value ? 'accordion-heading' : undefined}
+  >
+    <div
+      class="@xl:px-0 mx-auto grid max-w-screen-xl gap-6 px-0 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6"
+      data-component="AccordionBlockContentWrapper"
+    >
+      <div class="@lg:mb-0 mb-8">
+        {heading && (
+          <Text
+            tag="h2"
+            id="accordion-heading"
+            class="font-heading @md:text-6xl @lg:text-7xl max-w-screen-sm text-pretty text-5xl font-light leading-[1.1] tracking-tighter antialiased"
+            field={heading}
+          />
+        )}
+      </div>
+      <div class="@md:grid @md:grid-cols-[4fr,6fr] @md:gap-8 @lg:gap-12 @xl:gap-16">
+        <div class="@md:col-start-[2] @md:col-end-[2]">
+          <div class="@md:gap-11 grid w-full gap-8 p-0">
+            {accordionItems.map((child: any) => (
+              <AccordionBlockItem child={child} isEditing={isEditing} />
+            ))}
+          </div>
+        </div>
+        {(isEditing || description?.value || link?.value?.href) && (
+          <div class="bg-primary @sm:flex-row @sm:text-start @md:flex-col @md:text-center @lg:flex-row @lg:text-start mt-6 flex flex-col flex-nowrap items-center gap-4 p-7 text-center">
+            <Text
+              tag="p"
+              class="text-primary-foreground font-heading text-lg font-light"
+              field={description}
+            />
+            {link && (
+              isEditing ? (
+                <Link
+                  field={link}
+                  class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2-5 text-sm"
+                />
+              ) : (
+                link?.value?.href && link?.value?.text && (
+                  <a
+                    href={link.value.href}
+                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2-5 text-sm"
+                  >
+                    {link.value.text}
+                  </a>
+                )
+              )
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Accordion Block</div>
+)}

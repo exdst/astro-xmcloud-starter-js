@@ -1,0 +1,43 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useDictionary } from "@exdst-sitecore-content-sdk/astro/context";
+import { ProductListingIsland } from "./ProductListing.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const t = useDictionary();
+
+const datasource = fields?.data?.datasource;
+const title = datasource?.title?.jsonValue?.value || "";
+const viewAllLink = datasource?.viewAllLink?.jsonValue?.value || {};
+
+const products = (datasource?.products?.targetItems ?? []).map((item: any) => ({
+  productName: item.productName?.jsonValue?.value || "",
+  productThumbnail: item.productThumbnail?.jsonValue?.value?.src || "",
+  productThumbnailAlt: item.productThumbnail?.jsonValue?.value?.alt || "",
+  productBasePrice: item.productBasePrice?.jsonValue?.value || "",
+  productFeatureTitle: item.productFeatureTitle?.jsonValue?.value || "",
+  productFeatureText: item.productFeatureText?.jsonValue?.value || "",
+  productDrivingRange: item.productDrivingRange?.jsonValue?.value || "",
+  url: item.url?.path || "",
+}));
+
+const styles = params?.styles || "";
+---
+
+{products.length > 0 && (
+  <ProductListingIsland
+    client:visible
+    variant="Card"
+    title={title}
+    products={products}
+    viewAllLinkHref={viewAllLink.href || ""}
+    viewAllLinkText={viewAllLink.text || ""}
+    styles={styles}
+    dictionary={{
+      drivingRange: t("Demo2_ProductListing_DrivingRange") || "Driving Range",
+      seeFullSpecs: t("Demo2_ProductListing_SeeFullSpecs") || "See Full Specs",
+      price: t("Demo2_ProductListing_Price") || "Starting at",
+    }}
+  />
+)}

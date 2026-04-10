@@ -1,0 +1,42 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { ProductPageHeaderSTIsland } from "./ProductPageHeaderST.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const styles = params?.styles || "";
+const fields = rendering?.fields;
+
+const productName = (fields as any)?.ProductName?.value || "";
+const description = (fields as any)?.Description?.value || "";
+const price = (fields as any)?.Price?.value || "";
+
+const colors = ((fields as any)?.Colors ?? []).map((color: any) => ({
+  id: color.id,
+  displayName: color.displayName || "",
+  value: color.fields?.Value?.value || "",
+}));
+
+const images = ((fields as any)?.Images ?? []).map((img: any) => ({
+  id: img.id,
+  url: img.url || "",
+}));
+
+const warrantyLinkHref = (fields as any)?.WarrantyLink?.value?.href || "";
+const warrantyLinkText = (fields as any)?.WarrantyLink?.value?.text || "";
+const shippingLinkHref = (fields as any)?.ShippingLink?.value?.href || "";
+const shippingLinkText = (fields as any)?.ShippingLink?.value?.text || "";
+---
+
+<ProductPageHeaderSTIsland
+  client:load
+  styles={styles}
+  productName={productName}
+  description={description}
+  price={price}
+  colors={colors}
+  images={images}
+  warrantyLinkHref={warrantyLinkHref}
+  warrantyLinkText={warrantyLinkText}
+  shippingLinkHref={shippingLinkHref}
+  shippingLinkText={shippingLinkText}
+/>

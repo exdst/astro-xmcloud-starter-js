@@ -1,0 +1,190 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@/components/shared/AppText.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const children = datasource?.children?.results ?? [];
+const title = datasource?.title?.jsonValue;
+const droplistLabel = datasource?.droplistLabel?.jsonValue?.value || "Select a value";
+
+const tabs = children.map((child: any, index: number) => ({
+  id: child?.id || `tab-${index}`,
+  label: child?.title?.jsonValue?.value || `Tab ${index + 1}`,
+  image1: child?.image1?.jsonValue?.value?.src || "",
+  image2: child?.image2?.jsonValue?.value?.src || "",
+  link1: child?.link1?.jsonValue?.value?.href
+    ? { href: child.link1.jsonValue.value.href, text: child.link1.jsonValue.value.text || "Learn more" }
+    : null,
+  link2: child?.link2?.jsonValue?.value?.href
+    ? { href: child.link2.jsonValue.value.href, text: child.link2.jsonValue.value.text || "Learn more" }
+    : null,
+}));
+
+const { styles = "" } = params;
+---
+
+{tabs.length > 0 && (
+  <div class={`multi-promo-tabs @container bg-primary @md:p-12 @md:my-16 my-8 w-full group-[.is-inset]:px-4 sm:group-[.is-inset]:px-0 ${styles}`} data-multi-promo-tabs>
+    {title && (
+      <Text
+        tag="h2"
+        field={title}
+        class="text-box-trim-both text-box-edge-asc-baseline text-primary-foreground @md:text-6xl font-heading border-accent @sm:text-5xl -ml-1 mb-8 max-w-[20ch] text-pretty text-4xl font-normal leading-[1.1333] tracking-tighter md:max-w-[17.5ch]"
+      />
+    )}
+
+    {/* Mobile dropdown - hidden at @md */}
+    <div class="@md:hidden flex flex-col">
+      <label class="text-primary-foreground font-body mb-2 block text-base font-normal">
+        {droplistLabel}
+      </label>
+      <select
+        class="text-primary-foreground w-full rounded-md border-0 bg-black/20 px-3 py-2"
+        data-tab-select
+      >
+        {tabs.map((tab: any, index: number) => (
+          <option value={index} selected={index === 0}>
+            {tab.label}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Desktop tab buttons - hidden below @md */}
+    <div class="@md:flex hidden justify-start gap-2 border-0 bg-transparent">
+      {tabs.map((tab: any, index: number) => (
+        <button
+          type="button"
+          role="tab"
+          data-tab-trigger
+          data-tab-index={index}
+          aria-selected={index === 0 ? "true" : "false"}
+          class={`font-body rounded-md border border-accent px-4 py-2 text-base font-normal transition-all duration-300 ${
+            index === 0
+              ? "bg-accent text-accent-foreground"
+              : "bg-transparent text-white hover:bg-accent hover:text-accent-foreground"
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+
+    {/* Tab panels */}
+    {tabs.map((tab: any, index: number) => (
+      <div
+        data-tab-panel
+        data-tab-index={index}
+        role="tabpanel"
+        class={index === 0 ? "" : "hidden"}
+      >
+        <div class="@md:grid-cols-2 @md:my-16 my-8 grid grid-cols-1 gap-6">
+          {tab.image1 && (
+            <div class="group/card1 relative block cursor-pointer overflow-hidden rounded-2xl">
+              <div class="flex h-full w-full overflow-hidden">
+                <img
+                  src={tab.image1}
+                  alt=""
+                  class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card1:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              {tab.link1 && (
+                <a
+                  href={tab.link1.href}
+                  class="bg-popover text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 backdrop-blur-sm transition-all duration-500 group-hover/card1:translate-x-2"
+                >
+                  {tab.link1.text}
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          )}
+          {tab.image2 && (
+            <div class="group/card2 relative block cursor-pointer overflow-hidden rounded-2xl">
+              <div class="flex h-full w-full overflow-hidden">
+                <img
+                  src={tab.image2}
+                  alt=""
+                  class="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/card2:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              {tab.link2 && (
+                <a
+                  href={tab.link2.href}
+                  class="bg-popover text-popover-foreground font-body absolute bottom-4 left-4 flex items-center gap-2 rounded-lg px-4 py-2 backdrop-blur-sm transition-all duration-500 group-hover/card2:translate-x-2"
+                >
+                  {tab.link2.text}
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="7" y1="17" x2="17" y2="7" />
+                    <polyline points="7 7 17 7 17 17" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<script>
+  document.querySelectorAll('[data-multi-promo-tabs]').forEach((container) => {
+    const triggers = container.querySelectorAll('[data-tab-trigger]');
+    const panels = container.querySelectorAll('[data-tab-panel]');
+    const select = container.querySelector('[data-tab-select]') as HTMLSelectElement;
+
+    function activateTab(index: string) {
+      // Update button triggers
+      triggers.forEach((t) => {
+        const tIndex = (t as HTMLElement).dataset.tabIndex;
+        if (tIndex === index) {
+          t.setAttribute('aria-selected', 'true');
+          t.classList.add('bg-accent', 'text-accent-foreground');
+          t.classList.remove('bg-transparent', 'text-white');
+        } else {
+          t.setAttribute('aria-selected', 'false');
+          t.classList.remove('bg-accent', 'text-accent-foreground');
+          t.classList.add('bg-transparent', 'text-white');
+        }
+      });
+
+      // Update panels
+      panels.forEach((p) => {
+        const pIndex = (p as HTMLElement).dataset.tabIndex;
+        if (pIndex === index) {
+          p.classList.remove('hidden');
+        } else {
+          p.classList.add('hidden');
+        }
+      });
+
+      // Sync select
+      if (select) select.value = index;
+    }
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const index = (trigger as HTMLElement).dataset.tabIndex || '0';
+        activateTab(index);
+      });
+    });
+
+    // Handle select dropdown change
+    if (select) {
+      select.addEventListener('change', () => {
+        activateTab(select.value);
+      });
+    }
+  });
+</script>

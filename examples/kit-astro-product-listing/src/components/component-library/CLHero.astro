@@ -1,0 +1,209 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const btnPrimary = "inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90";
+const btnOutline = "inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground";
+
+const backgroundImageUrl = fields?.HeroImage1?.value?.src;
+const backgroundStyle = backgroundImageUrl ? `background-image: url('${backgroundImageUrl}'); filter: brightness(0.6);` : '';
+---
+
+{fields ? (
+  variant === 'Hero2' ? (
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="grid gap-12 md:grid-cols-12 md:items-center md:gap-8">
+        <div class="flex flex-col space-y-8 md:col-span-6 md:space-y-6">
+          <h1 class="text-5xl font-bold tracking-tight sm:text-6xl md:text-4xl xl:text-5xl">
+            <Text field={fields?.HeroTitle} />
+          </h1>
+          <div class="text-muted-foreground text-xl md:text-base">
+            <RichText field={fields?.HeroBody} />
+          </div>
+          <div class="flex gap-4 flex-wrap">
+            {(fields?.HeroLink1?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink1} class={`${btnPrimary} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+            {(fields?.HeroLink2?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink2} class={`${btnOutline} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+          </div>
+        </div>
+        <div class="gap-4 md:col-span-6 md:grid-cols-8 md:gap-8">
+          <div class="relative col-span-2">
+            {(fields?.HeroImage1?.value?.src || isEditing) && (
+              <AstroImage field={fields?.HeroImage1} class="object-cover" />
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'Hero3' ? (
+    <div class={`relative flex min-h-screen items-center overflow-hidden bg-zinc-600 px-[5%] ${styles}`} data-class-change>
+      <div class="absolute inset-0 z-0 bg-cover bg-center" style={backgroundStyle}></div>
+      <div class="container relative z-10 mx-auto px-6 py-24 md:py-32 md:pl-16 lg:py-40 lg:pl-24">
+        <div class="max-w-2xl space-y-6">
+          <h1 class="text-4xl font-bold leading-tight text-white md:text-5xl lg:text-6xl">
+            <Text field={fields?.HeroTitle} />
+          </h1>
+          <div class="text-lg leading-relaxed text-white/90">
+            <RichText field={fields?.HeroBody} />
+          </div>
+          <div class="flex flex-wrap gap-4">
+            {(fields?.HeroLink1?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink1} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-white w-full md:w-auto text-zinc-900 hover:bg-white/90 px-4 py-2 text-sm font-medium" />
+            )}
+            {(fields?.HeroLink2?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink2} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border-white w-full md:w-auto text-white hover:bg-white/10 border px-4 py-2 text-sm font-medium" />
+            )}
+          </div>
+          {isEditing && (
+            <div class="flex gap-4">
+              <p class="text-lg leading-relaxed text-white/90">To change the background image, edit the image field in the content item:</p>
+              <AstroImage field={fields?.HeroImage1} class="rounded-lg object-cover" />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : variant === 'Hero4' ? (
+    <section class={`w-full px-[5%] ${styles}`} data-class-change>
+      <div class="relative mb-12 h-[400px] w-full">
+        {(fields?.HeroImage1?.value?.src || isEditing) && (
+          <AstroImage field={fields?.HeroImage1} class="h-full object-cover" />
+        )}
+      </div>
+      <div class="container mx-auto px-6">
+        <div class="mx-auto grid max-w-6xl items-start gap-4 md:grid-cols-2">
+          <h1 class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            <Text field={fields?.HeroTitle} />
+          </h1>
+          <div class="space-y-6">
+            <div class="text-muted-foreground text-lg">
+              <RichText field={fields?.HeroBody} />
+            </div>
+            <div class="flex gap-4 flex-wrap">
+              {(fields?.HeroLink1?.value?.href || isEditing) && (
+                <Link field={fields?.HeroLink1} class={`${btnPrimary} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+              )}
+              {(fields?.HeroLink2?.value?.href || isEditing) && (
+                <Link field={fields?.HeroLink2} class={`${btnOutline} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'Hero5' ? (
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="grid gap-12 md:grid-cols-12 md:items-center md:gap-8">
+        <div class="gap-4 md:col-span-6 md:grid-cols-8 md:gap-8">
+          <div class="relative col-span-2">
+            {(fields?.HeroImage1?.value?.src || isEditing) && (
+              <AstroImage field={fields?.HeroImage1} class="object-cover" />
+            )}
+          </div>
+        </div>
+        <div class="flex flex-col space-y-8 md:col-span-6 md:space-y-6">
+          <h1 class="text-5xl font-bold tracking-tight sm:text-6xl md:text-4xl xl:text-5xl">
+            <Text field={fields?.HeroTitle} />
+          </h1>
+          <div class="text-muted-foreground text-xl md:text-base">
+            <RichText field={fields?.HeroBody} />
+          </div>
+          <div class="flex gap-4 flex-wrap">
+            {(fields?.HeroLink1?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink1} class={`${btnPrimary} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+            {(fields?.HeroLink2?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink2} class={`${btnOutline} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'Hero6' ? (
+    <section class={`px-[5%] ${styles}`} data-class-change>
+      <div class="container mx-auto py-[7rem]">
+        <div class="grid grid-cols-1 items-center gap-x-16 gap-y-16 md:grid-cols-2">
+          <div class="m-0">
+            <h1 class="mb-6 text-4xl font-bold tracking-tight md:text-6xl">
+              <Text field={fields?.HeroTitle} />
+            </h1>
+            <div class="text-muted-foreground mb-6 text-xl md:text-base">
+              <RichText field={fields?.HeroBody} />
+            </div>
+            <div class="flex flex-wrap gap-4">
+              {(fields?.HeroLink1?.value?.href || isEditing) && (
+                <Link field={fields?.HeroLink1} class={`${btnPrimary} h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm`} />
+              )}
+              {(fields?.HeroLink2?.value?.href || isEditing) && (
+                <Link field={fields?.HeroLink2} class={`${btnOutline} h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm`} />
+              )}
+            </div>
+          </div>
+          <div class="relative flex w-full">
+            <div class="mr-[30%]">
+              {(fields?.HeroImage1?.value?.src || isEditing) && (
+                <AstroImage field={fields?.HeroImage1} class="aspect-2/3 h-full w-full max-w-full object-cover" />
+              )}
+            </div>
+            <div class="absolute bottom-auto left-auto right-0 top-[10%] w-1/2 shadow-md">
+              {(fields?.HeroImage2?.value?.src || isEditing) && (
+                <AstroImage field={fields?.HeroImage2} class="aspect-square h-full max-h-full w-full object-cover" />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    /* Default / Hero1 */
+    <section class={`px-[5%] py-12 md:py-24 bg-primary ${styles}`} data-class-change>
+      <div class="grid gap-12 md:grid-cols-12 md:items-center md:gap-8">
+        <div class="flex flex-col space-y-8 md:col-span-4 md:space-y-6">
+          <h1 class="text-5xl font-bold tracking-tight sm:text-6xl md:text-4xl xl:text-5xl">
+            <Text field={fields?.HeroTitle} />
+          </h1>
+          <div class="text-muted-foreground text-xl md:text-base">
+            <RichText field={fields?.HeroBody} />
+          </div>
+          <div class="flex gap-4 flex-wrap">
+            {(fields?.HeroLink1?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink1} class={`${btnPrimary} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+            {(fields?.HeroLink2?.value?.href || isEditing) && (
+              <Link field={fields?.HeroLink2} class={`${btnOutline} h-14 w-full md:w-auto px-8 text-lg md:h-10 md:px-4 md:text-sm`} />
+            )}
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 md:col-span-8 md:grid-cols-8 md:gap-8">
+          <div class="relative col-span-1 h-[500px] md:col-span-5 md:h-[600px]">
+            {(fields?.HeroImage1?.value?.src || isEditing) && (
+              <AstroImage field={fields?.HeroImage1} class="max-h-full rounded-lg object-cover" />
+            )}
+          </div>
+          <div class="relative col-span-1 h-[300px] max-h-[300px] md:col-span-3">
+            {(fields?.HeroImage2?.value?.src || isEditing) && (
+              <AstroImage field={fields?.HeroImage2} class="max-h-full rounded-lg object-cover" />
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+) : (
+  <div class="is-empty-hint">CL Hero</div>
+)}

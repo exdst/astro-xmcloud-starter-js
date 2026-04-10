@@ -1,0 +1,16 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import PromoAnimatedDefault from "./PromoAnimatedDefault.astro";
+import PromoAnimatedImageRight from "./PromoAnimatedImageRight.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: PromoAnimatedDefault,
+  ImageRight: PromoAnimatedImageRight,
+};
+
+const Component = variants[variant] || PromoAnimatedDefault;
+---
+<Component {...Astro.props} />

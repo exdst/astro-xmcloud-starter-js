@@ -1,0 +1,48 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { TestimonialsIsland } from "./Testimonials.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+
+const sf = (f: any) => f?.jsonValue?.value ?? '';
+const si = (f: any) => ({ src: f?.jsonValue?.value?.src ?? '', alt: f?.jsonValue?.value?.alt ?? '' });
+const sl = (f: any) => ({ href: f?.jsonValue?.value?.href ?? '', text: f?.jsonValue?.value?.text ?? '', target: f?.jsonValue?.value?.target ?? '' });
+
+const testimonials = (datasource?.children?.results ?? []).map((t: any) => ({
+  id: t.id || '',
+  caseStudyLink: sl(t.caseStudyLink),
+  customerName: sf(t.customerName),
+  customerCompany: sf(t.customerCompany),
+  customerIcon: si(t.customerIcon),
+  testimonialBody: sf(t.testimonialBody),
+  testimonialIcon: si(t.testimonialIcon),
+  testimonialRating: sf(t.testimonialRating),
+}));
+
+const sectionData = {
+  title: sf(datasource?.title),
+  tagLine: sf(datasource?.tagLine),
+};
+---
+
+{datasource ? (
+  <TestimonialsIsland
+    client:visible
+    variant={variant}
+    styles={styles}
+    sectionData={sectionData}
+    testimonials={testimonials}
+    isEditing={isEditing}
+  />
+) : (
+  <div class="is-empty-hint">Testimonials</div>
+)}

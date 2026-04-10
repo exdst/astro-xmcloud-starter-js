@@ -1,0 +1,144 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const externalFields = rendering?.fields?.data?.externalFields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const imageRequired = datasource?.imageRequired?.jsonValue;
+const link1 = datasource?.link1?.jsonValue;
+const link2 = datasource?.link2?.jsonValue;
+
+const pageHeaderTitle = externalFields?.pageHeaderTitle?.jsonValue;
+const pageTitle = externalFields?.pageTitle?.jsonValue;
+const pageSubtitle = externalFields?.pageSubtitle?.jsonValue;
+
+const title = pageHeaderTitle?.value ? pageHeaderTitle : pageTitle;
+const subtitle = pageSubtitle;
+
+const shouldShowButtons = isEditing
+  ? true
+  : (link1?.value?.href !== '' || link2?.value?.href !== '');
+
+const hasPagesPositionStyles = params?.styles
+  ? (params.styles as string).includes('position-')
+  : false;
+
+const positionClass = !hasPagesPositionStyles ? 'position-left' : '';
+const stylesClass = params?.styles || '';
+---
+
+{datasource ? (
+  <section
+    data-component="PageHeader"
+    data-class-change
+    class:list={[
+      'bg-background text-foreground group w-full overflow-hidden',
+      positionClass,
+      stylesClass,
+    ]}
+  >
+    <div class="@container/headerwrapper">
+      <div class="@lg/headerwrapper:pt-20 @lg/headerwrapper:pb-16 @xl/headerwrapper:mx-auto @lg/headerwrapper:max-w-screen-xl @xl/headerwrapper:group-[.container--full-bleed]:px-8 relative mx-auto w-full py-12 group-[.container--full-bleed]:px-4">
+        <div class="@md/headerwrapper:grid-cols-2 @md/headerwrapper:grid-rows-[17fr_4fr_29fr] grid grid-cols-1 gap-x-[10px] gap-y-0">
+          {/* Left */}
+          <div class="@container/headercontent @md/headerwrapper:row-start-1 @md/headerwrapper:row-end-4 @md/headerwrapper:col-start-1 @md/headerwrapper:col-end-2 @md/headerwrapper:mb-0 mb-10">
+            <astro-animated-section
+              data-direction="up"
+              data-editing={isEditing ? "true" : undefined}
+              class="w-full"
+            >
+              <Text
+                tag="h1"
+                class="font-heading @[575px]/headercontent:text-6xl @xs/headercontent:text-5xl relative -ml-[0.1em] max-w-[14ch] text-balance text-left text-4xl font-light tracking-tighter antialiased"
+                field={title}
+              />
+            </astro-animated-section>
+            {/* Subtitle */}
+            {subtitle && (
+              <astro-animated-section
+                data-direction="up"
+                data-editing={isEditing ? "true" : undefined}
+              >
+                <RichTextSDK
+                  class="font-body mt-4 max-w-[50ch] text-pretty leading-tight"
+                  field={subtitle}
+                />
+              </astro-animated-section>
+            )}
+            {shouldShowButtons && (
+              <astro-animated-section
+                data-direction="up"
+                data-editing={isEditing ? "true" : undefined}
+              >
+                <div class="mt-9 flex flex-wrap gap-4">
+                  {link1?.value?.href && (
+                    isEditing ? (
+                      <Link field={link1} class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-primary text-primary-foreground hover:bg-primary-hover px-4 py-2-5 text-sm" />
+                    ) : (
+                      <a href={link1.value.href} class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-primary text-primary-foreground hover:bg-primary-hover px-4 py-2-5 text-sm">
+                        {link1.value.text}
+                      </a>
+                    )
+                  )}
+                  {link2?.value?.href && (
+                    isEditing ? (
+                      <Link field={link2} class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2-5 text-sm" />
+                    ) : (
+                      <a href={link2.value.href} class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default font-heading ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 antialiased font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 px-4 py-2-5 text-sm">
+                        {link2.value.text}
+                      </a>
+                    )
+                  )}
+                </div>
+              </astro-animated-section>
+            )}
+          </div>
+          {/* Right */}
+          <div class="@md/headerwrapper:row-start-2 @md/headerwrapper:row-end-4 @md/headerwrapper:col-start-2 @md/headerwrapper:col-end-3 @md/headerwrapper:self-end @md/headerwrapper:justify-self-end @md/headerwrapper:mt-auto relative w-full">
+            {/* Centered Line */}
+            <div class="@md/headerwrapper:block absolute bottom-0 left-1/2 top-0 mx-auto hidden w-full -translate-x-[50%]">
+              <div class="bg-foreground absolute -bottom-[100vw] -top-[100vw] right-[50%] block w-[2px] -translate-x-[50%]"></div>
+            </div>
+            {/* Image */}
+            <astro-animated-section
+              data-direction="up"
+              data-editing={isEditing ? "true" : undefined}
+              class="relative"
+            >
+              {imageRequired?.value?.src ? (
+                <div class="aspect-[30/19] w-full">
+                  <img
+                    src={imageRequired.value.src}
+                    alt={imageRequired.value.alt || ''}
+                    class="absolute inset-0 aspect-[30/19] h-full w-full object-cover"
+                    loading="eager"
+                  />
+                </div>
+              ) : isEditing ? (
+                <AstroImage field={imageRequired} />
+              ) : null}
+            </astro-animated-section>
+            {/* Right Line */}
+            <div class="absolute bottom-0 right-0 top-0">
+              <div class="@md/headerwrapper:bg-foreground absolute -bottom-[100vw] -top-[100vw] right-0 block w-[2px] bg-gradient-to-t from-white"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Page Header</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

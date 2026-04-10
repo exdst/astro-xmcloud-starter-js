@@ -1,0 +1,42 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as SearchExperienceDefault } from "./SearchExperience.tsx";
+import { LoadMore as SearchExperienceLoadMore } from "./SearchExperience.LoadMore.tsx";
+
+interface Props extends ComponentProps {
+  variant?: string;
+}
+
+const { rendering, params, variant = "Default" } = Astro.props as Props;
+
+const fields = rendering?.fields as {
+  search?: { value: string };
+} | undefined;
+
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+const isPreview = page?.mode?.isPreview ?? false;
+const siteName = page?.siteName ?? '';
+const routeName = page?.layout?.sitecore?.route?.name;
+const routeLanguage = page?.layout?.sitecore?.route?.itemLanguage;
+
+const searchFieldValue = fields?.search?.value ?? '';
+
+const reactProps = {
+  params: params || {},
+  searchFieldValue,
+  renderingUid: rendering?.uid,
+  isEditing,
+  isPreview,
+  siteName,
+  routeName,
+  routeLanguage,
+};
+---
+
+{variant === "LoadMore" ? (
+  <SearchExperienceLoadMore client:load {...reactProps} />
+) : (
+  <SearchExperienceDefault client:load {...reactProps} />
+)}

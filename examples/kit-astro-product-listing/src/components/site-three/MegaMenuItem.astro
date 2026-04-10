@@ -1,0 +1,138 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const styles = params?.styles || "";
+const dynamicId = params?.DynamicPlaceholderId || "default";
+const menuId = `mega-menu-${dynamicId}`;
+const isSimpleLink = !!(params as any)?.isSimpleLink;
+
+const title = fields?.Title;
+const link = fields?.Link;
+const featuredProduct = fields?.FeaturedProduct as any;
+---
+
+{isSimpleLink ? (
+  <li
+    class={`font-(family-name:--font-accent) font-medium ${styles}`}
+    data-class-change
+  >
+    {isEditing ? (
+      <Link
+        field={link}
+        class="inline-block p-4 font-[inherit] whitespace-nowrap cursor-pointer"
+      />
+    ) : (
+      link?.value?.href && (
+        <a
+          href={link.value.href}
+          class="inline-block p-4 font-[inherit] whitespace-nowrap cursor-pointer"
+        >
+          {link.value.text}
+        </a>
+      )
+    )}
+  </li>
+) : (
+  <mega-menu-toggle class={`font-(family-name:--font-accent) font-medium ${styles}`} data-menu-id={menuId} data-class-change>
+    <li>
+      <span class="inline-block p-4 font-[inherit] whitespace-nowrap cursor-pointer" data-trigger>
+        <Text field={title} />
+      </span>
+      <div
+        class="fixed lg:absolute top-14 left-0 right-0 lg:top-full lg:left-0 lg:right-0 h-[calc(100vh-3.5rem)] lg:h-auto overflow-auto opacity-0 translate-x-full lg:translate-x-0 lg:translate-y-2 pointer-events-none bg-background transition-all duration-300 ease-in-out [.partial-editing-mode_&]:!static [.partial-editing-mode_&]:!opacity-100 [.partial-editing-mode_&]:!translate-0 [.partial-editing-mode_&]:!pointer-events-auto"
+        data-content
+      >
+        <div class="grid lg:grid-cols-[2fr_2fr_3fr] gap-8 items-start pt-18 pl-8 pb-8 lg:pt-8 lg:pb-0 text-left">
+          <div
+            class="lg:hidden flex gap-4 items-center text-sm text-secondary-foreground **:font-(family-name:--font-heading) uppercase cursor-pointer"
+            data-back-btn
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            Back
+          </div>
+
+          <div class="text-2xl **:font-(family-name:--font-heading) uppercase pb-8">
+            <Placeholder name={`mega-menu-item-primary-links-${dynamicId}`} rendering={rendering} />
+          </div>
+          <div class="flex flex-col gap-6 pb-8">
+            <Placeholder name={`mega-menu-item-secondary-links-${dynamicId}`} rendering={rendering} />
+          </div>
+
+          {featuredProduct && featuredProduct.fields && featuredProduct.fields.FeaturedImage && (
+            <div class="relative self-end lg:justify-self-end max-w-lg pb-12 lg:pb-0 lg:pl-[20%]">
+              <div class="aspect-square">
+                <AstroImage field={featuredProduct.fields.FeaturedImage} class="w-full h-full object-cover" />
+              </div>
+              <div class="absolute bottom-0 lg:bottom-8 left-0 p-4 text-center bg-background shadow-lg">
+                <h3 class="mb-4 text-sm">
+                  <Text field={featuredProduct.fields.ProductName} />
+                </h3>
+                <a href={featuredProduct.url} class="btn btn-primary btn-sharp">
+                  Explore {featuredProduct.fields.ProductName?.value}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </li>
+  </mega-menu-toggle>
+)}
+
+<script>
+  class MegaMenuToggle extends HTMLElement {
+    private isVisible = false;
+    private trigger: HTMLElement | null;
+    private content: HTMLElement | null;
+    private backBtn: HTMLElement | null;
+
+    constructor() {
+      super();
+      this.trigger = this.querySelector("[data-trigger]");
+      this.content = this.querySelector("[data-content]");
+      this.backBtn = this.querySelector("[data-back-btn]");
+    }
+
+    connectedCallback() {
+      this.trigger?.addEventListener("click", () => this.toggle());
+      this.backBtn?.addEventListener("click", () => this.hide());
+      document.addEventListener("click", (e) => {
+        if (!this.contains(e.target as Node) && this.isVisible) {
+          this.hide();
+        }
+      });
+    }
+
+    toggle() {
+      this.isVisible ? this.hide() : this.show();
+    }
+
+    show() {
+      this.isVisible = true;
+      if (this.content) {
+        this.content.classList.remove("opacity-0", "translate-x-full", "lg:translate-y-2", "pointer-events-none");
+        this.content.classList.add("opacity-100", "translate-x-0", "lg:translate-y-0", "pointer-events-auto");
+      }
+    }
+
+    hide() {
+      this.isVisible = false;
+      if (this.content) {
+        this.content.classList.add("opacity-0", "translate-x-full", "lg:translate-y-2", "pointer-events-none");
+        this.content.classList.remove("opacity-100", "translate-x-0", "lg:translate-y-0", "pointer-events-auto");
+      }
+    }
+  }
+
+  customElements.define("mega-menu-toggle", MegaMenuToggle);
+</script>

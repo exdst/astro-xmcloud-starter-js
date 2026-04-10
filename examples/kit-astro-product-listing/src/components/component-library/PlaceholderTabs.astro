@@ -1,0 +1,81 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+const phSuffixes = ['one', 'two', 'three', 'four', 'five'];
+const tabs = (datasource?.children?.results ?? []).slice(0, phSuffixes.length);
+
+const tabsTriggerActiveStyles = 'data-[state=active]:pt-3 data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-b-white data-[state=active]:z-20';
+const tabsTriggerInactiveStyles = 'data-[state=inactive]:bg-gray-200 data-[state=inactive]:border-b-2 data-[state=inactive]:border-t-gray-300 data-[state=inactive]:border-s-gray-300 data-[state=inactive]:border-e-gray-300';
+---
+
+<section class={`px-4 ${styles}`} data-component="tabs">
+  <div class="container mx-auto">
+    {tabs.length > 0 && (
+      <div class="relative w-full" data-tabs>
+        <div class="sticky bg-white top-0 w-full flex justify-center pt-10 border-b-2 z-10">
+          <div class="relative top-[2px] w-auto self-center flex flex-row justify-center items-end" role="tablist">
+            {tabs.map((tab: any, index: number) => (
+              <button
+                role="tab"
+                data-tab-trigger
+                data-tab-value={tab.id}
+                aria-selected={index === 0 ? 'true' : 'false'}
+                data-state={index === 0 ? 'active' : 'inactive'}
+                class={`relative basis-auto px-4 py-2 -ml-[2px] first:ml-0 border-2 !border-e-2 rounded-tr-sm rounded-tl-sm text-base transition-all hover:pt-3 cursor-pointer ${tabsTriggerActiveStyles} ${tabsTriggerInactiveStyles}`}
+              >
+                <Text field={tab.title?.jsonValue} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {tabs.map((tab: any, index: number) => (
+          <div
+            role="tabpanel"
+            data-tab-content
+            data-tab-value={tab.id}
+            class:list={['relative border-0 p-0', index !== 0 ? 'hidden' : '']}
+          >
+            <Placeholder
+              name={`tab-content-${phSuffixes[index]}-${params.DynamicPlaceholderId}`}
+              rendering={rendering}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('[data-tabs]').forEach((tabsContainer) => {
+    const triggers = tabsContainer.querySelectorAll('[data-tab-trigger]');
+    const contents = tabsContainer.querySelectorAll('[data-tab-content]');
+
+    triggers.forEach((trigger) => {
+      trigger.addEventListener('click', () => {
+        const value = trigger.getAttribute('data-tab-value');
+
+        triggers.forEach((t) => {
+          t.setAttribute('data-state', t === trigger ? 'active' : 'inactive');
+          t.setAttribute('aria-selected', t === trigger ? 'true' : 'false');
+        });
+
+        contents.forEach((c) => {
+          if (c.getAttribute('data-tab-value') === value) {
+            c.classList.remove('hidden');
+          } else {
+            c.classList.add('hidden');
+          }
+        });
+      });
+    });
+  });
+</script>

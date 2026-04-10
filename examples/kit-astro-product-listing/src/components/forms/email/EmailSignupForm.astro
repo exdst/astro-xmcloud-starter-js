@@ -1,0 +1,21 @@
+---
+import { EmailSignupForm } from "./EmailSignupForm.tsx";
+
+const props = Astro.props as any;
+const fields = props.fields || props.rendering?.fields || {};
+
+const emailPlaceholder = fields.emailPlaceholder?.value || "Enter your email address";
+const emailErrorMessage = fields.emailErrorMessage?.value || "Please enter a valid email address";
+const emailSubmitLabel = fields.emailSubmitLabel?.value || "Subscribe";
+const emailSuccessMessage = fields.emailSuccessMessage?.value || "Thank you for subscribing!";
+const buttonVariant = fields.buttonVariant || "default";
+---
+
+<EmailSignupForm
+  client:visible
+  emailPlaceholder={emailPlaceholder}
+  emailErrorMessage={emailErrorMessage}
+  emailSubmitLabel={emailSubmitLabel}
+  emailSuccessMessage={emailSuccessMessage}
+  buttonVariant={buttonVariant}
+/>

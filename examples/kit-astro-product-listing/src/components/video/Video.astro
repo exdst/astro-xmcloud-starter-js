@@ -1,0 +1,147 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const video = fields?.video;
+const image = fields?.image;
+
+const videoUrl = video?.value?.href || '';
+const darkPlayIcon = (params as any)?.darkPlayIcon || '0';
+const displayIcon = (params as any)?.displayIcon;
+
+// Extract YouTube video ID
+function extractVideoId(url: string): string | null {
+  if (!url) return null;
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/
+  );
+  return match ? match[1] : null;
+}
+
+const videoId = extractVideoId(videoUrl);
+const imageSrc = image?.value?.src;
+const playIconColor = darkPlayIcon === '1' ? 'text-black' : 'text-white';
+---
+
+{videoUrl ? (
+  <astro-video data-video-id={videoId} data-video-url={videoUrl}>
+    <div class="max-w-screens-2xl relative z-10 mx-auto overflow-hidden">
+      <div class="relative aspect-video w-full">
+        <div class="absolute inset-0">
+          {/* Poster/thumbnail */}
+          <div data-poster class="absolute inset-0 transition-transform duration-300 hover:scale-105">
+            {imageSrc ? (
+              <img
+                src={imageSrc}
+                alt=""
+                class="h-full w-full object-cover"
+                aria-hidden="true"
+                loading="lazy"
+              />
+            ) : videoId ? (
+              <img
+                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                alt=""
+                class="h-full w-full object-cover"
+                aria-hidden="true"
+                loading="lazy"
+              />
+            ) : null}
+          </div>
+          {/* Starburst icon */}
+          {displayIcon && (
+            <div class="absolute inset-0 flex max-w-[30%] items-center justify-center">
+              <svg
+                width="364"
+                height="358"
+                viewBox="0 0 364 358"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="absolute bottom-0 left-0 block h-auto w-full"
+                aria-hidden="true"
+              >
+                <path
+                  d="M244.774 214.641L324.325 292.523L297.024 319.411L217.472 241.065C212.294 244.31 207.116 246.165 200.997 248.019V358.353H162.398V248.019C156.749 246.628 151.101 244.31 145.923 241.065L66.8421 319.411L39.5404 292.523L119.092 214.641C115.797 209.541 113.914 203.978 112.031 198.415H0V160.401H112.031C113.443 154.374 115.797 149.275 119.092 144.176L39.5404 65.8293L66.8421 38.9413L145.923 117.287C151.101 114.506 156.749 112.188 162.398 110.334V0H200.997V110.334C207.116 112.188 212.294 114.506 217.472 117.287L297.024 38.9413L324.325 65.8293L244.774 144.176C247.598 149.275 249.952 154.374 251.835 160.401H363.866V198.415H251.835C249.952 203.978 247.598 209.541 244.774 214.641Z"
+                  fill="#EA580C"
+                />
+              </svg>
+            </div>
+          )}
+          {/* Play button */}
+          <button
+            data-play-btn
+            class={`absolute inset-0 z-20 flex cursor-pointer items-center justify-center ${playIconColor}`}
+            aria-label="Play video"
+          >
+            <svg class="h-[65px] w-[65px] transition-transform hover:scale-110" fill="currentColor" viewBox="0 0 24 24">
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+          </button>
+          {/* Video iframe (shown when playing) */}
+          <div data-video-container class="absolute inset-0 hidden">
+            {videoId && (
+              <iframe
+                data-iframe
+                width="100%"
+                height="100%"
+                src=""
+                title="Video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                class="h-full w-full"
+              ></iframe>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </astro-video>
+) : (
+  <p class="bg-secondary flex aspect-video items-center justify-center border">
+    <span class="font-bold">Please add video</span>
+  </p>
+)}
+
+<script>
+  class AstroVideo extends HTMLElement {
+    private videoId: string | null;
+    private videoUrl: string;
+    private playBtn: HTMLButtonElement | null;
+    private poster: HTMLElement | null;
+    private videoContainer: HTMLElement | null;
+    private iframe: HTMLIFrameElement | null;
+
+    constructor() {
+      super();
+      this.videoId = this.dataset.videoId || null;
+      this.videoUrl = this.dataset.videoUrl || '';
+      this.playBtn = this.querySelector('[data-play-btn]');
+      this.poster = this.querySelector('[data-poster]');
+      this.videoContainer = this.querySelector('[data-video-container]');
+      this.iframe = this.querySelector('[data-iframe]');
+    }
+
+    connectedCallback() {
+      this.playBtn?.addEventListener('click', () => this.play());
+    }
+
+    play() {
+      if (this.videoId && this.iframe) {
+        this.iframe.src = `https://www.youtube.com/embed/${this.videoId}?autoplay=1`;
+        this.videoContainer?.classList.remove('hidden');
+        this.poster?.classList.add('hidden');
+        this.playBtn?.classList.add('hidden');
+      } else if (this.videoUrl) {
+        window.open(this.videoUrl, '_blank');
+      }
+    }
+  }
+
+  customElements.define('astro-video', AstroVideo);
+</script>

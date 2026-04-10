@@ -1,0 +1,203 @@
+---
+/**
+ * FloatingDock - Astro equivalent of floating-dock.dev.tsx
+ * Replaces Framer Motion with CSS transitions + scroll-triggered vanilla JS.
+ */
+interface DockItem {
+  title: string;
+  icon: string;
+  href: string;
+}
+
+interface Props {
+  items: DockItem[];
+  desktopClassName?: string;
+  mobileClassName?: string;
+  forceCollapse?: boolean;
+}
+
+const {
+  items = [],
+  desktopClassName = '',
+  mobileClassName = '',
+  forceCollapse = false,
+} = Astro.props as Props;
+---
+
+{/* Desktop dock - hidden on mobile */}
+{!forceCollapse && (
+  <div
+    class:list={[
+      'floating-dock-desktop mx-auto hidden h-auto w-16 flex-col items-center gap-4 rounded-2xl py-4 md:flex',
+      desktopClassName,
+    ]}
+    role="region"
+    aria-label="Share options"
+    data-floating-dock-desktop
+  >
+    {items.map((item) => (
+      <button
+        class="floating-dock-icon group relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 hover:h-[80px] hover:w-[80px] hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+        aria-label={item.title}
+        tabindex="0"
+        data-dock-item
+        data-dock-href={item.href}
+      >
+        <span
+          class="floating-dock-tooltip pointer-events-none absolute -left-24 top-1/2 w-fit -translate-y-1/2 whitespace-pre rounded-md bg-black px-2 py-0.5 text-xs text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus:opacity-100 dark:bg-white dark:text-black"
+        >
+          {item.title}
+        </span>
+        <div class="flex h-5 w-5 items-center justify-center transition-all duration-200 group-hover:h-10 group-hover:w-10">
+          <Fragment set:html={item.icon} />
+        </div>
+      </button>
+    ))}
+  </div>
+)}
+
+{/* Mobile dock */}
+<div
+  class:list={[
+    'floating-dock-mobile relative z-50 block md:hidden',
+    mobileClassName,
+    { 'md:block': forceCollapse },
+  ]}
+  role="region"
+  aria-label="Share menu"
+  data-floating-dock-mobile
+>
+  <!-- Backdrop -->
+  <div
+    class="floating-dock-backdrop fixed inset-0 z-40 hidden bg-black/20 backdrop-blur-sm opacity-0 transition-opacity duration-200"
+    data-dock-backdrop
+    style="backdrop-filter: blur(8px);"
+  />
+
+  <!-- Menu items -->
+  <div
+    class="floating-dock-menu absolute inset-x-0 bottom-full z-50 mb-2 hidden flex-col gap-2"
+    role="menu"
+    data-dock-menu
+  >
+    {items.map((item) => (
+      <div class="dock-menu-item translate-y-2 opacity-0 transition-all duration-200">
+        <button
+          class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+          aria-label={item.title}
+          role="menuitem"
+          tabindex="-1"
+          data-dock-menu-item
+          data-dock-href={item.href}
+        >
+          <div class="h-4 w-4">
+            <Fragment set:html={item.icon} />
+          </div>
+        </button>
+      </div>
+    ))}
+  </div>
+
+  <!-- Toggle button -->
+  <button
+    class="relative z-50 flex h-10 w-10 items-center justify-center rounded-full hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-transparent"
+    aria-expanded="false"
+    aria-haspopup="menu"
+    aria-label="Open share menu"
+    data-dock-trigger
+  >
+    <!-- Share icon (visible when closed) -->
+    <svg data-dock-icon-share class="h-5 w-5 text-white transition-all duration-200 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+    </svg>
+    <!-- Close icon (hidden when closed) -->
+    <svg data-dock-icon-close class="absolute h-5 w-5 text-white opacity-0 transition-all duration-200 dark:text-neutral-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll('[data-floating-dock-mobile]').forEach((dock) => {
+    const trigger = dock.querySelector('[data-dock-trigger]') as HTMLButtonElement;
+    const menu = dock.querySelector('[data-dock-menu]') as HTMLElement;
+    const backdrop = dock.querySelector('[data-dock-backdrop]') as HTMLElement;
+    const shareIcon = dock.querySelector('[data-dock-icon-share]') as HTMLElement;
+    const closeIcon = dock.querySelector('[data-dock-icon-close]') as HTMLElement;
+    const menuItems = dock.querySelectorAll('[data-dock-menu-item]');
+    let isOpen = false;
+
+    function openMenu() {
+      isOpen = true;
+      menu.classList.remove('hidden');
+      menu.classList.add('flex');
+      backdrop.classList.remove('hidden');
+      shareIcon.classList.add('opacity-0');
+      closeIcon.classList.remove('opacity-0');
+      trigger.setAttribute('aria-expanded', 'true');
+      trigger.setAttribute('aria-label', 'Close share menu');
+
+      requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        menu.querySelectorAll('.dock-menu-item').forEach((item, i) => {
+          setTimeout(() => {
+            (item as HTMLElement).classList.remove('translate-y-2', 'opacity-0');
+          }, i * 50);
+        });
+      });
+
+      menuItems.forEach((item) => (item as HTMLElement).setAttribute('tabindex', '0'));
+      if (menuItems.length > 0) (menuItems[0] as HTMLElement).focus();
+    }
+
+    function closeMenu() {
+      isOpen = false;
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      shareIcon.classList.remove('opacity-0');
+      closeIcon.classList.add('opacity-0');
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.setAttribute('aria-label', 'Open share menu');
+
+      menu.querySelectorAll('.dock-menu-item').forEach((item) => {
+        (item as HTMLElement).classList.add('translate-y-2', 'opacity-0');
+      });
+
+      menuItems.forEach((item) => (item as HTMLElement).setAttribute('tabindex', '-1'));
+
+      setTimeout(() => {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+        backdrop.classList.add('hidden');
+      }, 200);
+    }
+
+    trigger?.addEventListener('click', () => {
+      if (isOpen) { closeMenu(); } else { openMenu(); }
+    });
+
+    backdrop?.addEventListener('click', () => {
+      closeMenu();
+      trigger?.focus();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeMenu();
+        trigger?.focus();
+      }
+    });
+  });
+
+  // Desktop dock item click handlers
+  document.querySelectorAll('[data-floating-dock-desktop] [data-dock-item]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const href = (btn as HTMLElement).dataset.dockHref;
+      if (href) window.open(href, '_blank');
+    });
+  });
+</script>

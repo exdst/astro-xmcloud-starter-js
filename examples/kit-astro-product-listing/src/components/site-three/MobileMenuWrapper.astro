@@ -1,0 +1,116 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const dynamicId = params?.DynamicPlaceholderId;
+const supportLink = fields?.SupportLink;
+
+const navLinkClass = "block p-4 font-[family-name:var(--font-accent)] font-medium";
+
+function hasValidLink(field: any): boolean {
+  const href = field?.value?.href;
+  return !!(href && href !== "#" && !href.startsWith("http://#"));
+}
+
+const hasValidSupportLink = hasValidLink(supportLink);
+---
+
+<mobile-menu-wrapper>
+  <li class="lg:hidden flex justify-center items-center p-4 cursor-pointer relative">
+    <button
+      class="relative w-5 h-4 flex items-center justify-center"
+      data-toggle-btn
+      aria-label="Toggle mobile menu"
+      aria-expanded="false"
+    >
+      <span class="relative w-5 h-4">
+        <span class="absolute left-0 top-0 w-full h-0.5 bg-current origin-top-right transition-transform duration-300 ease-in-out" data-line-top></span>
+        <span class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-0.5 bg-current transition-all duration-300 ease-in-out" data-line-mid></span>
+        <span class="absolute left-0 bottom-0 w-full h-0.5 bg-current origin-bottom-right transition-transform duration-300 ease-in-out" data-line-bot></span>
+      </span>
+    </button>
+
+    <div
+      class="opacity-0 pointer-events-none fixed top-14 left-0 right-0 flex flex-col items-center justify-center h-[calc(100vh-3.5rem)] p-4 overflow-auto bg-background transition-all duration-300 ease-in-out z-50"
+      data-menu-content
+    >
+      <div class="lg:hidden flex flex-col w-full h-full">
+        <div class="flex-1 flex items-center justify-center">
+          <ul class="flex flex-col text-center bg-background">
+            <Placeholder name={`header-navigation-${dynamicId}`} rendering={rendering} />
+          </ul>
+        </div>
+        <div class="w-full">
+          <hr class="w-full border-border" />
+          <ul class="text-center">
+            <li>
+              {hasValidSupportLink ? (
+                <Link field={supportLink} class={navLinkClass} />
+              ) : (
+                <span class={navLinkClass}>{supportLink?.value?.text || "Support"}</span>
+              )}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </li>
+</mobile-menu-wrapper>
+
+<script>
+  class MobileMenuWrapperEl extends HTMLElement {
+    private isVisible = false;
+    private toggleBtn: HTMLButtonElement | null;
+    private menuContent: HTMLElement | null;
+    private lineTop: HTMLElement | null;
+    private lineMid: HTMLElement | null;
+    private lineBot: HTMLElement | null;
+
+    constructor() {
+      super();
+      this.toggleBtn = this.querySelector("[data-toggle-btn]");
+      this.menuContent = this.querySelector("[data-menu-content]");
+      this.lineTop = this.querySelector("[data-line-top]");
+      this.lineMid = this.querySelector("[data-line-mid]");
+      this.lineBot = this.querySelector("[data-line-bot]");
+    }
+
+    connectedCallback() {
+      this.toggleBtn?.addEventListener("click", () => this.toggle());
+      document.addEventListener("click", (e) => {
+        if (!this.contains(e.target as Node) && this.isVisible) {
+          this.hide();
+        }
+      });
+    }
+
+    toggle() {
+      this.isVisible ? this.hide() : this.show();
+    }
+
+    show() {
+      this.isVisible = true;
+      this.toggleBtn?.setAttribute("aria-expanded", "true");
+      this.menuContent?.classList.remove("opacity-0", "pointer-events-none");
+      this.menuContent?.classList.add("opacity-100", "pointer-events-auto");
+      this.lineTop?.classList.add("-rotate-47");
+      this.lineMid?.classList.add("opacity-0");
+      this.lineBot?.classList.add("rotate-47");
+    }
+
+    hide() {
+      this.isVisible = false;
+      this.toggleBtn?.setAttribute("aria-expanded", "false");
+      this.menuContent?.classList.add("opacity-0", "pointer-events-none");
+      this.menuContent?.classList.remove("opacity-100", "pointer-events-auto");
+      this.lineTop?.classList.remove("-rotate-47");
+      this.lineMid?.classList.remove("opacity-0");
+      this.lineBot?.classList.remove("rotate-47");
+    }
+  }
+
+  customElements.define("mobile-menu-wrapper", MobileMenuWrapperEl);
+</script>

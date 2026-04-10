@@ -1,0 +1,33 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { ImageCarouselIsland } from "./ImageCarousel.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const datasource = fields?.data?.datasource;
+const title = datasource?.title?.jsonValue?.value || "";
+
+const slides = (datasource?.imageItems?.results ?? []).map((item: any) => ({
+  image: item.image?.jsonValue?.value?.src || "",
+  imageAlt: item.image?.jsonValue?.value?.alt || "",
+  backgroundText: item.backgroundText?.jsonValue?.value || "",
+  linkHref: item.link?.jsonValue?.value?.href || "",
+  linkText: item.link?.jsonValue?.value?.text || "",
+}));
+
+const styles = params?.styles || "";
+---
+
+{slides.length > 0 && (
+  <ImageCarouselIsland
+    client:visible
+    variant={isEditing ? "EditMode" : "FullBleed"}
+    title={title}
+    slides={slides}
+    styles={styles}
+  />
+)}

@@ -1,0 +1,26 @@
+---
+import { Meteors } from "./Meteors.tsx";
+
+const props = Astro.props as any;
+
+const number = props.number ?? 20;
+const minDelay = props.minDelay ?? 0.2;
+const maxDelay = props.maxDelay ?? 1.2;
+const minDuration = props.minDuration ?? 2;
+const maxDuration = props.maxDuration ?? 10;
+const angle = props.angle ?? 215;
+const className = props.class ?? props.className ?? "";
+const size = props.size ?? "1";
+---
+
+<Meteors
+  client:visible
+  number={number}
+  minDelay={minDelay}
+  maxDelay={maxDelay}
+  minDuration={minDuration}
+  maxDuration={maxDuration}
+  angle={angle}
+  className={className}
+  size={size}
+/>

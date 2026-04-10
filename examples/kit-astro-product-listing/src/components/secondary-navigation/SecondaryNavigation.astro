@@ -1,0 +1,131 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+
+const parent = datasource?.parent;
+const children = datasource?.children;
+const currentId = datasource?.id;
+
+const parentItems = parent?.children?.results ?? [];
+const childItems = children?.results ?? [];
+---
+
+{datasource ? (
+  <>
+    {/* Desktop */}
+    <nav class="hidden sm:block relative justify-center" aria-label="Secondary navigation">
+      <ul class="m-0 flex list-none flex-col gap-2 pl-0">
+        {parentItems.map((item: any) => {
+          const isParent = currentId === item.id;
+          const title =
+            item.navigationTitle?.jsonValue?.value ||
+            item.title?.jsonValue?.value ||
+            item.displayName ||
+            item.name;
+          return (
+            <li>
+              <a
+                href={item.url?.href || ''}
+                class="box-border inline-block w-full p-2 px-4 font-bold hover:bg-accent rounded-md"
+              >
+                {title}
+              </a>
+              {isParent && childItems.length > 0 && (
+                <ul class="mt-2 flex list-none flex-col items-start gap-2 pl-4">
+                  {childItems.map((child: any) => {
+                    const childTitle =
+                      child.navigationTitle?.jsonValue?.value ||
+                      child.title?.jsonValue?.value ||
+                      child.displayName ||
+                      child.name;
+                    return (
+                      <li>
+                        <a
+                          href={child.url?.href || ''}
+                          class="p-2 font-bold hover:underline"
+                        >
+                          {childTitle}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    {/* Mobile Dropdown */}
+    <div class="relative block sm:hidden">
+      <details class="secondary-nav-mobile">
+        <summary class="flex w-full cursor-pointer items-center justify-between rounded-md border border-accent bg-background p-2 px-4 [&::-webkit-details-marker]:hidden">
+          <span>Navigate</span>
+          <svg class="h-4 w-4 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <div class="absolute top-full w-full rounded-b-md border border-t-0 border-accent bg-background">
+          <nav>
+            <ul class="m-0 flex list-none flex-col gap-2 p-4 pl-0">
+              {parentItems.map((item: any) => {
+                const isParent = currentId === item.id;
+                const title =
+                  item.navigationTitle?.jsonValue?.value ||
+                  item.title?.jsonValue?.value ||
+                  item.displayName ||
+                  item.name;
+                return (
+                  <li>
+                    <a
+                      href={item.url?.href || ''}
+                      class="box-border inline-block w-full p-2 px-4 font-bold hover:bg-accent rounded-md"
+                    >
+                      {title}
+                    </a>
+                    {isParent && childItems.length > 0 && (
+                      <ul class="mt-2 flex list-none flex-col items-start gap-2 pl-4">
+                        {childItems.map((child: any) => {
+                          const childTitle =
+                            child.navigationTitle?.jsonValue?.value ||
+                            child.title?.jsonValue?.value ||
+                            child.displayName ||
+                            child.name;
+                          return (
+                            <li>
+                              <a
+                                href={child.url?.href || ''}
+                                class="p-2 font-bold hover:underline"
+                              >
+                                {childTitle}
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
+      </details>
+    </div>
+  </>
+) : (
+  <div class="is-empty-hint">Secondary Navigation</div>
+)}
+
+<style>
+  .secondary-nav-mobile[open] summary svg {
+    transform: rotate(180deg);
+  }
+  .secondary-nav-mobile[open] summary {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+</style>

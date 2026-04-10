@@ -1,0 +1,127 @@
+import type { LocationSearchProps } from './location-search.props';
+import { LocationSearchItem } from './LocationSearchItem';
+import { GoogleMap } from './GoogleMap';
+import { ZipcodeModal } from './ZipcodeModal';
+import { useLocationSearch } from './use-location-search';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+
+export const LocationSearchDefault = (props: LocationSearchProps) => {
+  const {
+    title,
+    googleMapsApiKey,
+    isPageEditing,
+    styles,
+    zipCode,
+    dealerships,
+    selectedDealership,
+    mapCenter,
+    isLoading,
+    initialDealerships,
+    geoLoading,
+    showModal,
+    geoError,
+    handleSelectDealership,
+    handleUseMyLocation,
+    handleModalSubmit,
+    handleOpenModal,
+    handleCloseModal,
+  } = useLocationSearch(props);
+
+  return (
+    <div
+      className={cn('@container bg-background text-foreground relative', {
+        [styles]: styles,
+      })}
+      data-class-change
+      data-component="LocationSearch"
+    >
+      {googleMapsApiKey === '' && isPageEditing && (
+        <p className="border-default bg-secondary text-secondary-foreground max-w-3/4 absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transform p-4 text-center text-xl">
+          Please set the Google Maps API key in the environment variables to enable the map.
+        </p>
+      )}
+      <div className="mx-auto max-w-screen-xl px-4 py-8">
+        {title?.value && (
+          <h2 className="mb-4">{title.value}</h2>
+        )}
+        <div
+          className={cn('mb-8 flex flex-wrap items-center gap-2', {
+            'opacity-20': googleMapsApiKey === '' && isPageEditing,
+          })}
+        >
+          <span className="font-heading text-lg font-light">Locations near</span>
+          <Button
+            variant="link"
+            onClick={handleOpenModal}
+            className="font-heading flex p-0 text-lg font-bold underline decoration-current underline-offset-2 transition-all duration-200 hover:decoration-transparent "
+            disabled={geoLoading}
+          >
+            {!geoLoading ? (
+              <>
+                {zipCode}
+                <span className="sr-only">Change Location</span>
+              </>
+            ) : (
+              <>
+                <div className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-b-2"></div>
+                <span className="font-heading flex text-lg font-bold underline underline-offset-4">
+                  Detecting location...
+                </span>
+              </>
+            )}
+          </Button>
+        </div>
+        <div
+          className={cn('grid grid-cols-1 gap-[60px] md:grid-cols-2', {
+            'opacity-20': googleMapsApiKey === '' && isPageEditing,
+          })}
+        >
+          <div className="relative h-[500px] overflow-hidden rounded-md bg-white">
+            <GoogleMap
+              apiKey={googleMapsApiKey}
+              center={mapCenter}
+              zoom={12}
+              selectedDealership={selectedDealership}
+              dealerships={dealerships}
+              onDealershipSelect={handleSelectDealership}
+            />
+          </div>
+          <div className="max-h-[500px] space-y-6 overflow-y-auto pr-2">
+            {isLoading ? (
+              <div className="py-4 text-center">Loading dealerships...</div>
+            ) : dealerships.length === 0 ? (
+              <div className="py-4 text-center">
+                No dealerships found
+                <span className="mt-2 block text-xs text-gray-400">
+                  (Initial count from Sitecore: {initialDealerships.length})
+                </span>
+              </div>
+            ) : (
+              dealerships.map((dealership, index) => (
+                <LocationSearchItem
+                  key={index}
+                  dealership={dealership}
+                  isSelected={
+                    selectedDealership?.dealershipName?.jsonValue?.value ===
+                    dealership.dealershipName?.jsonValue?.value
+                  }
+                  onSelect={handleSelectDealership}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      <ZipcodeModal
+        open={showModal}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
+        onUseMyLocation={handleUseMyLocation}
+        isGeoLoading={geoLoading}
+        error={geoError}
+      />
+    </div>
+  );
+};

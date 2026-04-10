@@ -1,0 +1,49 @@
+---
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+
+interface Props {
+  image: any;
+  className?: string;
+  class?: string;
+  wrapperClass?: string;
+  page?: any;
+  [key: string]: any;
+}
+
+const { image, className, class: classAttr, wrapperClass, page, ...rest } = Astro.props;
+const imgClass = className || classAttr || "";
+const src = image?.value?.src || image?.src || "";
+const alt = image?.value?.alt || image?.alt || "";
+---
+
+{wrapperClass ? (
+  <div class={wrapperClass}>
+    {src ? (
+      <AstroImage
+        field={image}
+        class={imgClass}
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+        alt={alt}
+        {...rest}
+      />
+    ) : (
+      <div class={`bg-muted flex items-center justify-center ${imgClass}`}>
+        <span class="text-muted-foreground text-sm">No image</span>
+      </div>
+    )}
+  </div>
+) : (
+  src ? (
+    <AstroImage
+      field={image}
+      class={imgClass}
+      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
+      alt={alt}
+      {...rest}
+    />
+  ) : (
+    <div class={`bg-muted flex items-center justify-center ${imgClass}`}>
+      <span class="text-muted-foreground text-sm">No image</span>
+    </div>
+  )
+)}

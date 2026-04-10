@@ -1,0 +1,274 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+const stats = datasource?.children?.results ?? [];
+const statGridLayout = stats.length > 2 ? 'md:grid-cols-2' : '';
+---
+
+{datasource ? (
+  variant === 'StatsSection1' ? (
+    <section class={`relative py-24 px-4 ${styles}`} data-class-change>
+      <div class="absolute inset-0 h-full w-full z-1">
+        <AstroImage field={datasource.image1?.jsonValue} class="h-full w-full object-cover brightness-50" />
+      </div>
+      <div class="relative container mx-auto text-white z-2">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-4 mb-20">
+          <div>
+            <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+            <h2 class="text-5xl font-bold"><Text field={datasource.heading?.jsonValue} /></h2>
+          </div>
+          <div>
+            <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+            <div class="mt-4">
+              <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+              <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+            </div>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-x-8 gap-y-12">
+          {stats.map((stat: any) => (
+            <div class="border-s ps-8">
+              <h3 class="text-xl font-bold mb-6"><Text field={stat.statHeading?.jsonValue} /></h3>
+              <p class="text-7xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+              <p><Text field={stat.statBody?.jsonValue} /></p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection2' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl">
+          <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+          <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+          <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-x-8 gap-y-12 my-12">
+          {stats.map((stat: any) => (
+            <div class="border p-8 flex flex-col">
+              <h3 class="text-xl font-bold mb-12"><Text field={stat.statHeading?.jsonValue} /></h3>
+              <p class="text-7xl font-bold pb-4 mb-4 text-right border-b mt-auto" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+              <p class="text-right"><Text field={stat.statBody?.jsonValue} /></p>
+            </div>
+          ))}
+        </div>
+        <div class="mt-4">
+          <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+          <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection3' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-20 items-start">
+          <div>
+            <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+            <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+            <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+            <div class="mt-4">
+              <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+              <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+            </div>
+          </div>
+          <div class={`grid ${statGridLayout} gap-x-8 gap-y-12`}>
+            {stats.map((stat: any) => (
+              <div class="border-s ps-8">
+                <h3 class="text-xl font-bold mb-6"><Text field={stat.statHeading?.jsonValue} /></h3>
+                <p class="text-7xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+                <p><Text field={stat.statBody?.jsonValue} /></p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection4' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-5 gap-20 items-start">
+          <div class="md:col-span-2">
+            <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+            <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+            <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+            <div class="mt-4">
+              <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+              <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+            </div>
+          </div>
+          <div class={`grid ${statGridLayout} gap-x-8 gap-y-12 col-span-3`}>
+            {stats.map((stat: any) => (
+              <div class="border p-8 flex flex-col">
+                <h3 class="text-xl font-bold mt-auto mb-12"><Text field={stat.statHeading?.jsonValue} /></h3>
+                <p class="text-7xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+                <p><Text field={stat.statBody?.jsonValue} /></p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection5' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="text-center mb-20">
+          <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+          <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+          <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+          <div class="mt-4">
+            <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+            <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-x-20 gap-y-4">
+          <div class="relative basis-2/3 shrink pt-[70%] md:pt-0">
+            <AstroImage field={datasource.image1?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          <div class="flex flex-col basis-1/3 grow py-8 gap-16">
+            {stats.map((stat: any) => (
+              <div>
+                <h3 class="text-xl font-bold mb-6"><Text field={stat.statHeading?.jsonValue} /></h3>
+                <p class="text-6xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+                <p><Text field={stat.statBody?.jsonValue} /></p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection6' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl text-center mb-20 mx-auto">
+          <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+          <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+          <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+          <div class="mt-4">
+            <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+            <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="relative basis-1/3 shrink pt-[70%] md:pt-0">
+            <AstroImage field={datasource.image1?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          <div class="flex flex-col basis-1/3 grow gap-8">
+            {stats.map((stat: any) => (
+              <div class="border p-8 flex flex-col">
+                <h3 class="text-xl font-bold mb-12"><Text field={stat.statHeading?.jsonValue} /></h3>
+                <p class="text-6xl font-bold pb-4 mb-4 text-right border-b mt-auto" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+                <p class="text-right"><Text field={stat.statBody?.jsonValue} /></p>
+              </div>
+            ))}
+          </div>
+          <div class="relative basis-1/3 shrink pt-[70%] md:pt-0">
+            <AstroImage field={datasource.image2?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection7' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="max-w-3xl mb-20">
+          <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+          <h2 class="text-5xl font-bold mb-6"><Text field={datasource.heading?.jsonValue} /></h2>
+          <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+          <div class="mt-4">
+            <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+            <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="relative basis-2/3 pt-[70%] md:pt-0">
+            <AstroImage field={datasource.image1?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          <div class="flex flex-col basis-1/3 gap-8">
+            {stats.map((stat: any) => (
+              <div class="border p-8 flex flex-col">
+                <h3 class="text-xl font-bold mt-auto mb-12"><Text field={stat.statHeading?.jsonValue} /></h3>
+                <p class="text-6xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+                <p><Text field={stat.statBody?.jsonValue} /></p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'StatsSection8' ? (
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-4 mb-20">
+          <div>
+            <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+            <h2 class="text-5xl font-bold"><Text field={datasource.heading?.jsonValue} /></h2>
+          </div>
+          <div>
+            <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+            <div class="mt-4">
+              <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+              <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+            </div>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 grid-flow-row-dense gap-8">
+          <div class="relative row-start-2 pt-[70%] md:row-start-2 md:col-start-2 lg:row-start-auto lg:col-start-2 lg:pt-0">
+            <AstroImage field={datasource.image1?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          <div class="relative row-start-4 pt-[70%] md:row-start-3 md:col-start-1 lg:row-start-2 lg:col-start-3 lg:pt-0">
+            <AstroImage field={datasource.image2?.jsonValue} class="absolute inset-0 h-full w-full object-cover" />
+          </div>
+          {stats.map((stat: any, i: number) => (
+            <div class:list={['border p-8 flex flex-col', i === 0 ? 'md:col-start-1 md:row-start-1 md:row-span-2' : '']}>
+              <h3 class="text-xl font-bold mb-12"><Text field={stat.statHeading?.jsonValue} /></h3>
+              <p class="text-7xl font-bold pb-4 mb-4 text-right border-b mt-auto" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+              <p class="text-right"><Text field={stat.statBody?.jsonValue} /></p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : (
+    /* Default */
+    <section class={`py-24 px-4 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="grid md:grid-cols-2 gap-x-20 gap-y-4 mb-20">
+          <div>
+            <p class="font-semibold mb-4"><Text field={datasource.tagLine?.jsonValue} /></p>
+            <h2 class="text-5xl font-bold"><Text field={datasource.heading?.jsonValue} /></h2>
+          </div>
+          <div>
+            <div class="text-lg"><RichText field={datasource.body?.jsonValue} /></div>
+            <div class="mt-4">
+              <Link field={datasource.link1?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground" />
+              <Link field={datasource.link2?.jsonValue} class="inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground" />
+            </div>
+          </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-x-8 gap-y-12">
+          {stats.map((stat: any) => (
+            <div class="border-s ps-8">
+              <h3 class="text-xl font-bold mb-6"><Text field={stat.statHeading?.jsonValue} /></h3>
+              <p class="text-7xl font-bold" aria-label="Statistic value"><Text field={stat.statValue?.jsonValue} /></p>
+              <p><Text field={stat.statBody?.jsonValue} /></p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+) : (
+  <div class="is-empty-hint">Stats Section</div>
+)}

@@ -1,0 +1,11 @@
+---
+/**
+ * Portal - Astro equivalent of portal.dev.tsx
+ * In Astro, there is no React portal mechanism. Instead, just render
+ * a div with slot content that can be positioned via CSS (e.g., fixed/absolute).
+ */
+---
+
+<div data-portal>
+  <slot />
+</div>

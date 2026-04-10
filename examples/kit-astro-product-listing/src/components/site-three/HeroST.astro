@@ -1,0 +1,32 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { HeroSTIsland } from "./HeroST.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+const fields = rendering?.fields;
+
+const eyebrow = fields?.Eyebrow?.value || "";
+const title = fields?.Title?.value || "";
+const image1Src = fields?.Image1?.value?.src || "";
+const image1Alt = fields?.Image1?.value?.alt || "";
+const link1Href = fields?.Link1?.value?.href || "";
+const link1Text = fields?.Link1?.value?.text || "";
+const link2Href = fields?.Link2?.value?.href || "";
+const link2Text = fields?.Link2?.value?.text || "";
+---
+
+<HeroSTIsland
+  client:load
+  variant={variant}
+  styles={styles}
+  eyebrow={eyebrow}
+  title={title}
+  image1Src={image1Src}
+  image1Alt={image1Alt}
+  link1Href={link1Href}
+  link1Text={link1Text}
+  link2Href={link2Href}
+  link2Text={link2Text}
+/>

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "sync",
+    "hostName": "*",
+    "language": "en"
+  },
+  {
+    "name": "alaris",
+    "hostName": "*",
+    "language": "en"
+  },
+  {
+    "name": "basic1",
+    "hostName": "*",
+    "language": "en"
+  },
+  {
+    "name": "solterra",
+    "hostName": "*",
+    "language": "en"
+  },
+  {
+    "name": "basic",
+    "hostName": "*",
+    "language": "en"
+  }
+]

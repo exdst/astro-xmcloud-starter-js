@@ -1,0 +1,115 @@
+---
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+
+if (!fields) return;
+
+const heading = fields?.Heading;
+const subheading = fields?.Subheading;
+const image = fields?.Image;
+
+const inputClass = "px-4 text-sm text-gray-900 bg-muted placeholder-muted-foreground transition-all duration-200 rounded-full focus:outline-none focus:ring-0 focus:border-transparent border-0 outline-none focus:shadow-none shadow-none focus-visible:ring-0 focus-visible:outline-none w-full h-10";
+---
+
+{variant === "ContentLeft" ? (
+  <section class={`relative px-4 ${styles}`} data-class-change>
+    <div class="absolute inset-0 z-10">
+      {image && <AstroImage field={image} class="w-full h-full object-cover" />}
+    </div>
+    <div class="relative container mx-auto z-20">
+      <div class="lg:max-w-[60%] h-full overflow-hidden backdrop-blur-[20px] bg-[linear-gradient(136deg,rgba(78,76,76,0.15)_2.61%,rgba(78,76,76,0.30)_73.95%)]">
+        <div class="relative px-4 sm:px-8 py-8 sm:py-16 py-14 text-white h-full flex flex-col justify-center">
+          <div class="max-w-[38rem] mx-auto">
+            <h1 class="text-2xl lg:text-5xl mb-4 text-left">
+              {heading && <Text field={heading} />}
+            </h1>
+            <div class="text-lg mb-6 leading-relaxed text-left">
+              {subheading && <RichText field={subheading} />}
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-1">
+                <input type="email" placeholder="Enter your email" class={inputClass} />
+              </div>
+              <button class="btn btn-primary">Sign Up</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+) : variant === "BackgroundPrimary" ? (
+  <section class={`relative bg-primary overflow-hidden py-8 px-4 ${styles}`} data-class-change>
+    <div class="absolute bottom-8 lg:top-1/2 left-0 lg:-left-[16%] lg:-translate-y-1/2 bg-sound-waves bg-repeat lg:bg-no-repeat lg:bg-contain bg-center w-full h-20 lg:w-2/5 lg:h-auto lg:aspect-3/1"></div>
+    <div class="hidden lg:block absolute top-0 lg:top-1/2 right-0 lg:-right-[16%] lg:-translate-y-1/2 bg-sound-waves bg-repeat lg:bg-no-repeat lg:bg-contain bg-center w-1/2 lg:w-2/5 aspect-3/1"></div>
+    <div class="relative container mx-auto pb-28 lg:py-16 text-center h-full flex flex-col justify-center z-20">
+      <div class="lg:w-1/2 max-w-[38rem] mx-auto">
+        <h3 class="lg:text-5xl text-2xl mb-4 uppercase">
+          {heading && <Text field={heading} />}
+        </h3>
+        <div class="text-lg leading-relaxed mb-6">
+          {subheading && <RichText field={subheading} />}
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1">
+            <input type="email" placeholder="Enter your email" class={inputClass} />
+          </div>
+          <button class="btn btn-primary outline">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </section>
+) : variant === "BackgroundDark" ? (
+  <section class={`relative bg-black py-8 px-4 ${styles}`} data-class-change>
+    <div class="absolute h-20 lg:h-auto bottom-8 left-0 right-0 lg:inset-0 mask-add mask-[var(--background-image-sound-waves),var(--background-image-sound-waves)] mask-[position:center] lg:mask-[position:-27%_50%,127%_50%] mask-size-[contain] lg:mask-size-[40%] lg:mask-no-repeat bg-primary z-10">
+      {image && <AstroImage field={image} class="w-full h-full object-cover mix-blend-multiply" />}
+    </div>
+    <div class="relative z-40 container mx-auto pb-28 lg:py-16 text-center text-white h-full flex flex-col justify-center">
+      <div class="lg:w-1/2 max-w-[38rem] mx-auto">
+        <h3 class="lg:text-5xl text-2xl mb-4 uppercase">
+          {heading && <Text field={heading} />}
+        </h3>
+        <div class="text-lg leading-relaxed mb-6">
+          {subheading && <RichText field={subheading} />}
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="flex-1">
+            <input type="email" placeholder="Enter your email" class={inputClass} />
+          </div>
+          <button class="btn btn-outline">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <!-- Default variant -->
+  <section class={`relative px-4 ${styles}`} data-class-change>
+    <div class="absolute inset-0 z-10">
+      {image && <AstroImage field={image} class="w-full h-full object-cover" />}
+    </div>
+    <div class="relative container mx-auto overflow-hidden backdrop-blur-[20px] bg-[linear-gradient(136deg,rgba(78,76,76,0.15)_2.61%,rgba(78,76,76,0.30)_73.95%)] z-20">
+      <div class="relative px-4 sm:px-8 py-14 sm:py-16 text-center text-white h-full flex flex-col justify-center">
+        <div class="max-w-[38rem] mx-auto">
+          <h3 class="lg:text-5xl text-2xl mb-4 uppercase">
+            {heading && <Text field={heading} />}
+          </h3>
+          <div class="text-lg leading-relaxed mb-6">
+            {subheading && <RichText field={subheading} />}
+          </div>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <input type="email" placeholder="Enter your email" class={inputClass} />
+            </div>
+            <button class="btn btn-primary">Sign Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+)}

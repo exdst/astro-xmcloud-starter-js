@@ -1,0 +1,113 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+
+const datasource = rendering?.fields?.data?.datasource;
+const items = (datasource?.children?.results ?? []).filter(Boolean);
+
+function hasValidLink(link: any): boolean {
+  const href = link?.value?.href;
+  return !!(href && href !== '#' && !href.startsWith('http://#'));
+}
+
+const parentBasedGridClasses =
+  'grid lg:[.multipromo-2-3_&]:grid-cols-[2fr_3fr] lg:[.multipromo-3-2_&]:grid-cols-[3fr_2fr] lg:grid-cols-[1fr_1fr] gap-14';
+const parentBasedGridItemClasses =
+  '[.multipromo-centered_&]:items-center [.bg-gradient_&]:text-white items-start';
+---
+
+{datasource ? (
+  variant === "Stacked" ? (
+    <section class={`relative ${styles} overflow-hidden`} data-class-change>
+      <span class="absolute top-1/3 left-1/3 [.multipromo-3-2_&]:-left-1/3 w-screen h-64 bg-primary opacity-50 blur-[400px] -rotate-15 [.multipromo-3-2_&]:rotate-15 z-0"></span>
+      <div class={`relative container mx-auto px-4 py-16 z-10`}>
+        <div class={parentBasedGridClasses}>
+          <div class="lg:[.multipromo-3-2_&]:col-start-1 lg:[.multipromo-2-3_&]:col-start-2 lg:col-start-2 [.multipromo-2-3_&]:text-right">
+            <h2 class="mb-6 text-2xl lg:text-5xl uppercase">
+              <Text field={datasource?.title?.jsonValue} />
+            </h2>
+            <p class="text-lg">
+              <Text field={datasource?.description?.jsonValue} />
+            </p>
+          </div>
+        </div>
+        <div class={`${parentBasedGridClasses} ${parentBasedGridItemClasses} mt-30`}>
+          {items.map((promo: any) => (
+            <div class="lg:odd:-mt-8 lg:[.multipromo-3-2_&]:even:-mt-8 lg:[.multipromo-3-2_&]:odd:mt-0">
+              <div class="grid gap-8">
+                <AstroImage field={promo?.image?.jsonValue} class="w-full h-full aspect-square object-cover shadow-2xl" />
+                <div>
+                  <h3 class="text-xl lg:text-2xl mb-2 uppercase"><Text field={promo?.heading?.jsonValue} /></h3>
+                  <p class="lg:text-lg mb-2"><Text field={promo?.description?.jsonValue} /></p>
+                  {hasValidLink(promo?.link?.jsonValue) ? (
+                    <Link field={promo?.link?.jsonValue} class="btn btn-ghost" />
+                  ) : (
+                    <span class="btn btn-ghost inline-block">{promo?.link?.jsonValue?.value?.text || ''}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : variant === "SingleColumn" ? (
+    <section class={`relative ${styles}`} data-class-change>
+      <div class="container mx-auto px-4 py-16">
+        <div class="max-w-2xl mb-16">
+          <h2 class="mb-6 text-2xl lg:text-5xl uppercase"><Text field={datasource?.title?.jsonValue} /></h2>
+          <p class="text-lg"><Text field={datasource?.description?.jsonValue} /></p>
+        </div>
+        <div class="grid gap-14">
+          {items.map((promo: any) => (
+            <div class="grid gap-8 lg:grid-cols-[1fr_2fr]">
+              <AstroImage field={promo?.image?.jsonValue} class="w-full h-full aspect-square object-cover shadow-2xl" />
+              <div>
+                <h3 class="text-xl lg:text-2xl mb-2 uppercase"><Text field={promo?.heading?.jsonValue} /></h3>
+                <p class="lg:text-lg mb-2"><Text field={promo?.description?.jsonValue} /></p>
+                {hasValidLink(promo?.link?.jsonValue) ? (
+                  <Link field={promo?.link?.jsonValue} class="btn btn-ghost" />
+                ) : (
+                  <span class="btn btn-ghost inline-block">{promo?.link?.jsonValue?.value?.text || ''}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ) : (
+    <section class={`relative ${styles}`} data-class-change>
+      <div class="container mx-auto px-4 py-16">
+        <div class="max-w-2xl mx-auto text-center">
+          <h2 class="mb-6 text-2xl lg:text-5xl uppercase"><Text field={datasource?.title?.jsonValue} /></h2>
+          <p class="text-lg"><Text field={datasource?.description?.jsonValue} /></p>
+        </div>
+        <div class={`${parentBasedGridClasses} ${parentBasedGridItemClasses} mt-12`}>
+          {items.map((promo: any) => (
+            <div class="grid gap-8">
+              <AstroImage field={promo?.image?.jsonValue} class="w-full h-full aspect-square object-cover shadow-2xl" />
+              <div>
+                <h3 class="text-xl lg:text-2xl mb-2 uppercase"><Text field={promo?.heading?.jsonValue} /></h3>
+                <p class="lg:text-lg mb-2"><Text field={promo?.description?.jsonValue} /></p>
+                {hasValidLink(promo?.link?.jsonValue) ? (
+                  <Link field={promo?.link?.jsonValue} class="btn btn-ghost" />
+                ) : (
+                  <span class="btn btn-ghost inline-block">{promo?.link?.jsonValue?.value?.text || ''}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+) : (
+  <div class="is-empty-hint">Multi Promo</div>
+)}

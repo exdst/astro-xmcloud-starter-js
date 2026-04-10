@@ -1,0 +1,39 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import LocationSearch from "./LocationSearch.tsx";
+
+interface Props extends ComponentProps {
+  variant?: string;
+}
+
+const { rendering, params, variant = "Default" } = Astro.props as Props;
+
+const fields = rendering?.fields;
+const datasource = fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+// Extract Sitecore data into serializable props for the React island
+const title = datasource?.title?.jsonValue;
+const defaultZipCode = datasource?.defaultZipCode || "";
+const initialDealerships = fields?.data?.dealerships?.results ?? [];
+
+// Google Maps API key from Astro public env
+const googleMapsApiKey = import.meta.env.PUBLIC_GOOGLE_MAPS_API_KEY || "";
+
+const { styles = "", RenderingIdentifier: id } = params || {};
+---
+
+<div id={id}>
+  <LocationSearch
+    client:load
+    variant={variant}
+    isPageEditing={isEditing}
+    title={title}
+    defaultZipCode={defaultZipCode}
+    googleMapsApiKey={googleMapsApiKey}
+    initialDealerships={initialDealerships}
+    styles={styles}
+  />
+</div>

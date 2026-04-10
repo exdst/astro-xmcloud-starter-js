@@ -1,0 +1,9 @@
+---
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+
+const { field, ...rest } = Astro.props;
+---
+
+<div class="content-sdk-rich-text">
+  <RichText field={field} {...rest} />
+</div>

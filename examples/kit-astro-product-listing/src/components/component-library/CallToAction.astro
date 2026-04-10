@@ -1,0 +1,155 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+---
+
+{fields ? (
+  variant === 'CallToAction2' ? (
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="py-3 md:py-4">
+          <div class="grid-rows-auto align-center grid grid-cols-1 items-center gap-20 md:grid-cols-2">
+            <div>
+              <div class="mb-6">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+                  <Text field={fields?.CTATitle} />
+                </h1>
+              </div>
+              <div>
+                <RichText field={fields?.CTABody} />
+              </div>
+              <div class="mt-8">
+                <div class="align-center grid-cols-1 md:grid-cols-2 flex grid flex-wrap gap-4">
+                  {(fields?.CTALink1?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink1} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                  {(fields?.CTALink2?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink2} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                </div>
+              </div>
+            </div>
+            <div>
+              <AstroImage field={fields?.CTAImage} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'CallToAction3' ? (
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="py-3 md:py-4">
+          <div class="grid-rows-auto align-center grid grid-cols-1 items-center gap-20 md:grid-cols-2">
+            <div>
+              <AstroImage field={fields?.CTAImage} />
+            </div>
+            <div>
+              <div class="mb-6">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+                  <Text field={fields?.CTATitle} />
+                </h1>
+              </div>
+              <div>
+                <RichText field={fields?.CTABody} />
+              </div>
+              <div class="mt-8">
+                <div class="align-center grid-cols-1 md:grid-cols-2 flex grid flex-wrap gap-4">
+                  {(fields?.CTALink1?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink1} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                  {(fields?.CTALink2?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink2} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : variant === 'CallToAction4' ? (
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="py-3 md:py-4">
+          <div class="grid-rows-auto grid grid-cols-1 items-start gap-8 md:grid-cols-2 mb-12">
+            <div>
+              <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl md:text-4xl">
+                <Text field={fields?.CTATitle} />
+              </h1>
+            </div>
+            <div>
+              <div class="mb-8">
+                <RichText field={fields?.CTABody} />
+              </div>
+              <div class="align-center grid-cols-1 md:grid-cols-2 flex grid flex-wrap gap-4">
+                {(fields?.CTALink1?.value?.href || isEditing) && (
+                  <Link field={fields?.CTALink1} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                )}
+                {(fields?.CTALink2?.value?.href || isEditing) && (
+                  <Link field={fields?.CTALink2} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                )}
+              </div>
+            </div>
+          </div>
+          <div class="w-full">
+            <AstroImage field={fields?.CTAImage} class="w-full h-auto" />
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    /* Default / CallToAction1 */
+    <section class={`px-[5%] py-12 md:py-24 ${styles}`} data-class-change>
+      <div class="container mx-auto">
+        <div class="py-3 md:py-4">
+          <div class="auto-cols-1fr grid grid-cols-1 gap-2.5">
+            <div class="align-start relative flex flex-col justify-center p-12">
+              <div class="w-full max-w-3xl">
+                <div class="mb-6">
+                  <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                    <Text field={fields?.CTATitle} />
+                  </h1>
+                </div>
+                <div>
+                  <RichText field={fields?.CTABody} />
+                </div>
+              </div>
+              <div class="mt-8">
+                <div class="align-center grid-col-1 md:grid-col-2 flex grid flex-wrap gap-4">
+                  {(fields?.CTALink1?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink1} class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                  {(fields?.CTALink2?.value?.href || isEditing) && (
+                    <Link field={fields?.CTALink2} class="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground h-14 w-full px-8 text-lg md:h-10 md:w-auto md:px-4 md:text-sm" />
+                  )}
+                </div>
+              </div>
+              <div class="-z-1 absolute bottom-0 left-0 right-0 top-0">
+                <div class="z-1 position-absolute bottom-0 left-0 right-0 top-0 bg-black/50"></div>
+                <AstroImage
+                  field={fields?.CTAImage}
+                  class="absolute bottom-0 left-0 right-0 top-0 h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+) : (
+  <div class="is-empty-hint">Call To Action</div>
+)}

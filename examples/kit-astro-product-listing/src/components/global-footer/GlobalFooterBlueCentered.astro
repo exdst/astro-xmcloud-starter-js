@@ -1,0 +1,125 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const footerNavLinks = datasource?.footerNavLinks?.results ?? [];
+const footerCopyright = datasource?.footerCopyright?.jsonValue;
+const socialLinks = datasource?.socialLinks?.results ?? [];
+const tagline = datasource?.tagline?.jsonValue;
+const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
+---
+
+{datasource ? (
+  <footer
+    class="@container bg-primary text-primary-foreground border-primary-foreground relative w-full overflow-hidden border-b-2"
+    role="contentinfo"
+  >
+    {/* Background logo - semi-transparent */}
+    <div class="pointer-events-none absolute inset-0 z-0 opacity-90" aria-hidden="true">
+      <div class="flex h-full w-full items-center justify-center leading-none">
+        <div class="bg-primary-gradient text-fill-transparent text-50-clamp bg-clip-text font-bold leading-none text-transparent">
+          Alaris
+        </div>
+      </div>
+    </div>
+    {/* Main footer content */}
+    <div class="border-foreground relative border-b-2 px-4 py-16">
+      <div class="@xl:px-8 relative z-10 mx-auto max-w-screen-2xl">
+        <div class=" grid grid-cols-1 gap-8">
+          {/* Left section with heading */}
+          <div>
+            {tagline && (
+              <Text
+                tag="h2"
+                field={tagline}
+                class="font-heading mb-8 text-pretty text-center text-5xl font-light antialiased"
+              />
+            )}
+            {/* Navigation links */}
+            <nav>
+              <ul class="flex items-center justify-center gap-0 @md:gap-8 @md:flex-row flex-col">
+                {footerNavLinks.map((navLink: any) => {
+                  const linkField = navLink?.link?.jsonValue;
+                  const href = linkField?.value?.href;
+                  const text = linkField?.value?.text;
+                  return isEditing ? (
+                    <li>
+                      <Link field={linkField} class="relative inline-flex items-center justify-center whitespace-nowrap px-8 py-2.5 text-base font-medium hover:bg-transparent" />
+                    </li>
+                  ) : (
+                    href && (
+                      <li>
+                        <a href={href} class="relative inline-flex items-center justify-center whitespace-nowrap px-8 py-2.5 text-base font-medium hover:bg-transparent">
+                          {text}
+                        </a>
+                      </li>
+                    )
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+
+          {/* Right section with subscription form */}
+          <div class="@md:max-w-[400px] mx-auto flex w-full flex-col items-center gap-4">
+            {emailSubscriptionTitle && (
+              <Text
+                class="font-body mb-4 w-full text-center text-xl font-medium"
+                field={emailSubscriptionTitle}
+              />
+            )}
+            <div class="@sm:flex-row flex flex-col gap-2">
+              <Placeholder name="container-footer-email" rendering={rendering} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Bottom footer with social icons and copyright */}
+    <div class="relative mx-auto flex max-w-screen-2xl flex-col justify-center px-4 py-8 ">
+      <div class="@sm:flex-row flex flex-col items-center justify-between">
+        {/* Social media icons */}
+        <ul class="@sm:mb-0 mb-0 flex list-none gap-6">
+          {socialLinks.map((socialLink: any) => {
+            const linkField = socialLink?.link?.jsonValue;
+            const iconField = socialLink?.socialIcon?.jsonValue;
+            const href = linkField?.value?.href || '#';
+            const text = linkField?.value?.text || '';
+            return (
+              <li>
+                <a
+                  href={href}
+                  class="relative inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-transparent"
+                  aria-label={text}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {iconField?.value?.src ? (
+                    <img src={iconField.value.src} alt={text} class="h-6 w-6 object-contain" />
+                  ) : (
+                    <span class="text-sm">{text}</span>
+                  )}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+        {/* Copyright text */}
+        {footerCopyright && (
+          <Text field={footerCopyright} />
+        )}
+      </div>
+    </div>
+  </footer>
+) : (
+  <div class="is-empty-hint">Global Footer - Blue Centered</div>
+)}

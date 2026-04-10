@@ -1,0 +1,49 @@
+---
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface AnimatedSectionProps {
+  class?: string;
+  direction?: 'up' | 'down' | 'left' | 'right';
+  distanceInRem?: number;
+  delay?: number;
+  duration?: number;
+  animationType?: 'slide' | 'rotate';
+  endRotation?: number;
+  threshold?: number;
+  reducedMotion?: boolean;
+}
+
+const {
+  class: className = '',
+  direction = 'up',
+  distanceInRem = 2,
+  delay = 0,
+  duration = 1000,
+  animationType = 'slide',
+  endRotation = 180,
+  threshold = 0.3,
+  reducedMotion = false,
+} = Astro.props as AnimatedSectionProps;
+
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+---
+
+<astro-animated-section
+  class={className}
+  data-direction={direction}
+  data-distance-in-rem={String(distanceInRem)}
+  data-delay={String(delay)}
+  data-duration={String(duration)}
+  data-animation-type={animationType}
+  data-end-rotation={String(endRotation)}
+  data-threshold={String(threshold)}
+  data-reduced-motion={reducedMotion ? 'true' : undefined}
+  data-editing={isEditing ? 'true' : undefined}
+>
+  <slot />
+</astro-animated-section>
+
+<script>
+  import '@/scripts/animated-section';
+</script>

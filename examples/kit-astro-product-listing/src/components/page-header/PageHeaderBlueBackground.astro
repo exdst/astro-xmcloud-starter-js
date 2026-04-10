@@ -1,0 +1,122 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const externalFields = rendering?.fields?.data?.externalFields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const imageRequired = datasource?.imageRequired?.jsonValue;
+const link1 = datasource?.link1?.jsonValue;
+const link2 = datasource?.link2?.jsonValue;
+
+const pageHeaderTitle = externalFields?.pageHeaderTitle?.jsonValue;
+const pageTitle = externalFields?.pageTitle?.jsonValue;
+const pageSubtitle = externalFields?.pageSubtitle?.jsonValue;
+
+const title = pageHeaderTitle?.value ? pageHeaderTitle : pageTitle;
+const subtitle = pageSubtitle;
+
+const shouldShowButtons = isEditing
+  ? true
+  : (link1?.value?.href !== '' || link2?.value?.href !== '')
+    ? true
+    : false;
+---
+
+{datasource ? (
+  <section
+    data-component="PageHeader"
+    data-class-change
+    class="bg-primary text-primary-foreground border-primary-foreground @container group w-full overflow-hidden border-b-2 border-t-2"
+  >
+    <div class="@lg:pt-5 @lg:pb-0 @md:grid-cols-2 relative mx-auto grid w-full max-w-screen-xl grid-cols-1 gap-0 px-0 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6">
+      {/* Right Content */}
+      <div class="@container @md:col-start-2 @md:col-end-3 @md:mb-0 @md:flex @md:flex-col @md:justify-center @md:py-16 py-8 pt-8">
+        <astro-animated-section data-direction="left" data-editing={isEditing ? "true" : undefined}
+          class="w-full"
+        >
+          <Text
+            tag="h1"
+            class="font-heading @xs:text-6xl leading-tighter relative max-w-[14ch] text-balance text-left text-6xl font-light tracking-tighter antialiased"
+            field={title}
+          />
+        </astro-animated-section>
+        {/* Subtitle */}
+        {subtitle && (
+          <astro-animated-section data-direction="left" data-delay="600" data-editing={isEditing ? "true" : undefined}>
+            <RichTextSDK
+              class="font-body mt-6 max-w-[50ch] text-pretty leading-relaxed"
+              field={subtitle}
+            />
+          </astro-animated-section>
+        )}
+        {shouldShowButtons && (
+          <astro-animated-section data-direction="left" data-delay="800" data-editing={isEditing ? "true" : undefined}>
+            <div class="mt-10 flex flex-wrap gap-4">
+              {link1 && (
+                isEditing ? (
+                  <Link
+                    field={link1}
+                    class="inline-flex items-center justify-center rounded-default border-1 border-primary-foreground bg-transparent px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary-foreground/10"
+                  />
+                ) : link1?.value?.href ? (
+                  <a
+                    href={link1.value.href}
+                    class="inline-flex items-center justify-center rounded-default border-1 border-primary-foreground bg-transparent px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary-foreground/10"
+                  >
+                    {link1.value.text}
+                  </a>
+                ) : null
+              )}
+              {link2 && (
+                isEditing ? (
+                  <Link
+                    field={link2}
+                    class="inline-flex items-center justify-center rounded-default bg-secondary px-8 py-2-5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                  />
+                ) : link2?.value?.href ? (
+                  <a
+                    href={link2.value.href}
+                    class="inline-flex items-center justify-center rounded-default bg-secondary px-8 py-2-5 text-sm font-medium text-secondary-foreground hover:bg-secondary/80"
+                  >
+                    {link2.value.text}
+                  </a>
+                ) : null
+              )}
+            </div>
+          </astro-animated-section>
+        )}
+      </div>
+    </div>
+    <div class="border-primary-foreground mb-16 border-2 border-l-0 border-r-0">
+      {/* Left Image */}
+      <div class="@xl:mx-auto @lg:max-w-screen-xl @xl:group-[.container--full-bleed]:px-8 @md:grid-cols-2 relative mx-auto grid w-full grid-cols-1 gap-0 group-[.container--full-bleed]:px-4">
+        <div class="@md:col-start-1 @md:col-end-2 @md:row-start-1 relative w-full">
+          <astro-animated-section data-direction="right" data-delay="1200" data-editing={isEditing ? "true" : undefined}
+            class="relative"
+          >
+            <div class="aspect-[16/9] w-full before:block before:w-full before:aspect-[16/9]">
+              <AstroImage
+                field={imageRequired}
+                class="absolute inset-0 aspect-[16/9] h-full w-full object-cover"
+              />
+            </div>
+          </astro-animated-section>
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Page Header</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

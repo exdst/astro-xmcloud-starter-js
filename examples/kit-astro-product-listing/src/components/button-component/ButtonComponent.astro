@@ -1,0 +1,37 @@
+---
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const buttonLink = fields?.buttonLink;
+const href = buttonLink?.value?.href || '';
+const text = buttonLink?.value?.text || '';
+
+const hasValidLink = !!text && (!!href || !!buttonLink?.value?.url) && href !== 'http://';
+---
+
+{fields ? (
+  <>
+    {isEditing ? (
+      <Link
+        field={buttonLink}
+        class="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+      />
+    ) : hasValidLink ? (
+      <a
+        href={href}
+        class="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        target={buttonLink?.value?.target || undefined}
+      >
+        {text}
+      </a>
+    ) : null}
+  </>
+) : (
+  <div class="is-empty-hint">Button</div>
+)}

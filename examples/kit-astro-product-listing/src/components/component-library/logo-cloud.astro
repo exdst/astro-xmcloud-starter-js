@@ -1,0 +1,66 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+const logos = datasource?.children?.results ?? [];
+---
+
+{datasource ? (
+  <section
+    class={`w-full py-12 md:py-24 lg:py-32 border rounded-lg ${styles}`}
+    data-class-change
+  >
+    <div class="container mx-auto px-8 md:px-10">
+      <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div class="space-y-6">
+          <h2 class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-6xl">
+            <Text field={datasource.title?.jsonValue} />
+          </h2>
+          <div class="max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+            <RichText field={datasource.bodyText?.jsonValue} />
+          </div>
+          <div class="flex flex-wrap gap-4">
+            {(datasource.link1?.jsonValue?.value?.href || isEditing) && (
+              <Link
+                field={datasource.link1?.jsonValue}
+                class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-sm font-medium"
+              />
+            )}
+            {(datasource.link2?.jsonValue?.value?.href || isEditing) && (
+              <Link
+                field={datasource.link2?.jsonValue}
+                class="inline-flex items-center gap-1 group text-sm font-medium underline-offset-4 hover:underline"
+              />
+            )}
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-8 md:grid-cols-3">
+          {logos.map((item: any) => (
+            <div class="flex items-center justify-center">
+              <div class="flex items-center space-x-2">
+                <AstroImage
+                  field={item.logoImage?.jsonValue}
+                  class="max-h-12 w-auto h-12"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Logo Cloud</div>
+)}

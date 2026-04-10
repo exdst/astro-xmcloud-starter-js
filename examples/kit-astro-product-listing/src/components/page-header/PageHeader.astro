@@ -1,0 +1,22 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import PageHeaderDefault from "./PageHeaderDefault.astro";
+import PageHeaderBlueText from "./PageHeaderBlueText.astro";
+import PageHeaderFiftyFifty from "./PageHeaderFiftyFifty.astro";
+import PageHeaderBlueBackground from "./PageHeaderBlueBackground.astro";
+import PageHeaderCentered from "./PageHeaderCentered.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: PageHeaderDefault,
+  BlueText: PageHeaderBlueText,
+  FiftyFifty: PageHeaderFiftyFifty,
+  BlueBackground: PageHeaderBlueBackground,
+  Centered: PageHeaderCentered,
+};
+
+const Component = variants[variant] || PageHeaderDefault;
+---
+<Component {...Astro.props} />

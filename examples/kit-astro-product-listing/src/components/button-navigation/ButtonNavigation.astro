@@ -1,0 +1,103 @@
+---
+/**
+ * ButtonNavigation - Astro equivalent of ButtonNavigation.client.tsx
+ * Scroll-to-section button grid using vanilla JS for smooth scroll.
+ */
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Fields {
+  Id: string;
+  DisplayName: string;
+  Title: { value?: string };
+  NavigationTitle: { value?: string };
+  Href: string;
+  Querystring: string;
+  Children: Array<Fields>;
+  Styles: string[];
+}
+
+interface Props {
+  list: Fields[];
+}
+
+const { list = [] } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+function getLinkField(fields: Fields) {
+  return {
+    value: {
+      href: fields.Href,
+      title: fields.NavigationTitle?.value || fields.Title?.value || fields.DisplayName,
+      querystring: fields.Querystring,
+    },
+  };
+}
+
+function getNavigationText(fields: Fields): string {
+  return fields.NavigationTitle?.value || fields.Title?.value || fields.DisplayName || '';
+}
+---
+
+<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" data-button-navigation>
+  {list.map((section) => {
+    const linkField = getLinkField(section);
+    const href = linkField?.value?.href;
+    const text = getNavigationText(section);
+
+    return isEditing ? (
+      <Link
+        field={linkField}
+        class="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+      >
+        <h4 class="mb-2 text-xl font-semibold text-brand-sky">
+          {text}
+        </h4>
+        <p class="mb-4 text-brand-black">
+          Explore {text} components
+        </p>
+        <div class="flex items-center text-brand-sky">
+          <span class="mr-2">View components</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </div>
+      </Link>
+    ) : href ? (
+      <a
+        href={href}
+        class="rounded-lg bg-white p-6 shadow-md transition-shadow hover:shadow-lg"
+        data-scroll-link
+      >
+        <h4 class="mb-2 text-xl font-semibold text-brand-sky">
+          {text}
+        </h4>
+        <p class="mb-4 text-brand-black">
+          Explore {text} components
+        </p>
+        <div class="flex items-center text-brand-sky">
+          <span class="mr-2">View components</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </div>
+      </a>
+    ) : null;
+  })}
+</div>
+
+<script>
+  document.querySelectorAll('[data-button-navigation] [data-scroll-link]').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      const href = (link as HTMLAnchorElement).getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  });
+</script>

@@ -1,0 +1,55 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { ContactSectionIsland } from "./ContactSection.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+
+const serializeField = (field: any) => field?.jsonValue?.value ?? '';
+const serializeImage = (field: any) => ({
+  src: field?.jsonValue?.value?.src ?? '',
+  alt: field?.jsonValue?.value?.alt ?? '',
+});
+const serializeLink = (field: any) => ({
+  href: field?.jsonValue?.value?.href ?? '',
+  text: field?.jsonValue?.value?.text ?? '',
+  target: field?.jsonValue?.value?.target ?? '',
+});
+
+const contacts = (datasource?.children?.results ?? []).map((c: any) => ({
+  id: c.id || '',
+  image: serializeImage(c.image),
+  heading: serializeField(c.heading),
+  description: serializeField(c.description),
+  contactLink: serializeLink(c.contactLink),
+  buttonLink: serializeLink(c.buttonLink),
+}));
+
+const sectionData = {
+  tagLine: serializeField(datasource?.tagLine),
+  heading: serializeField(datasource?.heading),
+  body: serializeField(datasource?.body),
+  image: serializeImage(datasource?.image),
+};
+---
+
+{datasource ? (
+  <ContactSectionIsland
+    client:visible
+    variant={variant}
+    styles={styles}
+    sectionData={sectionData}
+    contacts={contacts}
+    isEditing={isEditing}
+  />
+) : (
+  <div class="is-empty-hint">Contact Section</div>
+)}

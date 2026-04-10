@@ -1,0 +1,137 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const searchLink = fields?.SearchLink;
+
+const searchBaseHref = searchLink?.value?.href || "";
+const searchText = searchLink?.value?.text || "Search";
+
+function hasValidHref(href: string | undefined): boolean {
+  if (!href || href === "#" || href.startsWith("http://#")) return false;
+  return true;
+}
+
+const hasValidSearchLink = hasValidHref(searchBaseHref);
+---
+
+<search-box-st data-search-href={searchBaseHref} data-has-valid-link={hasValidSearchLink ? "true" : "false"}>
+  <button
+    type="button"
+    class="block p-4 font-[family-name:var(--font-accent)] font-medium w-full text-left"
+    data-search-trigger
+    aria-label="Search"
+  >
+    {searchText}
+  </button>
+
+  <div
+    class="fixed lg:absolute top-14 left-0 right-0 lg:top-full lg:left-0 lg:right-0 h-[calc(100vh-3.5rem)] lg:h-auto overflow-auto opacity-0 lg:translate-y-2 pointer-events-none bg-background transition-all duration-300 ease-in-out"
+    data-search-dropdown
+  >
+    <div class="pt-18 p-8 lg:pt-8">
+      <h2 class="mb-4 uppercase">Search</h2>
+      <div class="flex gap-4">
+        <input
+          type="text"
+          placeholder="Type to search..."
+          class="w-full border-b border-border focus-visible:outline-0 focus:border-black px-3 py-2"
+          data-search-input
+        />
+        <a
+          href={searchBaseHref}
+          class="btn btn-primary btn-sharp"
+          data-search-go
+          aria-label="Go to search results"
+        >
+          Go to search results
+        </a>
+      </div>
+    </div>
+  </div>
+</search-box-st>
+
+<script>
+  class SearchBoxST extends HTMLElement {
+    private isVisible = false;
+    private trigger: HTMLElement | null;
+    private dropdown: HTMLElement | null;
+    private input: HTMLInputElement | null;
+    private goLink: HTMLAnchorElement | null;
+    private searchHref: string;
+    private hasValidLink: boolean;
+
+    constructor() {
+      super();
+      this.trigger = this.querySelector("[data-search-trigger]");
+      this.dropdown = this.querySelector("[data-search-dropdown]");
+      this.input = this.querySelector("[data-search-input]");
+      this.goLink = this.querySelector("[data-search-go]");
+      this.searchHref = this.dataset.searchHref || "";
+      this.hasValidLink = this.dataset.hasValidLink === "true";
+    }
+
+    connectedCallback() {
+      this.trigger?.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.toggle();
+      });
+
+      this.input?.addEventListener("input", () => this.updateGoLink());
+
+      this.input?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && this.goLink?.href) {
+          window.location.href = this.goLink.href;
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!this.contains(e.target as Node) && this.isVisible) {
+          this.hide();
+        }
+      });
+    }
+
+    toggle() {
+      this.isVisible ? this.hide() : this.show();
+    }
+
+    show() {
+      this.isVisible = true;
+      if (this.dropdown) {
+        this.dropdown.classList.remove("opacity-0", "lg:translate-y-2", "pointer-events-none");
+        this.dropdown.classList.add("opacity-100", "translate-y-0", "pointer-events-auto");
+      }
+      this.input?.focus();
+    }
+
+    hide() {
+      this.isVisible = false;
+      if (this.dropdown) {
+        this.dropdown.classList.add("opacity-0", "lg:translate-y-2", "pointer-events-none");
+        this.dropdown.classList.remove("opacity-100", "translate-y-0", "pointer-events-auto");
+      }
+    }
+
+    updateGoLink() {
+      if (!this.goLink || !this.hasValidLink) return;
+      const term = this.input?.value?.trim() || "";
+      try {
+        const url = new URL(this.searchHref, window.location.origin);
+        if (term) {
+          url.searchParams.set("q", term);
+        } else {
+          url.searchParams.delete("q");
+        }
+        this.goLink.href = url.toString();
+      } catch {
+        this.goLink.href = term
+          ? `${this.searchHref}?q=${encodeURIComponent(term)}`
+          : this.searchHref;
+      }
+    }
+  }
+
+  customElements.define("search-box-st", SearchBoxST);
+</script>

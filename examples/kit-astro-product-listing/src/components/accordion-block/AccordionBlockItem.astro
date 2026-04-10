@@ -1,0 +1,39 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+
+interface Props {
+  child: any;
+  isEditing: boolean;
+}
+
+const { child, isEditing } = Astro.props;
+---
+
+<details
+  class="border-foreground border-b p-0"
+  open={isEditing ? true : undefined}
+>
+  <summary class="font-heading flex w-full cursor-pointer items-center justify-between py-4 text-left text-base font-medium [&::-webkit-details-marker]:hidden">
+    {child?.heading?.jsonValue && (
+      <Text
+        field={child.heading.jsonValue}
+        class="font-heading text-left text-base font-medium"
+      />
+    )}
+    <svg class="h-4 w-4 shrink-0 transition-transform duration-200 details-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </summary>
+  <div class="font-body py-4 pt-2 text-base font-medium">
+    {child?.description?.jsonValue && (
+      <RichTextSDK tag="div" field={child.description.jsonValue} />
+    )}
+  </div>
+</details>
+
+<style>
+  details[open] .details-chevron {
+    transform: rotate(180deg);
+  }
+</style>

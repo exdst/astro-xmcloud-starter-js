@@ -1,0 +1,52 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface FooterNavigationCalloutProps {
+  fields?: {
+    title?: any;
+    description?: any;
+    linkOptional?: any;
+  };
+}
+
+const { fields } = Astro.props as FooterNavigationCalloutProps;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = fields?.title;
+const description = fields?.description;
+const linkOptional = fields?.linkOptional;
+---
+
+{fields ? (
+  <div class="bg-accent text-accent-foreground rounded-[24px] border-none p-2">
+    <div class="flex flex-row justify-between pb-4 p-6">
+      <h3 class="font-heading text-xl font-medium tracking-tight">
+        <Text tag="span" field={title} />
+      </h3>
+    </div>
+    <div class="p-6 pt-0">
+      <Text class="font-body text-sm" field={description} />
+      {linkOptional && (
+        isEditing ? (
+          <Link
+            field={linkOptional}
+            class="mt-10 block w-full rounded-default bg-primary px-8 py-2.5 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          />
+        ) : linkOptional?.value?.href ? (
+          <a
+            href={linkOptional.value.href}
+            class="mt-10 block w-full rounded-default bg-primary px-8 py-2.5 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            target={linkOptional.value.target || undefined}
+          >
+            {linkOptional.value.text}
+          </a>
+        ) : null
+      )}
+    </div>
+  </div>
+) : (
+  <div class="is-empty-hint">FooterNavigationCallout</div>
+)}

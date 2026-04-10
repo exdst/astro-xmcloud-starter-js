@@ -1,0 +1,214 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = datasource?.title?.jsonValue;
+const items = datasource?.items?.results ?? [];
+---
+
+{datasource ? (
+  <div
+    class="@container bg-primary rounded-default text-primary-foreground relative mx-auto my-6 max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+    role="region"
+    aria-label={title?.value || 'Image Accordion'}
+  >
+    {title && (
+      <Text
+        tag="h2"
+        field={title}
+        class="font-heading text-primary-foreground @lg:text-6xl mb-16 text-4xl font-light tracking-tight"
+      />
+    )}
+
+    {isEditing ? (
+      /* Edit mode: all items stacked */
+      <div class="flex flex-col gap-14">
+        {items.map((item: any, index: number) => (
+          <div class="flex flex-col overflow-hidden rounded-lg">
+            <div class="@md:h-[513px] relative h-[300px]">
+              {item?.image?.jsonValue?.value?.src && (
+                <div class="h-full w-full">
+                  <AstroImage
+                    field={item.image.jsonValue}
+                    class="rounded-default h-full w-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+            <div class="flex flex-col py-6">
+              {item?.title && (
+                <Text
+                  tag="h3"
+                  field={item.title.jsonValue}
+                  class="font-accent text-primary-foreground text-2xl font-medium"
+                />
+              )}
+              {item?.description && (
+                <Text
+                  tag="p"
+                  field={item.description.jsonValue}
+                  class="text-primary-foreground mt-2"
+                />
+              )}
+              {item?.link?.jsonValue && (
+                <Link
+                  field={item.link.jsonValue}
+                  class="font-heading bg-secondary text-secondary-foreground mt-4 inline-flex w-fit items-center justify-center rounded px-8 py-2.5 text-sm font-medium"
+                />
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      /* Interactive mode */
+      <div
+        class="via-accordion @md:flex-row flex flex-col gap-[53px]"
+        role="tablist"
+        aria-orientation="vertical"
+      >
+        {items.map((item: any, index: number) => (
+          <div
+            class={`via-accordion-item group flex cursor-pointer flex-col overflow-hidden rounded-lg transition-all duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)] @md:w-[270px] ${index === 1 ? 'is-active @md:w-full' : ''}`}
+            data-accordion-item
+            data-index={index}
+            role="tab"
+            aria-selected={index === 1 ? 'true' : 'false'}
+            aria-controls={`panel-${index}`}
+            aria-expanded={index === 1 ? 'true' : 'false'}
+            tabindex="0"
+          >
+            {/* Image Container */}
+            <div
+              class={`relative overflow-hidden transition-all duration-[600ms] ease-[cubic-bezier(0.4,0,0.2,1)] @md:h-[513px] h-[170px] ${index === 1 ? 'h-[350px]' : ''}`}
+              role="img"
+              aria-label={item?.image?.jsonValue?.value?.alt?.toString() || `Image ${index + 1}`}
+            >
+              {item?.image?.jsonValue?.value?.src && (
+                <div class="absolute inset-0">
+                  <img
+                    src={item.image.jsonValue.value.src}
+                    alt={item.image.jsonValue.value.alt || ''}
+                    class="rounded-default h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Content section */}
+            <div
+              class="flex flex-col py-6 @md:opacity-100"
+              role="tabpanel"
+              id={`panel-${index}`}
+              aria-labelledby={`tab-${index}`}
+              hidden={index !== 1 ? true : undefined}
+            >
+              {item?.title && (
+                <Text
+                  tag="h3"
+                  field={item.title.jsonValue}
+                  class="font-accent text-primary-foreground text-2xl font-medium"
+                  id={`tab-${index}`}
+                />
+              )}
+              <div
+                class={`via-accordion-content flex flex-col gap-4 overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)] ${index === 1 ? '' : 'max-h-0 opacity-0 invisible'}`}
+              >
+                {item?.description && (
+                  <Text
+                    tag="p"
+                    field={item.description.jsonValue}
+                    class="text-primary-foreground mt-2"
+                  />
+                )}
+                {item?.link?.jsonValue?.value?.href && (
+                  <a
+                    href={item.link.jsonValue.value.href}
+                    class="font-heading bg-secondary text-secondary-foreground mt-4 inline-flex w-fit items-center justify-center rounded px-8 py-2.5 text-sm font-medium hover:bg-secondary/90"
+                    aria-label={`Learn more about ${item.title?.jsonValue?.value || ''}`}
+                  >
+                    {item.link.jsonValue.value.text}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+) : (
+  <div class="is-empty-hint">Vertical Image Accordion</div>
+)}
+
+<script>
+  document.querySelectorAll('.via-accordion').forEach((accordion) => {
+    const items = accordion.querySelectorAll('[data-accordion-item]');
+
+    items.forEach((item) => {
+      item.addEventListener('click', () => {
+        const clickedIndex = (item as HTMLElement).dataset.index;
+
+        items.forEach((otherItem) => {
+          const otherIndex = (otherItem as HTMLElement).dataset.index;
+          const content = otherItem.querySelector('.via-accordion-content');
+          const imageContainer = otherItem.querySelector('[role="img"]');
+
+          const panel = otherItem.querySelector('[role="tabpanel"]');
+          if (otherIndex === clickedIndex) {
+            otherItem.classList.add('is-active');
+            otherItem.classList.add('@md:w-full');
+            otherItem.classList.remove('@md:w-[270px]');
+            otherItem.setAttribute('aria-selected', 'true');
+            otherItem.setAttribute('aria-expanded', 'true');
+            if (panel) panel.removeAttribute('hidden');
+            if (content) {
+              content.classList.remove('max-h-0', 'opacity-0', 'invisible');
+              (content as HTMLElement).style.maxHeight = '500px';
+              (content as HTMLElement).style.opacity = '1';
+              (content as HTMLElement).style.visibility = 'visible';
+            }
+            if (imageContainer) {
+              imageContainer.classList.add('h-[350px]');
+              imageContainer.classList.remove('h-[170px]');
+            }
+          } else {
+            otherItem.classList.remove('is-active');
+            otherItem.classList.remove('@md:w-full');
+            otherItem.classList.add('@md:w-[270px]');
+            otherItem.setAttribute('aria-selected', 'false');
+            otherItem.setAttribute('aria-expanded', 'false');
+            if (panel) panel.setAttribute('hidden', '');
+            if (content) {
+              content.classList.add('max-h-0', 'opacity-0', 'invisible');
+              (content as HTMLElement).style.maxHeight = '0';
+              (content as HTMLElement).style.opacity = '0';
+              (content as HTMLElement).style.visibility = 'hidden';
+            }
+            if (imageContainer) {
+              imageContainer.classList.remove('h-[350px]');
+              imageContainer.classList.add('h-[170px]');
+            }
+          }
+        });
+      });
+
+      item.addEventListener('keydown', (e: Event) => {
+        const keyEvent = e as KeyboardEvent;
+        if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
+          keyEvent.preventDefault();
+          (item as HTMLElement).click();
+        }
+      });
+    });
+  });
+</script>

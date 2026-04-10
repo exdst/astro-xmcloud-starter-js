@@ -1,0 +1,75 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = fields?.title;
+const description = fields?.description;
+const link = fields?.link as any;
+---
+
+{fields ? (
+  <aside role="complementary" aria-label="Alert notification">
+    <astro-alert-banner>
+      <div class="relative border-none" data-alert-container>
+        <div class="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-4 py-1 xl:px-8">
+          <div class="space-y-1">
+            <div class="text-base font-semibold leading-none tracking-tight">
+              <Text class="font-heading text-lg font-semibold" field={title} />
+            </div>
+            <div class="text-muted-foreground text-sm">
+              <Text tag="p" class="font-body" field={description} />
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            {link?.value?.href && (
+              isEditing ? (
+                <Link
+                  field={link}
+                  class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                />
+              ) : (
+                <a
+                  href={link.value.href}
+                  class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  {link.value.text}
+                </a>
+              )
+            )}
+            <button
+              data-dismiss-alert
+              class="inline-flex items-center justify-center rounded-md bg-primary p-2 text-primary-foreground hover:bg-primary/90"
+              aria-label="Dismiss alert"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </astro-alert-banner>
+  </aside>
+) : (
+  <div class="is-empty-hint">Alert Banner</div>
+)}
+
+<script>
+  class AstroAlertBanner extends HTMLElement {
+    connectedCallback() {
+      const dismissBtn = this.querySelector('[data-dismiss-alert]');
+      const container = this.querySelector('[data-alert-container]');
+      dismissBtn?.addEventListener('click', () => {
+        container?.classList.add('hidden');
+      });
+    }
+  }
+  customElements.define('astro-alert-banner', AstroAlertBanner);
+</script>

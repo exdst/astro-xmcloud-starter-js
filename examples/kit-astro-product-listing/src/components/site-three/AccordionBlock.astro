@@ -1,0 +1,36 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { AccordionBlockSTIsland } from "./AccordionBlockST.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || "Default";
+const styles = params?.styles || "";
+
+const datasource = rendering?.fields?.data?.datasource;
+const heading = datasource?.heading?.jsonValue?.value || "";
+const description = datasource?.description?.jsonValue?.value || "";
+const link = datasource?.link?.jsonValue;
+const linkHref = link?.value?.href || "";
+const linkText = link?.value?.text || "";
+
+const items = (datasource?.children?.results ?? []).map((item: any) => ({
+  id: item.id,
+  heading: item.heading?.jsonValue?.value || "",
+  description: item.description?.jsonValue?.value || "",
+}));
+---
+
+{datasource ? (
+  <AccordionBlockSTIsland
+    client:load
+    variant={variant}
+    styles={styles}
+    heading={heading}
+    description={description}
+    linkHref={linkHref}
+    linkText={linkText}
+    items={items}
+  />
+) : (
+  <div class="is-empty-hint">Accordion Block</div>
+)}

@@ -1,0 +1,16 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import GlobalHeaderDefault from "./GlobalHeaderDefault.astro";
+import GlobalHeaderCentered from "./GlobalHeaderCentered.astro";
+
+const { params } = Astro.props as ComponentProps;
+const variant = params?.FieldNames || 'Default';
+
+const variants: Record<string, any> = {
+  Default: GlobalHeaderDefault,
+  Centered: GlobalHeaderCentered,
+};
+
+const Component = variants[variant] || GlobalHeaderDefault;
+---
+<Component {...Astro.props} />

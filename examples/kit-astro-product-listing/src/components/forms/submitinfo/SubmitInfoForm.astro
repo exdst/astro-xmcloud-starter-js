@@ -1,0 +1,45 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { SubmitInfoForm } from "./SubmitInfoForm.tsx";
+
+/**
+ * SubmitInfoForm Astro wrapper.
+ * Extracts dictionary/field values and passes them as serializable props
+ * to the React island.
+ */
+const props = Astro.props as any;
+const fields = props.fields || props.rendering?.fields || {};
+
+const firstNameLabel = fields.firstNameLabel?.value || "First name";
+const firstNamePlaceholder = fields.firstNamePlaceholder?.value || "Enter your first name";
+const lastNameLabel = fields.lastNameLabel?.value || "Last name";
+const lastNamePlaceholder = fields.lastNamePlaceholder?.value || "Enter your last (or family) name";
+const zipcodeLabel = fields.zipcodeLabel?.value || "Zipcode";
+const zipcodePlaceholder = fields.zipcodePlaceholder?.value || "Enter your zipcode";
+const emailLabel = fields.emailLabel?.value || "Email";
+const emailPlaceholder = fields.emailPlaceholder?.value || "Enter your email address";
+const emailErrorMessage = fields.emailErrorMessage?.value || "Please enter a valid email address";
+const phoneLabel = fields.phoneLabel?.value || "Phone";
+const phonePlaceholder = fields.phonePlaceholder?.value || "Enter your phone number";
+const buttonText = fields.buttonText?.value || "Finish Booking";
+const successMessage = fields.successMessage?.value || "Got it. Thank you! We will be in touch shortly.";
+const buttonVariant = fields.buttonVariant || "default";
+---
+
+<SubmitInfoForm
+  client:visible
+  firstNameLabel={firstNameLabel}
+  firstNamePlaceholder={firstNamePlaceholder}
+  lastNameLabel={lastNameLabel}
+  lastNamePlaceholder={lastNamePlaceholder}
+  zipcodeLabel={zipcodeLabel}
+  zipcodePlaceholder={zipcodePlaceholder}
+  emailLabel={emailLabel}
+  emailPlaceholder={emailPlaceholder}
+  emailErrorMessage={emailErrorMessage}
+  phoneLabel={phoneLabel}
+  phonePlaceholder={phonePlaceholder}
+  buttonText={buttonText}
+  successMessage={successMessage}
+  buttonVariant={buttonVariant}
+/>

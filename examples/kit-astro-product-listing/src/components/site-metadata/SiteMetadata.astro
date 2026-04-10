@@ -1,0 +1,20 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+
+const { rendering } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const title = fields?.metadataTitle?.value || fields?.title?.value || '';
+const keywords = fields?.metadataKeywords?.value || '';
+const description = fields?.metadataDescription?.value || '';
+---
+
+{fields && (
+  <Fragment>
+    {title && <title>{title}</title>}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {keywords && <meta name="keywords" content={keywords} />}
+    {description && <meta name="description" content={description} />}
+  </Fragment>
+)}

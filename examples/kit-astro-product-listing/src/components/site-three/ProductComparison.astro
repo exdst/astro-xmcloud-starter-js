@@ -1,0 +1,73 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { ProductComparisonSTIsland } from "./ProductComparisonST.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const styles = params?.styles || "";
+const showButton = !!(params as any)?.showButton;
+const fields = rendering?.fields;
+
+const title = fields?.Title?.value || "";
+const rawProducts = (fields as any)?.Products ?? [];
+
+// Transform product data - extract specs in order
+function transformProducts(products: any[]) {
+  if (!products || !Array.isArray(products) || products.length === 0) return [];
+
+  const specMeta = new Map<string, { displayName: string; order: number }>();
+
+  products.forEach((product: any) => {
+    const specs = product?.fields?.Specifications;
+    if (specs && Array.isArray(specs)) {
+      specs.forEach((spec: any) => {
+        const name = spec.name;
+        const displayName = spec.displayName;
+        const order = parseInt(spec.fields?.Value?.value || "0");
+        if (!specMeta.has(name) || (specMeta.get(name)?.order ?? 0) > order) {
+          specMeta.set(name, { displayName, order });
+        }
+      });
+    }
+  });
+
+  const orderedSpecKeys = Array.from(specMeta.entries())
+    .sort((a, b) => a[1].order - b[1].order)
+    .map(([name]) => name);
+
+  return products.map((product: any) => {
+    const f = product?.fields || {};
+    const specMap: Record<string, string> = {};
+    if (f.Specifications && Array.isArray(f.Specifications)) {
+      f.Specifications.forEach((spec: any) => {
+        if (spec?.name) specMap[spec.name] = spec.name || spec.displayName || "-";
+      });
+    }
+    const orderedSpecs = orderedSpecKeys.map((specName) => specMap[specName] || "-");
+
+    return {
+      id: product?.id || "",
+      imageSrc: f.ProductImage?.value?.src || "",
+      imageAlt: f.ProductImage?.value?.alt || "",
+      name: f.ProductName?.value || "",
+      price: f.Price?.value || "",
+      ampPower: f.AmpPower?.value || "",
+      specs: orderedSpecs,
+      url: product?.url || "#",
+    };
+  });
+}
+
+const products = transformProducts(rawProducts);
+---
+
+{products.length > 0 ? (
+  <ProductComparisonSTIsland
+    client:visible
+    styles={styles}
+    title={title}
+    products={products}
+    showButton={showButton}
+  />
+) : (
+  <div class="is-empty-hint">Product Comparison</div>
+)}

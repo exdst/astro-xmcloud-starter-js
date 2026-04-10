@@ -1,0 +1,37 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface ContainerFullWidthProps extends ComponentProps {
+  params: ComponentProps["params"] & {
+    DynamicPlaceholderId: string;
+    excludeTopMargin?: string;
+  };
+}
+
+const { params, rendering } = Astro.props as ContainerFullWidthProps;
+const {
+  styles = "",
+  DynamicPlaceholderId,
+  excludeTopMargin,
+} = params;
+
+const phKey = `container-fullwidth-${DynamicPlaceholderId}`;
+const hasMargin = excludeTopMargin !== "1";
+
+const sectionClasses = [
+  "@container container--full-width group",
+  hasMargin ? "mt-4" : "mt-0",
+  styles,
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<section class={sectionClasses}>
+  <div class="@xl:px-8 mx-auto max-w-screen-xl px-6 flex md:flex-row flex-col justify-start items-center gap-4 flex-wrap group-[.is-inset]:p-0">
+    <div class="grow-0 shrink basis-full md:w-full w-full">
+      <Placeholder name={phKey} rendering={rendering} />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,54 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import Icon from "@/components/icon/Icon.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields ?? (Astro.props as any).fields;
+const resolvedParams = params ?? rendering?.params ?? {};
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const image = fields?.image;
+const heading = fields?.heading;
+const description = fields?.description;
+const link = fields?.link as any;
+const className = (resolvedParams as any)?.className || '';
+const icon = (resolvedParams as any)?.icon || '';
+const editable = (resolvedParams as any)?.editable;
+---
+
+<div class={`flex flex-col overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm ${className}`}>
+  {image?.value?.src && (
+    <AstroImage field={image} class="aspect-video w-full object-cover" />
+  )}
+  <div class="flex flex-col space-y-1.5 p-6">
+    <h3 class="text-2xl font-semibold leading-none tracking-tight">
+      <Text field={heading} />
+    </h3>
+    <RichText field={description} />
+  </div>
+  {link && (
+    <div class="flex items-center p-6 pt-0">
+      {isEditing ? (
+        <Link field={link} class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+          {link?.value?.text}
+          <Icon iconName={icon ? icon : 'internal'} class="ml-2 h-4 w-4" />
+        </Link>
+      ) : link?.value?.href ? (
+        <a
+          href={link.value.href}
+          class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          target={link.value.target || undefined}
+        >
+          {link.value.text}
+          <Icon iconName={icon ? icon : 'internal'} class="ml-2 h-4 w-4" />
+        </a>
+      ) : null}
+    </div>
+  )}
+</div>

@@ -1,0 +1,66 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import type { ComponentProps } from "@/lib/component-props";
+
+interface ContainerFullBleedProps extends ComponentProps {
+  params: ComponentProps["params"] & {
+    DynamicPlaceholderId: string;
+    backgroundColor?: string;
+    backgroundImagePath?: string;
+    excludeTopMargin?: string;
+    inset?: string;
+  };
+}
+
+const { params, rendering } = Astro.props as ContainerFullBleedProps;
+const {
+  styles = "",
+  DynamicPlaceholderId,
+  backgroundColor,
+  backgroundImagePath,
+  excludeTopMargin,
+  inset: insetParam,
+} = params;
+
+const phKey = `container-fullbleed-${DynamicPlaceholderId}`;
+
+const isInset =
+  backgroundColor === "transparent" ? false : insetParam === "1";
+const hasPadding =
+  isInset || backgroundColor === "transparent" || !backgroundColor
+    ? false
+    : true;
+const hasMargin = excludeTopMargin !== "1";
+
+const bgClasses: Record<string, string> = {
+  primary: "has-bg bg-primary text-primary-foreground",
+  secondary: "has-bg bg-secondary text-secondary-foreground",
+  tertiary: "has-bg bg-tertiary text-tertiary-foreground",
+  transparent: "bg-transparent",
+};
+
+const sectionClasses = [
+  "group @container container--full-bleed",
+  styles,
+  bgClasses[backgroundColor || ""] || "bg-transparent",
+  isInset
+    ? "is-inset px-4 sm:px-8 md:px-16 2xl:px-24 mx-4 overflow-hidden rounded-3xl min-[1440px]:mx-auto max-w-[1408px]"
+    : "",
+  hasMargin ? "my-8 sm:my-16" : "mt-0 mb-0",
+  hasPadding ? "py-4 sm:py-16" : "py-0",
+]
+  .filter(Boolean)
+  .join(" ");
+
+const backgroundStyle = backgroundImagePath
+  ? `background-image: url('${backgroundImagePath}'); background-size: cover;`
+  : "";
+---
+
+<section class={sectionClasses} style={backgroundStyle}>
+  <div class={`mx-auto flex md:flex-row flex-col justify-start items-center gap-4 flex-wrap ${isInset ? 'p-0' : ''}`}>
+    <div class="grow-0 shrink basis-full md:w-full w-full">
+      <Placeholder name={phKey} rendering={rendering} />
+    </div>
+  </div>
+</section>

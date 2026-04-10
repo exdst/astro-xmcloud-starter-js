@@ -1,0 +1,13 @@
+---
+interface Props {
+  className?: string;
+  size?: number;
+}
+const { className = "", size = 24 } = Astro.props;
+---
+<svg class:list={["icon--arrow-up-right", className]} width={size} height={size} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 13 13">
+  <path
+    fill="currentColor"
+    d="M1.2942 12.6443.25 11.6l9.8405-9.85H1.1442V.25h11.5001v11.5h-1.5V2.8038l-9.85 9.8405Z"
+  />
+</svg>

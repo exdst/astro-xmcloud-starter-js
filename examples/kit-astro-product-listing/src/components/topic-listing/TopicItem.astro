@@ -1,0 +1,47 @@
+---
+/**
+ * TopicItem - Astro equivalent of TopicItem.dev.tsx
+ * Renders a topic button with icon and link.
+ */
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+interface Props {
+  link?: {
+    jsonValue?: any;
+  };
+  icon?: {
+    jsonValue?: {
+      value: string;
+    };
+  };
+}
+
+const { link, icon } = Astro.props as Props;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+if (!link?.jsonValue) return;
+
+const linkField = link.jsonValue;
+const href = linkField?.value?.href;
+const text = linkField?.value?.text;
+const iconValue = icon?.jsonValue?.value;
+---
+
+{isEditing ? (
+  <Link
+    field={linkField}
+    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-accent hover:bg-primary-hover text-accent-foreground font-heading py-2 text-sm font-medium transition-colors px-8 py-2-5"
+  />
+) : href ? (
+  <a
+    href={href}
+    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full bg-accent hover:bg-primary-hover text-accent-foreground font-heading py-2 text-sm font-medium transition-colors px-8 py-2-5"
+  >
+    {iconValue && (
+      <span class="h-4 w-4 shrink-0" set:html={iconValue} />
+    )}
+    {text || 'Add link'}
+  </a>
+) : null}

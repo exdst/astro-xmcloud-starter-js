@@ -1,0 +1,49 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { TeamSectionIsland } from "./TeamSection.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+const datasource = fields?.data?.datasource;
+
+const sf = (f: any) => f?.jsonValue?.value ?? '';
+const si = (f: any) => ({ src: f?.jsonValue?.value?.src ?? '', alt: f?.jsonValue?.value?.alt ?? '' });
+const sl = (f: any) => ({ href: f?.jsonValue?.value?.href ?? '', text: f?.jsonValue?.value?.text ?? '', target: f?.jsonValue?.value?.target ?? '' });
+
+const members = (datasource?.children?.results ?? []).map((tm: any) => ({
+  id: tm.id || '',
+  image: si(tm.image),
+  fullName: sf(tm.fullName),
+  jobTitle: sf(tm.jobTitle),
+  description: sf(tm.description),
+  facebook: sl(tm.facebook),
+  instagram: sl(tm.instagram),
+  linkedIn: sl(tm.linkedIn),
+  twitterX: sl(tm.twitterX),
+}));
+
+const sectionData = {
+  tagLine: sf(datasource?.tagLine),
+  heading: sf(datasource?.heading),
+  text: sf(datasource?.text),
+  heading2: sf(datasource?.heading2),
+  text2: sf(datasource?.text2),
+  link: sl(datasource?.link),
+};
+---
+
+{datasource ? (
+  <TeamSectionIsland
+    client:visible
+    variant={variant}
+    styles={styles}
+    sectionData={sectionData}
+    members={members}
+  />
+) : (
+  <div class="is-empty-hint">Team Section</div>
+)}

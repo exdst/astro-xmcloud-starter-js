@@ -1,0 +1,175 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@/components/shared/AppText.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const children = datasource?.children?.results ?? [];
+const { styles = "", RenderingIdentifier: id } = params || {};
+---
+
+{children.length > 0 && (
+  <div
+    class={`@container component testimonial-carousel text-secondary-foreground @md:px-6 @lg:px-0 overflow-hidden rounded-[24px] ${styles}`}
+    id={id}
+    data-testimonial-carousel
+  >
+    <div class="relative w-full">
+      <div class="overflow-hidden">
+        <div class="flex @md:-ml-4 -ml-2" data-carousel-track>
+          {children.map((child: any, index: number) => {
+            const attribution = child?.testimonialAttribution?.jsonValue;
+            const quote = child?.testimonialQuote?.jsonValue;
+            return (
+              <div
+                class="@lg:basis-3/4 @md:basis-4/5 @md:pl-4 py-[70px] shrink-0 basis-full pl-2"
+                data-carousel-item
+              >
+                <div class="px-4">
+                  {attribution && (
+                    <div class="flex flex-col gap-4">
+                      <div class="flex flex-row gap-[24px]">
+                        <svg
+                          width="35"
+                          height="25"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="text-accent inline-block h-8 w-8 shrink-0"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M26 25c-5 0-7-2-7-6v-1c0-6 4-13 9-18h7c-4 4-6 7-7 12 2 1 4 3 4 6v1c0 4-2 6-6 6ZM6 25c-4 0-6-2-6-6v-1C0 12 3 5 9 0h7c-4 4-7 7-8 12 3 1 4 3 4 6v1c0 4-2 6-6 6Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        <Text
+                          tag="p"
+                          class="text-primary text-sm font-semibold uppercase tracking-wide"
+                          field={attribution}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <div class="space-y-4">
+                    {quote && (
+                      <Text
+                        tag="p"
+                        class="text-primary @md:text-4xl @lg:text-5xl font-heading text-3xl font-normal tracking-tight"
+                        field={quote}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {children.length > 1 && (
+        <>
+          <button
+            data-carousel-prev
+            class="absolute top-1/2 -translate-y-1/2 -left-[116px] @md:h-[58px] @md:w-[58px] @lg:h-[116px] @lg:w-[116px] h-[40px] w-[40px] rounded-full bg-primary text-primary-foreground transition-all duration-300 inline-flex items-center justify-center hover:bg-primary/90"
+            aria-label="Previous testimonial"
+          >
+            <svg class="h-4 w-4 @md:h-10 @md:w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            data-carousel-next
+            class="absolute top-1/2 -translate-y-1/2 -right-[116px] @md:h-[58px] @md:w-[58px] @lg:h-[116px] @lg:w-[116px] h-[40px] w-[40px] rounded-full bg-primary text-primary-foreground transition-all duration-300 inline-flex items-center justify-center hover:bg-primary/90"
+            aria-label="Next testimonial"
+          >
+            <svg class="h-4 w-4 @md:h-10 @md:w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+)}
+
+<script>
+  document.querySelectorAll('[data-testimonial-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector('[data-carousel-track]') as HTMLElement;
+    const items = carousel.querySelectorAll('[data-carousel-item]');
+    const prevBtn = carousel.querySelector('[data-carousel-prev]') as HTMLElement;
+    const nextBtn = carousel.querySelector('[data-carousel-next]') as HTMLElement;
+    if (!track || items.length <= 1) return;
+
+    let currentIndex = 0;
+    const totalItems = items.length;
+
+    function scrollToIndex(index: number) {
+      const item = items[index] as HTMLElement;
+      if (!item) return;
+      track.style.transition = 'transform 0.3s ease';
+      track.style.transform = `translateX(-${item.offsetLeft}px)`;
+      currentIndex = index;
+    }
+
+    // Button click handlers (loop enabled)
+    prevBtn?.addEventListener('click', () => {
+      scrollToIndex(currentIndex === 0 ? totalItems - 1 : currentIndex - 1);
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      scrollToIndex(currentIndex === totalItems - 1 ? 0 : currentIndex + 1);
+    });
+
+    // Show/hide buttons on mouse position (like Next.js)
+    carousel.addEventListener('mousemove', (e: Event) => {
+      const mouseEvent = e as MouseEvent;
+      const rect = carousel.getBoundingClientRect();
+      const mouseX = mouseEvent.clientX - rect.left;
+      const threshold = rect.width / 4;
+
+      if (prevBtn) {
+        if (mouseX < threshold) {
+          prevBtn.style.left = window.innerWidth >= 1024 ? '140px' : window.innerWidth >= 768 ? '70px' : '35px';
+        } else {
+          prevBtn.style.left = '-116px';
+        }
+      }
+      if (nextBtn) {
+        if (mouseX > rect.width - threshold) {
+          nextBtn.style.right = window.innerWidth >= 1024 ? '140px' : window.innerWidth >= 768 ? '70px' : '35px';
+        } else {
+          nextBtn.style.right = '-116px';
+        }
+      }
+    });
+
+    carousel.addEventListener('mouseleave', () => {
+      if (prevBtn) prevBtn.style.left = '-116px';
+      if (nextBtn) nextBtn.style.right = '-116px';
+    });
+
+    // Touch/swipe support
+    let startX = 0;
+    let isDragging = false;
+
+    track.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        scrollToIndex(diff > 0
+          ? (currentIndex === totalItems - 1 ? 0 : currentIndex + 1)
+          : (currentIndex === 0 ? totalItems - 1 : currentIndex - 1)
+        );
+      }
+    });
+  });
+</script>

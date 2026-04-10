@@ -1,0 +1,24 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { ImageCarouselSTIsland } from "./ImageCarouselST.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const styles = params?.styles || "";
+
+const datasource = rendering?.fields?.data?.datasource;
+const images = (datasource?.imageItems?.results ?? []).map((item: any) => ({
+  id: item.id,
+  imageSrc: item.image?.jsonValue?.value?.src || "",
+  imageAlt: item.image?.jsonValue?.value?.alt || "",
+}));
+---
+
+{images.length > 0 ? (
+  <ImageCarouselSTIsland
+    client:load
+    styles={styles}
+    images={images}
+  />
+) : (
+  <div class="is-empty-hint">Image Carousel</div>
+)}

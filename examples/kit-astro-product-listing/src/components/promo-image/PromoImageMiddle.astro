@@ -1,0 +1,92 @@
+---
+import Text from "@/components/shared/AppText.astro";
+import RichTextSDK from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const image = fields?.image;
+const heading = fields?.heading;
+const description = fields?.description;
+const link = fields?.link;
+
+const hasLink = isEditing || link?.value?.href;
+---
+
+{fields ? (
+  <section
+    data-component="Promo Image"
+    class="@container @md:py-20 relative w-full overflow-hidden border-b-2 border-t-2 bg-black py-20 [.border-b-2+&]:border-t-0"
+  >
+    <div class="relative mx-auto max-w-screen-xl px-8">
+      {(isEditing || heading?.value) && (
+        <astro-animated-section data-direction="right" data-delay="600" data-editing={isEditing ? "true" : undefined}
+          class="@md:max-w-[45%] @md:z-10 @md:translate-y-1 relative"
+        >
+          <Text
+            tag="h2"
+            class="font-heading @xs:text-3xl @sm:text-4xl @lg:text-5xl text-primary-foreground text-pretty text-2xl"
+            field={heading}
+          />
+        </astro-animated-section>
+      )}
+
+      {(isEditing || image?.value?.src) && (
+        <astro-animated-section data-direction="up" data-editing={isEditing ? "true" : undefined}
+          class="@sm:h-[400px] @md:h-auto @md:aspect-[1164/482] @md:-mt-6 h-[300px] w-full"
+        >
+          <div class="w-full h-full">
+            <AstroImage
+              field={image}
+              class="h-full w-full object-cover"
+            />
+          </div>
+        </astro-animated-section>
+      )}
+      {(hasLink || description?.value) && (
+        <div class="@md:mt-[51px] @md:ml-auto @md:max-w-[55%] mt-6">
+          {description && (
+            <astro-animated-section data-direction="left" data-delay="900" data-editing={isEditing ? "true" : undefined}>
+              <RichTextSDK
+                class="@md:mt-0 text-primary-foreground @xs:text-lg @md:text-xl mt-6 font-normal tracking-tight antialiased"
+                field={description}
+              />
+            </astro-animated-section>
+          )}
+
+          {hasLink && (
+            <astro-animated-section data-direction="left" data-delay="1200" data-editing={isEditing ? "true" : undefined}>
+              <div class="mt-6">
+                {isEditing ? (
+                  <Link
+                    field={link}
+                    class="inline-flex items-center justify-center rounded-default bg-primary px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  />
+                ) : link?.value?.href ? (
+                  <a
+                    href={link.value.href}
+                    class="inline-flex items-center justify-center rounded-default bg-primary px-8 py-2-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+                  >
+                    {link.value.text}
+                  </a>
+                ) : null}
+              </div>
+            </astro-animated-section>
+          )}
+        </div>
+      )}
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Promo Image: Middle</div>
+)}
+
+<script>
+  import '@/scripts/animated-section';
+</script>

@@ -1,0 +1,148 @@
+---
+/**
+ * ModeToggle - Astro equivalent of mode-toggle.dev.tsx
+ * Replaces next-themes with localStorage + classList toggle vanilla JS.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props as Props;
+---
+
+<div class={className} data-mode-toggle>
+  <div class="relative">
+    <button
+      type="button"
+      class="inline-flex h-10 w-10 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      aria-label="Toggle theme"
+      data-mode-toggle-trigger
+    >
+      <!-- Sun icon -->
+      <svg
+        class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <!-- Moon icon -->
+      <svg
+        class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <span class="sr-only">Toggle theme</span>
+    </button>
+
+    <!-- Dropdown menu -->
+    <div
+      class="mode-toggle-menu absolute right-0 top-full z-50 mt-2 hidden min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+      data-mode-toggle-menu
+    >
+      <button
+        class="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        data-theme-choice="light"
+      >
+        Light
+      </button>
+      <button
+        class="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        data-theme-choice="dark"
+      >
+        Dark
+      </button>
+      <button
+        class="relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        data-theme-choice="system"
+      >
+        System
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initModeToggle() {
+    document.querySelectorAll('[data-mode-toggle]').forEach((container) => {
+      const trigger = container.querySelector('[data-mode-toggle-trigger]') as HTMLButtonElement;
+      const menu = container.querySelector('[data-mode-toggle-menu]') as HTMLElement;
+      const choices = container.querySelectorAll('[data-theme-choice]');
+
+      function applyTheme(theme: string) {
+        if (theme === 'system') {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.classList.toggle('dark', prefersDark);
+          localStorage.setItem('theme', 'system');
+        } else if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
+      }
+
+      // Initialize theme from localStorage
+      const saved = localStorage.getItem('theme') || 'system';
+      applyTheme(saved);
+
+      // Listen for system theme changes
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (localStorage.getItem('theme') === 'system') {
+          applyTheme('system');
+        }
+      });
+
+      trigger?.addEventListener('click', () => {
+        const isHidden = menu.classList.contains('hidden');
+        if (isHidden) {
+          menu.classList.remove('hidden');
+        } else {
+          menu.classList.add('hidden');
+        }
+      });
+
+      choices.forEach((choice) => {
+        choice.addEventListener('click', () => {
+          const theme = (choice as HTMLElement).dataset.themeChoice || 'system';
+          applyTheme(theme);
+          menu.classList.add('hidden');
+        });
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!container.contains(e.target as Node)) {
+          menu.classList.add('hidden');
+        }
+      });
+    });
+  }
+
+  initModeToggle();
+</script>

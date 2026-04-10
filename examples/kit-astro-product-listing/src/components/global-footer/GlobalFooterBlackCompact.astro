@@ -1,0 +1,134 @@
+---
+import Placeholder from "@exdst-sitecore-content-sdk/astro/components/Placeholder/Placeholder.astro";
+import Text from "@/components/shared/AppText.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+
+const { rendering } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const footerNavLinks = datasource?.footerNavLinks?.results ?? [];
+const footerCopyright = datasource?.footerCopyright?.jsonValue;
+const socialLinks = datasource?.socialLinks?.results ?? [];
+const tagline = datasource?.tagline?.jsonValue;
+const emailSubscriptionTitle = datasource?.emailSubscriptionTitle?.jsonValue;
+---
+
+{datasource ? (
+  <footer
+    class="@container bg-background text-foreground relative w-full overflow-hidden"
+    role="contentinfo"
+  >
+    {/* Main footer content */}
+    <div class="relative mx-auto max-w-screen-2xl">
+      <div
+        class=" @md:-bottom-[55px] @md:-right-[60px] @md:inset-0 @md:inset-unset pointer-events-none absolute inset-0 -bottom-[35px] z-0 opacity-20"
+        aria-hidden="true"
+        data-component="footer-logo"
+      >
+        <div class="@md:justify-end flex h-full w-full items-end justify-center leading-none">
+          <div class="bg-dark-gradient text-fill-transparent text-50-clamp bg-clip-text text-center font-bold leading-none text-transparent">
+            Alaris
+          </div>
+        </div>
+      </div>
+      <div class=" mx-auto px-12 pb-16 pt-12">
+        <div class="grid grid-cols-1 items-start gap-8 md:grid-cols-[1fr,auto]">
+          {/* Left section with heading and subscription */}
+          <div>
+            {/* Left section with heading */}
+            <div>
+              {tagline && (
+                <Text
+                  tag="h2"
+                  field={tagline}
+                  class="font-heading mb-10 text-pretty text-5xl font-light antialiased"
+                />
+              )}
+            </div>
+
+            {emailSubscriptionTitle && (
+              <Text
+                class="font-body mb-4 text-xl font-medium"
+                field={emailSubscriptionTitle}
+                tag="p"
+              />
+            )}
+
+            <div class="flex max-w-md flex-col gap-2 sm:flex-row">
+              <Placeholder name="container-footer-email" rendering={rendering} />
+            </div>
+          </div>
+
+          {/* Right section with navigation links */}
+          <div class="@md:items-end flex flex-col gap-2 text-right">
+            <nav>
+              <ul class="gap-0 flex list-none flex-wrap p-0">
+                {footerNavLinks.map((navLink: any) => {
+                  const linkField = navLink?.link?.jsonValue;
+                  const href = linkField?.value?.href;
+                  const text = linkField?.value?.text;
+                  return isEditing ? (
+                    <li>
+                      <Link field={linkField} class="relative inline-flex items-center justify-center whitespace-nowrap px-8 py-2.5 text-base font-medium hover:bg-transparent" />
+                    </li>
+                  ) : (
+                    href && (
+                      <li>
+                        <a href={href} class="relative inline-flex items-center justify-center whitespace-nowrap px-8 py-2.5 text-base font-medium hover:bg-transparent">
+                          {text}
+                        </a>
+                      </li>
+                    )
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+    {/* Bottom footer with social icons and copyright */}
+    <div class="border-foreground border-t">
+      <div class="@sm:flex-row @sm:justify-between mx-auto flex max-w-screen-2xl flex-col items-center justify-start gap-4 px-4 py-12">
+        {/* Social media icons */}
+        <div>
+          <ul class="@sm:gap-6 mx-auto flex items-center gap-4">
+            {socialLinks.map((socialLink: any) => {
+              const linkField = socialLink?.link?.jsonValue;
+              const iconField = socialLink?.socialIcon?.jsonValue;
+              const href = linkField?.value?.href || '#';
+              const text = linkField?.value?.text || '';
+              return (
+                <li class="relative z-10">
+                  <a
+                    href={href}
+                    class="relative inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-transparent"
+                    aria-label={text}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {iconField?.value?.src ? (
+                      <img src={iconField.value.src} alt={text} class="h-6 w-6 object-contain" />
+                    ) : (
+                      <span class="text-sm">{text}</span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        {/* Copyright text */}
+        {footerCopyright && (
+          <Text field={footerCopyright} />
+        )}
+      </div>
+    </div>
+  </footer>
+) : (
+  <div class="is-empty-hint">Global Footer - Black Compact</div>
+)}

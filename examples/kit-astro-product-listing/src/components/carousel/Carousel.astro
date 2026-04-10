@@ -1,0 +1,41 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { Default as CarouselReact } from "./Carousel.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const datasource = fields?.data?.datasource;
+const title = datasource?.title?.jsonValue?.value || "";
+const tagLine = datasource?.tagLine?.jsonValue?.value || "";
+
+const slides = (datasource?.children?.results ?? []).map((child: any) => ({
+  id: child.id || "",
+  title: child.title?.jsonValue?.value || "",
+  bodyText: child.bodyText?.jsonValue?.value || "",
+  slideImage: child.slideImage?.jsonValue?.value?.src || "",
+  slideImageAlt: child.slideImage?.jsonValue?.value?.alt || "",
+  callToAction: child.callToAction?.jsonValue?.value
+    ? {
+        href: child.callToAction.jsonValue.value.href || "",
+        text: child.callToAction.jsonValue.value.text || "",
+        target: child.callToAction.jsonValue.value.target || "",
+      }
+    : null,
+}));
+
+const styles = params?.styles || "";
+---
+
+{slides.length > 0 && (
+  <CarouselReact
+    client:visible
+    slides={slides}
+    title={title}
+    tagLine={tagLine}
+    styles={styles}
+  />
+)}

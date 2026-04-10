@@ -1,0 +1,100 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import Text from "@exdst-sitecore-content-sdk/astro/components/Text.astro";
+import RichText from "@exdst-sitecore-content-sdk/astro/components/RichText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const variant = params?.FieldNames || params?.Variant || 'Default';
+const styles = params?.styles || '';
+
+// Determine template options based on variant
+const variantConfig: Record<string, { centered?: boolean; withColumns?: boolean; withBackgroundImage?: boolean; bordered?: boolean }> = {
+  Default:              { centered: true },
+  NewsletterSection1:   { centered: true, withBackgroundImage: true },
+  NewsletterSection2:   {},
+  NewsletterSection3:   { withBackgroundImage: true },
+  NewsletterSection4:   { withColumns: true },
+  NewsletterSection5:   { withColumns: true, bordered: true },
+  NewsletterSection6:   { centered: true, bordered: true },
+  NewsletterSection7:   { centered: true, bordered: true, withBackgroundImage: true },
+  NewsletterSection8:   {},
+};
+
+const config = variantConfig[variant] || variantConfig['Default'];
+const centered = config.centered || false;
+const withColumns = config.withColumns || false;
+const withBackgroundImage = config.withBackgroundImage || false;
+const bordered = config.bordered || false;
+---
+
+{fields ? (
+  <section class={`relative py-24 px-4 ${styles}`}>
+    {withBackgroundImage && (
+      <div class="absolute inset-0 h-full w-full z-1">
+        <AstroImage
+          field={fields.Image}
+          class="h-full w-full object-cover brightness-50"
+        />
+      </div>
+    )}
+    <div
+      class:list={[
+        'container mx-auto',
+        withBackgroundImage ? 'relative text-white z-2' : '',
+        bordered ? `border p-12 ${withColumns ? '' : 'py-20'}` : '',
+      ]}
+    >
+      <div
+        class:list={[
+          withColumns ? 'grid gap-x-12 lg:grid-cols-2 items-center' : 'max-w-3xl flex flex-col',
+          centered ? 'mx-auto items-center text-center' : '',
+        ]}
+      >
+        <div>
+          <p class="font-semibold mb-4">
+            <Text field={fields.Tagline} />
+          </p>
+          <h1 class={`${withColumns ? 'text-5xl' : 'text-6xl'} font-bold mb-6`}>
+            <Text field={fields.Heading} />
+          </h1>
+          <div class="text-lg">
+            <RichText field={fields.Body} />
+          </div>
+          <div class:list={['flex w-full gap-2 mt-8', centered ? 'justify-center' : '']}>
+            <div class="max-w-[30rem]">
+              <div class="flex gap-4">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90"
+                >
+                  Subscribe
+                </button>
+              </div>
+              <div class="text-xs mt-3">
+                <RichText field={fields.FormDisclaimer} />
+              </div>
+            </div>
+          </div>
+        </div>
+        {withColumns && (
+          <div class="mt-8 lg:mt-0">
+            <AstroImage
+              field={fields.Image}
+              class="h-full w-full object-contain"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+) : (
+  <div class="is-empty-hint">Newsletter Section</div>
+)}

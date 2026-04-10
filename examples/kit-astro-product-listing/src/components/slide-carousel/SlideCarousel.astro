@@ -1,0 +1,205 @@
+---
+interface SlideCarouselProps {
+  class?: string;
+}
+
+const { class: className = '' } = Astro.props as SlideCarouselProps;
+---
+
+<astro-slide-carousel class={`block ${className}`}>
+  <section class={className}>
+    <div class="@xl:px-0 mx-auto max-w-screen-xl px-0 [&:not(.px-4_&):not(.px-6_&):not(.px-8_&):not(.px-10_&)]:px-6">
+      <div class="@lg:mb-10 @md:mb-14 mb-6 flex items-end justify-end">
+        <div class="@md:flex hidden shrink-0 gap-2">
+          <button
+            data-carousel-prev
+            class="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent disabled:pointer-events-auto disabled:opacity-50"
+            disabled
+            aria-label="Previous slide"
+          >
+            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            data-carousel-next
+            class="inline-flex items-center justify-center rounded-md p-2 hover:bg-accent disabled:pointer-events-auto disabled:opacity-50"
+            aria-label="Next slide"
+          >
+            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="w-full">
+      <div class="overflow-hidden w-full" data-carousel-viewport>
+        <div class="ml-0 2xl:ml-[max(8rem,calc(50vw-700px))] 2xl:mr-[max(0rem,calc(50vw-700px))] flex transition-transform duration-300 ease-in-out" data-carousel-track>
+          <slot />
+        </div>
+      </div>
+      <div class="mt-8 flex items-center justify-center gap-1.5" data-carousel-dots></div>
+    </div>
+  </section>
+</astro-slide-carousel>
+
+<script>
+  class AstroSlideCarousel extends HTMLElement {
+    private track: HTMLElement | null = null;
+    private viewport: HTMLElement | null = null;
+    private prevBtn: HTMLButtonElement | null = null;
+    private nextBtn: HTMLButtonElement | null = null;
+    private dotsContainer: HTMLElement | null = null;
+    private currentSlide = 0;
+    private itemCount = 0;
+    private isDragging = false;
+    private startX = 0;
+    private currentTranslate = 0;
+    private prevTranslate = 0;
+
+    connectedCallback() {
+      this.track = this.querySelector('[data-carousel-track]');
+      this.viewport = this.querySelector('[data-carousel-viewport]');
+      this.prevBtn = this.querySelector('[data-carousel-prev]');
+      this.nextBtn = this.querySelector('[data-carousel-next]');
+      this.dotsContainer = this.querySelector('[data-carousel-dots]');
+
+      if (!this.track || !this.viewport) return;
+
+      const items = Array.from(this.track.children) as HTMLElement[];
+      this.itemCount = items.length;
+
+      // Style items as flex items with padding
+      items.forEach((item) => {
+        item.style.flexShrink = '0';
+        item.style.paddingLeft = '20px';
+      });
+
+      this.renderDots();
+      this.updateButtons();
+
+      this.prevBtn?.addEventListener('click', () => this.scrollPrev());
+      this.nextBtn?.addEventListener('click', () => this.scrollNext());
+
+      // Touch/drag support for mobile
+      this.viewport?.addEventListener('touchstart', (e) => this.onDragStart(e), { passive: true });
+      this.viewport?.addEventListener('touchmove', (e) => this.onDragMove(e), { passive: true });
+      this.viewport?.addEventListener('touchend', () => this.onDragEnd());
+
+      window.addEventListener('resize', () => this.goToSlide(this.currentSlide));
+    }
+
+    getSlideWidth(): number {
+      if (!this.track) return 0;
+      const firstItem = this.track.children[0] as HTMLElement;
+      if (!firstItem) return 0;
+      return firstItem.getBoundingClientRect().width;
+    }
+
+    scrollPrev() {
+      if (this.currentSlide > 0) {
+        this.goToSlide(this.currentSlide - 1);
+      }
+    }
+
+    scrollNext() {
+      if (this.currentSlide < this.itemCount - 1) {
+        this.goToSlide(this.currentSlide + 1);
+      }
+    }
+
+    goToSlide(index: number) {
+      this.currentSlide = Math.max(0, Math.min(index, this.itemCount - 1));
+      const slideWidth = this.getSlideWidth();
+      const offset = -this.currentSlide * slideWidth;
+      this.currentTranslate = offset;
+      this.prevTranslate = offset;
+
+      if (this.track) {
+        this.track.style.transform = `translateX(${offset}px)`;
+      }
+
+      this.updateButtons();
+      this.updateDots();
+    }
+
+    updateButtons() {
+      if (this.prevBtn) {
+        this.prevBtn.disabled = this.currentSlide <= 0;
+      }
+      if (this.nextBtn) {
+        this.nextBtn.disabled = this.currentSlide >= this.itemCount - 1;
+      }
+    }
+
+    renderDots() {
+      if (!this.dotsContainer || this.itemCount <= 0) return;
+
+      this.dotsContainer.innerHTML = '';
+      for (let i = 0; i < this.itemCount; i++) {
+        const dot = document.createElement('button');
+        const distance = Math.abs(this.currentSlide - i);
+        const width = distance === 0 ? 24 : Math.max(8 - distance * 1.5, 6);
+
+        dot.className = `h-2 min-w-2 rounded-full transition-all duration-300 ${
+          this.currentSlide === i ? 'bg-primary' : 'bg-secondary'
+        }`;
+        dot.style.width = `${width}px`;
+        dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+        dot.setAttribute('aria-current', this.currentSlide === i ? 'true' : 'false');
+        dot.addEventListener('click', () => this.goToSlide(i));
+        this.dotsContainer.appendChild(dot);
+      }
+    }
+
+    updateDots() {
+      if (!this.dotsContainer) return;
+      const dots = Array.from(this.dotsContainer.children) as HTMLElement[];
+      dots.forEach((dot, index) => {
+        const distance = Math.abs(this.currentSlide - index);
+        const width = distance === 0 ? 24 : Math.max(8 - distance * 1.5, 6);
+        dot.className = `h-2 min-w-2 rounded-full transition-all duration-300 ${
+          this.currentSlide === index ? 'bg-primary' : 'bg-secondary'
+        }`;
+        dot.style.width = `${width}px`;
+        dot.setAttribute('aria-current', this.currentSlide === index ? 'true' : 'false');
+      });
+    }
+
+    onDragStart(e: TouchEvent) {
+      this.isDragging = true;
+      this.startX = e.touches[0].clientX;
+      if (this.track) {
+        this.track.style.transition = 'none';
+      }
+    }
+
+    onDragMove(e: TouchEvent) {
+      if (!this.isDragging || !this.track) return;
+      const currentX = e.touches[0].clientX;
+      const diff = currentX - this.startX;
+      this.currentTranslate = this.prevTranslate + diff;
+      this.track.style.transform = `translateX(${this.currentTranslate}px)`;
+    }
+
+    onDragEnd() {
+      if (!this.isDragging || !this.track) return;
+      this.isDragging = false;
+      this.track.style.transition = 'transform 300ms ease-in-out';
+
+      const diff = this.currentTranslate - this.prevTranslate;
+      const threshold = this.getSlideWidth() / 4;
+
+      if (diff < -threshold && this.currentSlide < this.itemCount - 1) {
+        this.goToSlide(this.currentSlide + 1);
+      } else if (diff > threshold && this.currentSlide > 0) {
+        this.goToSlide(this.currentSlide - 1);
+      } else {
+        this.goToSlide(this.currentSlide);
+      }
+    }
+  }
+
+  customElements.define('astro-slide-carousel', AstroSlideCarousel);
+</script>

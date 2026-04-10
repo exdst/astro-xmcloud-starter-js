@@ -1,0 +1,27 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import { VideoPlayer } from "./VideoPlayer.tsx";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const fields = rendering?.fields;
+
+const videoUrl = fields?.video?.value?.href || "";
+const darkPlayIcon = (params as any)?.darkPlayIcon || "0";
+const playIconColor = darkPlayIcon === "1" ? "text-black" : "text-white";
+---
+
+{videoUrl ? (
+  <VideoPlayer
+    client:visible
+    videoUrl={videoUrl}
+    isPlaying={false}
+    onPlay={() => {}}
+    fullScreen={true}
+    btnClasses={`absolute inset-0 z-20 flex cursor-pointer items-center justify-center ${playIconColor}`}
+  />
+) : (
+  <p class="bg-secondary flex aspect-video items-center justify-center border">
+    <span class="font-bold">Please add video</span>
+  </p>
+)}

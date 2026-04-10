@@ -1,0 +1,203 @@
+---
+import type { ComponentProps } from "@/lib/component-props";
+import { useSitecore } from "@exdst-sitecore-content-sdk/astro/context";
+import Text from "@/components/shared/AppText.astro";
+import AstroImage from "@exdst-sitecore-content-sdk/astro/components/AstroImage.astro";
+import Link from "@exdst-sitecore-content-sdk/astro/components/Link.astro";
+
+const { rendering, params } = Astro.props as ComponentProps;
+const datasource = rendering?.fields?.data?.datasource;
+const { page } = useSitecore();
+const isEditing = page?.mode?.isEditing ?? false;
+
+const title = datasource?.title?.jsonValue;
+const backgroundImage = datasource?.backgroundImage?.jsonValue;
+const logos = datasource?.logos?.results ?? [];
+const logoTabContent = datasource?.logoTabContent?.results ?? [];
+
+const hasBackgroundImage = !!backgroundImage?.value?.src;
+const { styles = "", RenderingIdentifier: id } = params || {};
+
+---
+
+<div class={`component logo-tabs ${styles}`} id={id}>
+  {isEditing ? (
+    <div class="component-content p-4">
+      <p class="text-sm text-gray-500">Logo Tabs (editing mode)</p>
+      {logos.length === 0 ? (
+        <span class="is-empty-hint">Logo Tabs</span>
+      ) : (
+        <div class="space-y-4">
+          {logos.map((logo: any) => (
+            <div class="border p-4 rounded">
+              <h3 class="font-semibold">
+                <Text tag="span" field={logo?.title?.jsonValue} />
+              </h3>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <div class="text-primary-foreground relative min-h-[800px] w-full overflow-hidden" data-logo-tabs>
+      {hasBackgroundImage ? (
+        <div class="absolute inset-0">
+          <AstroImage field={backgroundImage} class="h-full w-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/60 to-black/80" />
+        </div>
+      ) : (
+        <div class="absolute inset-0 bg-gradient-to-b from-gray-800 to-gray-900" />
+      )}
+
+      <div class="@container relative z-10 mx-auto max-w-7xl px-4 py-[88px] sm:px-6 lg:px-8">
+        {title?.value ? (
+          <Text
+            tag="h2"
+            field={title}
+            class="font-heading text-primary-foreground mb-11 font-light tracking-tight [font-size:clamp(3rem,2.143rem_+_2.857cqi,4.5rem)]"
+          />
+        ) : (
+          <h2 class="font-heading text-primary-foreground mb-11 font-light tracking-tight [font-size:clamp(3rem,2.143rem_+_2.857cqi,4.5rem)]">
+            Click to edit title
+          </h2>
+        )}
+
+        {logos.length > 0 && (
+          <>
+            <div class="@container mb-28">
+              <div
+                role="tablist"
+                aria-label={title?.value || "Brand tabs"}
+                class="@md:flex-row @md:justify-between flex w-full flex-col gap-4"
+              >
+                {logos.map((logo: any, index: number) => (
+                  <button
+                    role="tab"
+                    id={`tab-${index}`}
+                    aria-selected={index === 0 ? "true" : "false"}
+                    aria-controls={`panel-${index}`}
+                    tabindex={index === 0 ? 0 : -1}
+                    class={`@md:w-auto flex h-[58px] w-full items-center justify-center rounded-[20px] bg-white px-6 shadow-lg transition-all duration-300 ${
+                      index === 0
+                        ? "origin-center scale-[1.207] opacity-100"
+                        : "scale-100 opacity-50 hover:opacity-75"
+                    }`}
+                    data-logo-tab={index}
+                  >
+                    <span class="sr-only">
+                      {logo?.title?.jsonValue?.value || `Tab ${index + 1}`}
+                    </span>
+                    {logo?.logo?.jsonValue?.value?.src && (
+                      <AstroImage field={logo.logo.jsonValue} class="h-6 w-auto" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div aria-live="polite">
+              {logoTabContent.map((content: any, index: number) => (
+                <div
+                  role="tabpanel"
+                  id={`panel-${index}`}
+                  aria-labelledby={`tab-${index}`}
+                  class={`max-w-lg transition-[visibility,opacity] duration-300 ${
+                    index === 0
+                      ? "visible opacity-100"
+                      : "invisible absolute opacity-0"
+                  }`}
+                  hidden={index !== 0 ? true : undefined}
+                  data-logo-panel={index}
+                >
+                  <Text
+                    tag="h3"
+                    field={content?.heading?.jsonValue || { value: "Click to edit content" }}
+                    class="font-heading text-primary-foreground mb-4 text-2xl font-medium leading-tight md:text-3xl"
+                  />
+                  {content?.cta?.jsonValue?.value?.href && (
+                    <a
+                      href={content.cta.jsonValue.value.href}
+                      target={content.cta.jsonValue.value.target || undefined}
+                      class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-default ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 rounded-full bg-white text-secondary-foreground hover:bg-gray-100 transition-all duration-300 py-2-5 font-heading px-8 py-2.5 text-sm font-medium"
+                    >
+                      {content.cta.jsonValue.value.text || "Learn more"}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )}
+</div>
+
+<script>
+  document.querySelectorAll('[data-logo-tabs]').forEach((container) => {
+    const tabs = container.querySelectorAll('[data-logo-tab]');
+    const panels = container.querySelectorAll('[data-logo-panel]');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const index = parseInt(tab.getAttribute('data-logo-tab') || '0');
+
+        // Update tabs
+        tabs.forEach((t, i) => {
+          const isActive = i === index;
+          t.setAttribute('aria-selected', String(isActive));
+          t.setAttribute('tabindex', isActive ? '0' : '-1');
+          if (isActive) {
+            t.classList.remove('scale-100', 'opacity-50', 'hover:opacity-75');
+            t.classList.add('origin-center', 'scale-[1.207]', 'opacity-100');
+          } else {
+            t.classList.remove('origin-center', 'scale-[1.207]', 'opacity-100');
+            t.classList.add('scale-100', 'opacity-50', 'hover:opacity-75');
+          }
+        });
+
+        // Update panels
+        panels.forEach((p, i) => {
+          const isActive = i === index;
+          if (isActive) {
+            p.classList.remove('invisible', 'absolute', 'opacity-0');
+            p.classList.add('visible', 'opacity-100');
+            p.removeAttribute('hidden');
+          } else {
+            p.classList.remove('visible', 'opacity-100');
+            p.classList.add('invisible', 'absolute', 'opacity-0');
+            p.setAttribute('hidden', '');
+          }
+        });
+      });
+    });
+
+    // Keyboard navigation
+    const tablist = container.querySelector('[role="tablist"]');
+    tablist?.addEventListener('keydown', (e: Event) => {
+      const event = e as KeyboardEvent;
+      const tabArray = Array.from(tabs);
+      const currentIndex = tabArray.findIndex(t => t.getAttribute('aria-selected') === 'true');
+
+      let newIndex = currentIndex;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        newIndex = (currentIndex + 1) % tabArray.length;
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        newIndex = (currentIndex - 1 + tabArray.length) % tabArray.length;
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        newIndex = 0;
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        newIndex = tabArray.length - 1;
+      }
+
+      if (newIndex !== currentIndex) {
+        (tabArray[newIndex] as HTMLElement).click();
+        (tabArray[newIndex] as HTMLElement).focus();
+      }
+    });
+  });
+</script>
