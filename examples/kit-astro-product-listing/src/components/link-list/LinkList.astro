@@ -65,8 +65,8 @@ const footerStyleClasses = `font-[inherit] ${params.styles || ""}`.trim();
         <h3>Link List</h3>
       ) : (
         <>
-          <Text tag="h3" field={datasource.field?.title} class="text-nowrap mb-5 text-xl font-bold" />
-          <ul class="flex flex-col lg:flex-row lg:[.list-vertical_&]:flex-col flex-wrap list-none p-0 m-0 [.position-center_&]:items-center [.position-center_&]:justify-center" aria-label="Navigation options">
+          <Text tag="h3" field={datasource.field?.title} class="text-nowrap mb-5 text-xl font-bold text-gray-600" />
+          <ul class="flex flex-col lg:flex-row lg:[.list-vertical_&]:flex-col flex-wrap list-none gap-1 p-0 m-0 [.position-center_&]:items-center [.position-center_&]:justify-center" aria-label="Navigation options">
             {links.map((element, index) => {
               const classNames = [
                 `item${index}`,
@@ -84,11 +84,11 @@ const footerStyleClasses = `font-[inherit] ${params.styles || ""}`.trim();
                 <li class={classNames}>
                   <div>
                     {href ? (
-                      <a href={href} class="inline-block px-2 py-2 text-nowrap text-sm">
+                      <a href={href} class="text-gray-600 hover:underline inline-block px-2 py-2 text-nowrap text-sm">
                         {text}
                       </a>
                     ) : (
-                      <Link field={element.field.link} class="inline-block px-2 py-2 text-nowrap text-sm" />
+                      <Link field={element.field.link} class="text-gray-600 hover:underline inline-block px-2 py-2 text-nowrap text-sm" />
                     )}
                   </div>
                 </li>

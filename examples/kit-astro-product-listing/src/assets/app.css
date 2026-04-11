@@ -25,6 +25,11 @@
   line-gap-override: 0%;
 }
 
+/* Hide CMS development placeholders in production */
+.is-empty-hint {
+  display: none;
+}
+
 @layer base {
   :root {
     --font-heading: var(--font-family-heading);
