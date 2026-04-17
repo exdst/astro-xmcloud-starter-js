@@ -1,8 +1,11 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
+import netlify from '@astrojs/netlify';
 import tailwindcss from '@tailwindcss/vite';
 import { loadEnv } from 'vite';
+
+const isNetlify = process.env.DEPLOY_TARGET === 'netlify';
 
 // https://astro.build/config
 export default defineConfig({
@@ -31,9 +34,7 @@ export default defineConfig({
     host: true,
   },
   output: 'server',
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter: isNetlify ? netlify() : node({ mode: 'standalone' }),
   i18n: {
     locales: ['en'],
     defaultLocale: 'en',
