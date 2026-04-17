@@ -5,3 +5,10 @@
 [build.environment]
   NODE_VERSION = "22"
   DEPLOY_TARGET = "netlify"
+
+[images]
+  remote_images = [
+    "https://xmc-.*\\.sitecorecloud\\.io/.*",
+    "https://edge.*\\.sitecorecloud\\.io/.*",
+    "https://.*\\.sitecore\\.cloud/.*"
+  ]
