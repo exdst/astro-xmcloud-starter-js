@@ -47,6 +47,9 @@ packages/
 #Ignore system files
 .DS_Store
 
+# Netlify env files
+.env.netlify
+
 # VS Code settings
 .vscode/
 /examples/kit-astro-skate-part/node_modules
