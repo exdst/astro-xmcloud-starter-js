@@ -1,0 +1,15 @@
+{
+  "name": "backstop-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Orchestrator that runs BackstopJS visual-regression tests across the Astro example kits and aggregates one summary report.",
+  "type": "module",
+  "scripts": {
+    "test": "node src/runner.js",
+    "reference": "node src/runner.js --reference",
+    "report": "node src/aggregate.js"
+  },
+  "dependencies": {
+    "tree-kill": "^1.2.2"
+  }
+}

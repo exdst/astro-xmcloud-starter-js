@@ -67,3 +67,7 @@ packages/
 # Lighthouse tests
 /lighthouse-tests/node_modules
 /lighthouse-tests/reports
+
+# Backstop tests
+/backstop-tests/node_modules
+/backstop-tests/reports
