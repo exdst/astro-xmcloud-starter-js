@@ -63,3 +63,7 @@ packages/
 /examples/kit-astro-product-listing/dist
 /examples/kit-astro-product-listing/backstop/backstop_data
 /examples/kit-astro-product-listing/backstop/compare
+
+# Lighthouse tests
+/lighthouse-tests/node_modules
+/lighthouse-tests/reports

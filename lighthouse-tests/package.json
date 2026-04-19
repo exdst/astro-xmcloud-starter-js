@@ -1,0 +1,18 @@
+{
+  "name": "lighthouse-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Lighthouse performance tests for Astro vs Next.js sample sites deployed to Netlify.",
+  "type": "module",
+  "scripts": {
+    "test": "node src/runner.js",
+    "test:site": "node src/runner.js --site",
+    "test:astro": "node src/runner.js --only-framework astro",
+    "test:nextjs": "node src/runner.js --only-framework nextjs",
+    "report": "node src/aggregate.js"
+  },
+  "dependencies": {
+    "chrome-launcher": "^1.1.2",
+    "lighthouse": "^12.2.1"
+  }
+}
