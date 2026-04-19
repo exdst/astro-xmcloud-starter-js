@@ -115,11 +115,12 @@ const stylesClass = params?.styles || '';
             >
               {imageRequired?.value?.src ? (
                 <div class="aspect-[30/19] w-full">
-                  <img
-                    src={imageRequired.value.src}
+                  <AstroImage
+                    field={imageRequired}
                     alt={imageRequired.value.alt || ''}
                     class="absolute inset-0 aspect-[30/19] h-full w-full object-cover"
                     loading="eager"
+                    fetchpriority="high"
                   />
                 </div>
               ) : isEditing ? (

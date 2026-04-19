@@ -106,6 +106,8 @@ const shouldShowButtons = isEditing
               <AstroImage
                 field={imageRequired}
                 class="absolute inset-0 aspect-[16/9] h-full w-full object-cover"
+                loading="eager"
+                fetchpriority="high"
               />
             </div>
           </astro-animated-section>

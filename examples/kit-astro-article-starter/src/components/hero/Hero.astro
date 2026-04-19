@@ -113,7 +113,9 @@ const mediaSections: MediaItem[] = [
                       src={section.image.value.src}
                       alt={section.image.value.alt || ''}
                       class="absolute inset-0 h-full w-full object-cover"
-                      loading="lazy"
+                      loading="eager"
+                      fetchpriority="high"
+                      decoding="async"
                     />
                   ) : null}
                 </div>

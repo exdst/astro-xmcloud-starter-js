@@ -27,7 +27,12 @@ const headerContact = item?.headerContact?.jsonValue;
         ) : (
           logo?.value?.src && (
             <a href="/" class="flex w-[164px] items-stretch space-x-2">
-              <img src={logo.value.src} alt={logo.value.alt || ''} class="w-full object-contain" />
+              <AstroImage
+                field={logo}
+                alt={logo.value.alt || ''}
+                class="w-full object-contain"
+                loading="eager"
+              />
             </a>
           )
         )}

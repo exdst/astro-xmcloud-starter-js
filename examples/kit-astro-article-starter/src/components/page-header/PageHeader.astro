@@ -90,7 +90,9 @@ const videoHref = videoOptional?.value?.href;
                   src={imageRequired?.value?.src || ''}
                   alt={title?.value || ''}
                   class="h-full w-full object-cover"
-                  loading="lazy"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
                 />
                 <button
                   data-video-url={videoHref}
@@ -103,7 +105,7 @@ const videoHref = videoOptional?.value?.href;
                 </button>
               </div>
             ) : imageRequired?.value?.src ? (
-              <AstroImage field={imageRequired} />
+              <AstroImage field={imageRequired} loading="eager" fetchpriority="high" />
             ) : null}
           </div>
         </astro-animated-section>
