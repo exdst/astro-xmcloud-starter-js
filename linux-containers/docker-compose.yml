@@ -1,14 +1,103 @@
+# North Star Outfitters - Mockingbird example stack.
+# Linux only. No CM, mssql, edb, or marketplace.
+
 services:
-  mockingbird:
-    image: projectmockingbird/mockingbird:0.11.1
+
+  traefik:
+    image: ${TRAEFIK_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-traefik
+    command:
+      - "--ping"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/etc/traefik/config/dynamic"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.websecure.forwardedHeaders.insecure"
     ports:
-      - "127.0.0.1:${MOCKINGBIRD_PORT}:${MOCKINGBIRD_PORT}"
+      - "443:443"
+      - "18080:8080"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./linux-containers/traefik/certs:/etc/traefik/certs
+      - ./linux-containers/traefik/config/dynamic:/etc/traefik/config/dynamic
+    depends_on:
+      mockingbird:
+        condition: service_started
+
+  mockingbird:
+    image: ${MOCKINGBIRD_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-mockingbird
+    healthcheck:
+      disable: true
     environment:
-      PORT: ${MOCKINGBIRD_PORT}
+      PORT: 3333
       HOST: 0.0.0.0
-      MOCKINGBIRD_WORKSPACE: /workspaces
       MOCKINGBIRD_CONFIG_PATH: /workspaces/config.mockingbird
       INDEX_CACHE_PATH: /workspaces/.mockingbird/cache/index.json.gz
-      SITE_ROOT_PATH: /sitecore/content/<tenant>/<site>/Home
+      SITE_ROOT_PATH: /sitecore/content/Collection/alaris/Home
+      TACO: 1
     volumes:
       - ${MOCKINGBIRD_WORKSPACE}:/workspaces
+    networks:
+      default:
+        aliases:
+          - mockingbird
+          - ${MOCKINGBIRD_HOST}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mockingbird-secure.rule=Host(`${MOCKINGBIRD_HOST}`)"
+      - "traefik.http.routers.mockingbird-secure.entrypoints=websecure"
+      - "traefik.http.routers.mockingbird-secure.tls=true"
+      - "traefik.http.services.mockingbird.loadbalancer.server.port=3333"
+
+  rendering:
+    image: ${COMPOSE_PROJECT_NAME}-rendering:${VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME}-rendering
+    build:
+      context: ./examples/kit-nextjs-article-starter
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-nextjs-article-starter:/app
+      - rendering-node-modules:/app/node_modules
+    environment:
+      NEXT_PUBLIC_SITECORE_API_HOST: http://mockingbird:3333
+      NEXT_PUBLIC_SITECORE_API_KEY: local-dev
+      GRAPH_QL_ENDPOINT: http://mockingbird:3333/api/graphql
+      NEXT_PUBLIC_SITECORE_LOCAL_CM: "true"
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: alaris
+      NEXT_PUBLIC_DEFAULT_LANGUAGE: en
+      SITECORE_EDITING_SECRET: local-dev-secret
+      NEXTJS_DIST_DIR: ".next-container"
+    networks:
+      default:
+        aliases:
+          - ${RENDERING_HOST}
+    depends_on:
+      - mockingbird
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.rendering-secure.rule=Host(`${RENDERING_HOST}`)"
+      - "traefik.http.routers.rendering-secure.entrypoints=websecure"
+      - "traefik.http.routers.rendering-secure.tls=true"
+      - "traefik.http.services.rendering.loadbalancer.server.port=3004"
+
+  hostswriter:
+    image: ${WHW_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-hostswriter
+    volumes:
+      - C:/Windows/System32/drivers/etc:/host-etc
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Container IPs from Docker Desktop's Linux engine aren't reachable
+      # from the Windows host. termination_map=loopback writes 127.0.0.1
+      # entries instead, which work because traefik is port-forwarded on
+      # 0.0.0.0:443. Lowercase env name is required (case-sensitive on Linux).
+      termination_map: rendering,mockingbird:loopback
+
+volumes:
+  mockingbird-cache:
+  rendering-node-modules:

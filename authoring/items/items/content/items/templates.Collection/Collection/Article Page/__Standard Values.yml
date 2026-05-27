@@ -1,0 +1,44 @@
+﻿---
+ID: "269df562-53f5-47c7-992a-dbc3ebdaaf51"
+Parent: "a6c086ad-9651-4912-bc60-512ca5417795"
+Template: "a6c086ad-9651-4912-bc60-512ca5417795"
+Path: /sitecore/templates/Project/Collection/Article Page/__Standard Values
+SharedFields:
+- ID: "1172f251-dad4-4efb-a329-0c63500e4f1e"
+  Hint: __Masters
+  Value: |
+    {A6C086AD-9651-4912-BC60-512CA5417795}
+    {0B78E7DE-3C0D-424D-80D6-2BFFFC464885}
+    {37A75481-CA32-4354-8991-A470426AE164}
+    {3B8BAB4B-8626-433B-AFDE-E4031C7A42C3}
+    {0853A0D4-4097-46DB-AD03-F4A7A32A13F6}
+    {76D8AB20-2CCD-4E44-A4ED-6E36A96C38FC}
+- ID: "dbbbeca1-21c7-4906-9dd2-493c1efa59a2"
+  Hint: __Shared revision
+  Value: "9ee52ff4-538e-41b4-a57a-69efbfe96806"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214419Z
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "d92caa61-716d-4762-9809-f2143c31c412"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214424Z

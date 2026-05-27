@@ -17,11 +17,11 @@
         }
       ],
       "createdAt": 1779875637103,
-      "lastOpenedAt": 1779880029016
+      "lastOpenedAt": 1779895959244
     },
     "567eaded3b6d": {
       "hash": "567eaded3b6d",
-      "name": "project2",
+      "name": "a1",
       "layers": [
         {
           "sitecoreJsonPath": "/sitecore.json",
@@ -30,7 +30,7 @@
         }
       ],
       "createdAt": 1779880072600,
-      "lastOpenedAt": 1779880480532
+      "lastOpenedAt": 1779896173944
     }
   },
   "lastOpenedHash": "567eaded3b6d"
