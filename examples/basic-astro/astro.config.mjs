@@ -46,6 +46,7 @@ export default defineConfig({
       cors: {
         preflightContinue: true,
       },
+      allowedHosts: ['.local'],
     },
     ssr: {
       noExternal: [
