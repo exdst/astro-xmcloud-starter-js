@@ -1,0 +1,36 @@
+﻿---
+ID: "1b6d71cb-a868-4e32-93a9-d2d6dbbb8f92"
+Parent: "f55ab73e-f2e7-45d5-808c-94a29f6a1781"
+Template: "c2dc4690-af44-48c7-bb21-90d1ad246732"
+Path: /sitecore/content/Collection/basic1/Settings/Redirects
+BranchID: "50213d5e-83f8-4fa7-a91d-825e61c7b8a2"
+SharedFields:
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{DC338247-8B52-4159-8095-88F00E323E2D}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214157Z
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "a3f52778-245f-4540-9fa9-d794acf8d376"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214157Z

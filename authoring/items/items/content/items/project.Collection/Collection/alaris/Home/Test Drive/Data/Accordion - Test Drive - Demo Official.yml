@@ -1,0 +1,55 @@
+﻿---
+ID: "0b73bc0a-0916-458f-8b24-348ac4a5c1b0"
+Parent: "8d1c7538-f39a-41a8-ab06-cb02ccc7e9a0"
+Template: "4dddcbac-a737-4c55-8ec8-508f1550d44a"
+Path: "/sitecore/content/Collection/alaris/Home/Test Drive/Data/Accordion - Test Drive - Demo Official"
+BranchID: "0014ad63-0106-4608-88c1-16d67fec801c"
+SharedFields:
+- ID: "a4f985d9-98b3-4b52-aaaf-4344f6e747c6"
+  Hint: __Workflow
+  Value: "{A053ED9F-4099-4682-9411-2B4C98E481E4}"
+- ID: "dbbbeca1-21c7-4906-9dd2-493c1efa59a2"
+  Hint: __Shared revision
+  Value: "b61bd7fe-3032-43eb-8d50-3c26577822b1"
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{16744EA1-160A-4FD0-AF75-2272DF623B3A}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "23c31b2b-4652-4755-94b0-184bca384219"
+      Hint: heading
+      Value: Frequently Asked Questions.
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214317Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{4460E76C-87E9-4859-9DE6-DE122774937F}"
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "6938a6f3-824b-41d6-83ce-bce57f4cb90a"
+      Hint: link
+      Value: |
+        <link class="" id="{5467A130-D956-4A1E-9935-5362A3A624F1}" querystring="" anchor="" target="" title="" linktype="internal" text="Contact Us" url="" />
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "6fc97bf4-23b3-4874-94d5-c0809b909996"
+    - ID: "9054b11a-2026-4582-8830-f66d1adfb618"
+      Hint: description
+      Value: "Still have questions? Reach out."
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214439Z

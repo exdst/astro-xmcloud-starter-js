@@ -1,0 +1,14 @@
+{
+    "$schema": "../../.sitecore/schemas/ModuleFile.schema.json",
+    "namespace": "Demo",
+    "items": {
+        "includes": [
+            {
+                "name": "project.Collection",
+                "path": "/sitecore/content/Collection",
+                "allowedPushOperations": "CreateUpdateAndDelete",
+                "scope": "ItemAndDescendants"
+            }
+        ]
+    }
+}

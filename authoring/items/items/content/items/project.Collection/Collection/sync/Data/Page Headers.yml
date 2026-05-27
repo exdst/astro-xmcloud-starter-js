@@ -1,0 +1,34 @@
+﻿---
+ID: "829409c1-d290-4b3b-96c2-de0193bfd01c"
+Parent: "4aa8c1c0-a4e3-4144-8e4f-cebde332d52f"
+Template: "d0bd3f13-00e0-4f39-b533-ca963e4bb683"
+Path: /sitecore/content/Collection/sync/Data/Page Headers
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214403Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{F7FE5BDD-A991-4A58-9735-CD08F9B097AB}"
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "9cd53f00-2910-418c-94e4-798b863e1d76"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214527Z

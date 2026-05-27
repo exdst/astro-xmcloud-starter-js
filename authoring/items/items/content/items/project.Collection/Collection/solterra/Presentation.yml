@@ -1,0 +1,45 @@
+﻿---
+ID: "f1a881af-b0c0-46cb-b3f8-c52b2ea0317e"
+Parent: "64dd985d-cada-47ad-8727-57edb7bf7926"
+Template: "0a70fa73-8923-4a6e-abf3-4134f25f3221"
+Path: /sitecore/content/Collection/solterra/Presentation
+BranchID: "45cf9f42-b3ac-4412-aab9-f8441c7e448e"
+SharedFields:
+- ID: "ba3f86a2-4a1c-4d78-b63d-91c2779c1b5e"
+  Hint: __Sortorder
+  Value: 1600
+- ID: "dbbbeca1-21c7-4906-9dd2-493c1efa59a2"
+  Hint: __Shared revision
+  Value: "d98b7036-ea09-4732-ba26-1921be45cafa"
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{1DB2D249-8FDB-4D9F-A357-841D6A51ABFA}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214131Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{F7FE5BDD-A991-4A58-9735-CD08F9B097AB}"
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "0cb0dc1a-9136-4c3f-abad-7bb510ab981e"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214457Z

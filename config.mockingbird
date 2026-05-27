@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "projects": {
+    "cc771ce77ffc": {
+      "hash": "cc771ce77ffc",
+      "name": "xmcloud-starter",
+      "layers": [
+        {
+          "sitecoreJsonPath": "/sitecore.json",
+          "name": "layer",
+          "color": "#3b82f6"
+        },
+        {
+          "sitecoreJsonPath": "/sitecore.json",
+          "name": "layer",
+          "color": "#3b82f6"
+        }
+      ],
+      "createdAt": 1779875637103,
+      "lastOpenedAt": 1779880029016
+    },
+    "567eaded3b6d": {
+      "hash": "567eaded3b6d",
+      "name": "project2",
+      "layers": [
+        {
+          "sitecoreJsonPath": "/sitecore.json",
+          "name": "layer",
+          "color": "#22c55e"
+        }
+      ],
+      "createdAt": 1779880072600,
+      "lastOpenedAt": 1779880480532
+    }
+  },
+  "lastOpenedHash": "567eaded3b6d"
+}

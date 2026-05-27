@@ -1,0 +1,45 @@
+﻿---
+ID: "3ee7b095-86db-49fb-9923-5cbcc6d4fc11"
+Parent: "c331aa16-05e9-416c-bdfe-9b43306a6a64"
+Template: "a798e9a5-014f-4d29-976f-e3dd66f894de"
+Path: /sitecore/content/Collection/sync/Presentation/Page Designs
+BranchID: "45cf9f42-b3ac-4412-aab9-f8441c7e448e"
+SharedFields:
+- ID: "ba1f60d6-3deb-40cc-bb61-eec772279ee1"
+  Hint: TemplatesMapping
+  Value: "%7b31FCB12A-D1D9-41BC-AFE5-1721BE43E55A%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D%26%7bDA1D0F17-CEB5-48C3-9C7B-D52963181BEB%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D%26%7b0B78E7DE-3C0D-424D-80D6-2BFFFC464885%7d%3d%257B1C96E13D-B091-44BB-8AE9-6774B7FB8B51%257D%26%7bA6C086AD-9651-4912-BC60-512CA5417795%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D%26%7b37A75481-CA32-4354-8991-A470426AE164%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D%26%7b3B8BAB4B-8626-433B-AFDE-E4031C7A42C3%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D%26%7b0853A0D4-4097-46DB-AD03-F4A7A32A13F6%7d%3d%257B6FB7F3EA-BEE5-4DB3-BA56-862C971F95EB%257D"
+- ID: "dbbbeca1-21c7-4906-9dd2-493c1efa59a2"
+  Hint: __Shared revision
+  Value: "b5dfbaff-7560-4e9a-b53c-1b0f73aff205"
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{2EA756FA-AED6-4599-83B7-36FEFE229B31}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214131Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{F7FE5BDD-A991-4A58-9735-CD08F9B097AB}"
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "889f07f3-a9ff-469d-8ac7-c33bf392b4dc"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214539Z

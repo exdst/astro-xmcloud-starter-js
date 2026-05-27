@@ -71,3 +71,4 @@ packages/
 # Backstop tests
 /backstop-tests/node_modules
 /backstop-tests/reports
+.mockingbird/
