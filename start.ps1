@@ -134,19 +134,40 @@ Write-Host "  traefik: healthy" -ForegroundColor Green
 
 docker compose --project-directory $PSScriptRoot -f $composeFile --profile $Profile ps
 Write-Host ""
-Write-Host "Mockingbird:           https://mockingbird.local"            -ForegroundColor Green
-Write-Host "Traefik UI:            http://localhost:18080"                      -ForegroundColor Green
+Write-Host "Mockingbird:           https://mockingbird.local" -ForegroundColor Green
+Write-Host "Traefik UI:            http://localhost:18080"    -ForegroundColor Green
 Write-Host ""
-Write-Host "Next.js apps:" -ForegroundColor Cyan
-Write-Host "  next-location-finder (alaris):   https://next.location-finder.local"
-Write-Host "  next-article-starter (solterra): https://next.article-starter.local"
-Write-Host "  next-product-listing (sync):     https://next.product-listing.local"
-Write-Host "  next-skate-park      (basic):    https://next.skate-park.local"
-Write-Host "  next-basic           (basic):    https://next.basic.local"
-Write-Host ""
-Write-Host "Astro apps:" -ForegroundColor Cyan
-Write-Host "  astro-location-finder (alaris):   https://astro.location-finder.local"
-Write-Host "  astro-article-starter (solterra): https://astro.article-starter.local"
-Write-Host "  astro-product-listing (sync):     https://astro.product-listing.local"
-Write-Host "  astro-skate-part      (basic):    https://astro.skate-part.local"
-Write-Host "  astro-basic           (basic):    https://astro.basic.local"
+
+# Print URLs for only the rendering services that the active profile started.
+$urlMap = [ordered]@{
+    'next-location-finder'  = 'https://next.location-finder.local'
+    'next-article-starter'  = 'https://next.article-starter.local'
+    'next-product-listing'  = 'https://next.product-listing.local'
+    'next-skate-park'       = 'https://next.skate-park.local'
+    'next-basic'            = 'https://next.basic.local'
+    'astro-location-finder' = 'https://astro.location-finder.local'
+    'astro-article-starter' = 'https://astro.article-starter.local'
+    'astro-product-listing' = 'https://astro.product-listing.local'
+    'astro-skate-part'      = 'https://astro.skate-part.local'
+    'astro-basic'           = 'https://astro.basic.local'
+}
+$activeServices = @(docker compose --project-directory $PSScriptRoot -f $composeFile --profile $Profile ps --services --filter "status=running" 2>$null)
+
+$activeNext = @($urlMap.Keys | Where-Object { $_ -like 'next-*' -and $activeServices -contains $_ })
+if ($activeNext.Count -gt 0) {
+    Write-Host "Next.js apps:" -ForegroundColor Cyan
+    foreach ($svc in $activeNext) { Write-Host ("  {0,-22} {1}" -f $svc, $urlMap[$svc]) }
+    Write-Host ""
+}
+
+$activeAstro = @($urlMap.Keys | Where-Object { $_ -like 'astro-*' -and $activeServices -contains $_ })
+if ($activeAstro.Count -gt 0) {
+    Write-Host "Astro apps:" -ForegroundColor Cyan
+    foreach ($svc in $activeAstro) { Write-Host ("  {0,-22} {1}" -f $svc, $urlMap[$svc]) }
+    Write-Host ""
+}
+
+if ($activeNext.Count -eq 0 -and $activeAstro.Count -eq 0) {
+    Write-Host "No rendering containers are running under profile '$Profile'." -ForegroundColor Yellow
+    Write-Host "Valid profiles: alaris, solterra, sync, basic, location-finder, article-starter, product-listing, skate-park, basic-app, nextjs, astro, kit, minimal, all" -ForegroundColor DarkGray
+}

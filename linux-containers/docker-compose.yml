@@ -6,15 +6,23 @@
 # https://<framework>.<app-short>.local and gated by compose profiles.
 #
 # Profiles:
-#   alaris    next-location-finder + astro-location-finder
-#   solterra  next-article-starter + astro-article-starter
-#   sync      next-product-listing + astro-product-listing
-#   basic     next-skate-park + astro-skate-part + next-basic + astro-basic
-#   nextjs    all 5 Next.js apps
-#   astro     all 5 Astro apps
-#   kit       the 8 kit apps only
-#   minimal   next-basic + astro-basic only
-#   all       everything
+#   By site:
+#     alaris            next-location-finder + astro-location-finder
+#     solterra          next-article-starter + astro-article-starter
+#     sync              next-product-listing + astro-product-listing
+#     basic             next-skate-park + astro-skate-part + next-basic + astro-basic
+#   By app (next + astro pair):
+#     location-finder   the alaris pair
+#     article-starter   the solterra pair
+#     product-listing   the sync pair
+#     skate-park        next-skate-park + astro-skate-part
+#     basic-app         next-basic + astro-basic
+#   By framework / scope:
+#     nextjs            all 5 Next.js apps
+#     astro             all 5 Astro apps
+#     kit               the 8 kit apps only
+#     minimal           next-basic + astro-basic only (same as basic-app)
+#     all               everything
 #
 # Mockingbird/Traefik/hostswriter are unprofiled, so they always start.
 
@@ -81,18 +89,19 @@ services:
     depends_on:
       mockingbird:
         condition: service_started
-      # All rendering services - compose silently drops profile-disabled entries,
-      # so traefik will only wait on services activated by the current --profile.
-      next-location-finder:  { condition: service_healthy }
-      next-article-starter:  { condition: service_healthy }
-      next-product-listing:  { condition: service_healthy }
-      next-skate-park:       { condition: service_healthy }
-      next-basic:            { condition: service_healthy }
-      astro-location-finder: { condition: service_healthy }
-      astro-article-starter: { condition: service_healthy }
-      astro-product-listing: { condition: service_healthy }
-      astro-skate-part:      { condition: service_healthy }
-      astro-basic:           { condition: service_healthy }
+      # All rendering services. required:false (Compose v2.20+) lets traefik
+      # still start when a profile excludes some of these - the dep is treated
+      # as "wait if present, skip if not".
+      next-location-finder:  { condition: service_healthy, required: false }
+      next-article-starter:  { condition: service_healthy, required: false }
+      next-product-listing:  { condition: service_healthy, required: false }
+      next-skate-park:       { condition: service_healthy, required: false }
+      next-basic:            { condition: service_healthy, required: false }
+      astro-location-finder: { condition: service_healthy, required: false }
+      astro-article-starter: { condition: service_healthy, required: false }
+      astro-product-listing: { condition: service_healthy, required: false }
+      astro-skate-part:      { condition: service_healthy, required: false }
+      astro-basic:           { condition: service_healthy, required: false }
 
   mockingbird:
     image: ${MOCKINGBIRD_IMAGE}
@@ -144,7 +153,7 @@ services:
       - "traefik.http.routers.next-location-finder.entrypoints=websecure"
       - "traefik.http.routers.next-location-finder.tls=true"
       - "traefik.http.services.next-location-finder.loadbalancer.server.port=3004"
-    profiles: ["alaris", "nextjs", "kit", "all"]
+    profiles: ["location-finder", "alaris", "nextjs", "kit", "all"]
 
   next-article-starter:
     <<: *next-rendering
@@ -169,7 +178,7 @@ services:
       - "traefik.http.routers.next-article-starter.entrypoints=websecure"
       - "traefik.http.routers.next-article-starter.tls=true"
       - "traefik.http.services.next-article-starter.loadbalancer.server.port=3004"
-    profiles: ["solterra", "nextjs", "kit", "all"]
+    profiles: ["article-starter", "solterra", "nextjs", "kit", "all"]
 
   next-product-listing:
     <<: *next-rendering
@@ -194,7 +203,7 @@ services:
       - "traefik.http.routers.next-product-listing.entrypoints=websecure"
       - "traefik.http.routers.next-product-listing.tls=true"
       - "traefik.http.services.next-product-listing.loadbalancer.server.port=3004"
-    profiles: ["sync", "nextjs", "kit", "all"]
+    profiles: ["product-listing", "sync", "nextjs", "kit", "all"]
 
   next-skate-park:
     <<: *next-rendering
@@ -219,7 +228,7 @@ services:
       - "traefik.http.routers.next-skate-park.entrypoints=websecure"
       - "traefik.http.routers.next-skate-park.tls=true"
       - "traefik.http.services.next-skate-park.loadbalancer.server.port=3004"
-    profiles: ["basic", "nextjs", "kit", "all"]
+    profiles: ["skate-park", "basic", "nextjs", "kit", "all"]
 
   next-basic:
     <<: *next-rendering
@@ -244,7 +253,7 @@ services:
       - "traefik.http.routers.next-basic.entrypoints=websecure"
       - "traefik.http.routers.next-basic.tls=true"
       - "traefik.http.services.next-basic.loadbalancer.server.port=3004"
-    profiles: ["basic", "nextjs", "minimal", "all"]
+    profiles: ["basic-app", "basic", "nextjs", "minimal", "all"]
 
   # ===== ASTRO RENDERINGS (internal port 3005) =====
 
@@ -271,7 +280,7 @@ services:
       - "traefik.http.routers.astro-location-finder.entrypoints=websecure"
       - "traefik.http.routers.astro-location-finder.tls=true"
       - "traefik.http.services.astro-location-finder.loadbalancer.server.port=3005"
-    profiles: ["alaris", "astro", "kit", "all"]
+    profiles: ["location-finder", "alaris", "astro", "kit", "all"]
 
   astro-article-starter:
     <<: *astro-rendering
@@ -296,7 +305,7 @@ services:
       - "traefik.http.routers.astro-article-starter.entrypoints=websecure"
       - "traefik.http.routers.astro-article-starter.tls=true"
       - "traefik.http.services.astro-article-starter.loadbalancer.server.port=3005"
-    profiles: ["solterra", "astro", "kit", "all"]
+    profiles: ["article-starter", "solterra", "astro", "kit", "all"]
 
   astro-product-listing:
     <<: *astro-rendering
@@ -321,7 +330,7 @@ services:
       - "traefik.http.routers.astro-product-listing.entrypoints=websecure"
       - "traefik.http.routers.astro-product-listing.tls=true"
       - "traefik.http.services.astro-product-listing.loadbalancer.server.port=3005"
-    profiles: ["sync", "astro", "kit", "all"]
+    profiles: ["product-listing", "sync", "astro", "kit", "all"]
 
   astro-skate-part:
     <<: *astro-rendering
@@ -346,7 +355,7 @@ services:
       - "traefik.http.routers.astro-skate-part.entrypoints=websecure"
       - "traefik.http.routers.astro-skate-part.tls=true"
       - "traefik.http.services.astro-skate-part.loadbalancer.server.port=3005"
-    profiles: ["basic", "astro", "kit", "all"]
+    profiles: ["skate-park", "basic", "astro", "kit", "all"]
 
   astro-basic:
     <<: *astro-rendering
@@ -371,7 +380,24 @@ services:
       - "traefik.http.routers.astro-basic.entrypoints=websecure"
       - "traefik.http.routers.astro-basic.tls=true"
       - "traefik.http.services.astro-basic.loadbalancer.server.port=3005"
-    profiles: ["basic", "astro", "minimal", "all"]
+    profiles: ["basic-app", "basic", "astro", "minimal", "all"]
+
+  # Restarts any container whose healthcheck reports unhealthy. Needed because
+  # Vite's SSR module-runner can hang during the simultaneous cold start of
+  # 10 dev servers ("transport invoke timed out after 60000ms"); a process
+  # restart unblocks it but the healthcheck itself can't trigger one. Watches
+  # every container with a healthcheck (AUTOHEAL_CONTAINER_LABEL=all).
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-autoheal
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: all
+      AUTOHEAL_INTERVAL: "15"
+      AUTOHEAL_START_PERIOD: "0"
+      DOCKER_SOCK: /var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   hostswriter:
     image: ${WHW_IMAGE}
