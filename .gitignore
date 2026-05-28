@@ -71,3 +71,7 @@ packages/
 # Backstop tests
 /backstop-tests/node_modules
 /backstop-tests/reports
+.mockingbird/
+/linux-containers/traefik/certs
+/linux-containers/traefik/config/dynamic
+.env

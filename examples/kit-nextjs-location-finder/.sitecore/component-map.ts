@@ -5,10 +5,10 @@ import { Form } from '@sitecore-content-sdk/nextjs';
 
 // end of built-in components
 import * as zipcodemodaldev from 'src/components/zipcode-modal/zipcode-modal.dev';
+import * as videoprops from 'src/components/video/video-props';
 import * as VideoPlayerdev from 'src/components/video/VideoPlayer.dev';
 import * as VideoModaldev from 'src/components/video/VideoModal.dev';
 import * as Video from 'src/components/video/Video';
-import * as videoprops from 'src/components/video/video-props';
 import * as VerticalImageAccordion from 'src/components/vertical-image-accordion/VerticalImageAccordion';
 import * as TopicListing from 'src/components/topic-listing/TopicListing';
 import * as TopicItemdev from 'src/components/topic-listing/TopicItem.dev';
@@ -104,10 +104,16 @@ import * as ImageWrapperdev from 'src/components/image/ImageWrapper.dev';
 import * as ImageWrapperclient from 'src/components/image/ImageWrapper.client';
 import * as ImageBlock from 'src/components/image/ImageBlock';
 import * as Icon from 'src/components/icon/Icon';
-import * as YoutubeIcondev from 'src/components/icon/svg/YoutubeIcon.dev';
-import * as TwitterIcondev from 'src/components/icon/svg/TwitterIcon.dev';
 import * as signaldev from 'src/components/icon/svg/signal.dev';
 import * as playdev from 'src/components/icon/svg/play.dev';
+import * as diversitydev from 'src/components/icon/svg/diversity.dev';
+import * as crossarrowsdev from 'src/components/icon/svg/cross-arrows.dev';
+import * as communitiesdev from 'src/components/icon/svg/communities.dev';
+import * as arrowuprightdev from 'src/components/icon/svg/arrow-up-right.dev';
+import * as arrowrightdev from 'src/components/icon/svg/arrow-right.dev';
+import * as arrowleftdev from 'src/components/icon/svg/arrow-left.dev';
+import * as YoutubeIcondev from 'src/components/icon/svg/YoutubeIcon.dev';
+import * as TwitterIcondev from 'src/components/icon/svg/TwitterIcon.dev';
 import * as LinkedInIcondev from 'src/components/icon/svg/LinkedInIcon.dev';
 import * as InternalIcondev from 'src/components/icon/svg/InternalIcon.dev';
 import * as InstagramIcondev from 'src/components/icon/svg/InstagramIcon.dev';
@@ -115,12 +121,6 @@ import * as FileIcondev from 'src/components/icon/svg/FileIcon.dev';
 import * as FacebookIcondev from 'src/components/icon/svg/FacebookIcon.dev';
 import * as ExternalIcondev from 'src/components/icon/svg/ExternalIcon.dev';
 import * as EmailIcondev from 'src/components/icon/svg/EmailIcon.dev';
-import * as diversitydev from 'src/components/icon/svg/diversity.dev';
-import * as crossarrowsdev from 'src/components/icon/svg/cross-arrows.dev';
-import * as communitiesdev from 'src/components/icon/svg/communities.dev';
-import * as arrowuprightdev from 'src/components/icon/svg/arrow-up-right.dev';
-import * as arrowrightdev from 'src/components/icon/svg/arrow-right.dev';
-import * as arrowleftdev from 'src/components/icon/svg/arrow-left.dev';
 import * as HeroImageRightdev from 'src/components/hero/HeroImageRight.dev';
 import * as HeroImageBottomInsetdev from 'src/components/hero/HeroImageBottomInset.dev';
 import * as HeroImageBottomdev from 'src/components/hero/HeroImageBottom.dev';
@@ -180,10 +180,10 @@ export const componentMap = new Map<string, NextjsContentSdkComponent>([
   ['FEaaSWrapper', FEaaSServerWrapper],
   ['Form', { ...Form, componentType: 'client' }],
   ['zipcode-modal', { ...zipcodemodaldev }],
+  ['video-props', { ...videoprops }],
   ['VideoPlayer', { ...VideoPlayerdev }],
   ['VideoModal', { ...VideoModaldev }],
   ['Video', { ...Video, componentType: 'client' }],
-  ['video-props', { ...videoprops }],
   ['VerticalImageAccordion', { ...VerticalImageAccordion, componentType: 'client' }],
   ['TopicListing', { ...TopicListing }],
   ['TopicItem', { ...TopicItemdev }],
@@ -277,10 +277,16 @@ export const componentMap = new Map<string, NextjsContentSdkComponent>([
   ['ImageWrapper', { ...ImageWrapperdev, ...ImageWrapperclient }],
   ['ImageBlock', { ...ImageBlock }],
   ['Icon', { ...Icon, componentType: 'client' }],
-  ['YoutubeIcon', { ...YoutubeIcondev }],
-  ['TwitterIcon', { ...TwitterIcondev }],
   ['signal', { ...signaldev }],
   ['play', { ...playdev }],
+  ['diversity', { ...diversitydev }],
+  ['cross-arrows', { ...crossarrowsdev }],
+  ['communities', { ...communitiesdev }],
+  ['arrow-up-right', { ...arrowuprightdev }],
+  ['arrow-right', { ...arrowrightdev }],
+  ['arrow-left', { ...arrowleftdev }],
+  ['YoutubeIcon', { ...YoutubeIcondev }],
+  ['TwitterIcon', { ...TwitterIcondev }],
   ['LinkedInIcon', { ...LinkedInIcondev }],
   ['InternalIcon', { ...InternalIcondev }],
   ['InstagramIcon', { ...InstagramIcondev }],
@@ -288,12 +294,6 @@ export const componentMap = new Map<string, NextjsContentSdkComponent>([
   ['FacebookIcon', { ...FacebookIcondev }],
   ['ExternalIcon', { ...ExternalIcondev }],
   ['EmailIcon', { ...EmailIcondev }],
-  ['diversity', { ...diversitydev }],
-  ['cross-arrows', { ...crossarrowsdev }],
-  ['communities', { ...communitiesdev }],
-  ['arrow-up-right', { ...arrowuprightdev }],
-  ['arrow-right', { ...arrowrightdev }],
-  ['arrow-left', { ...arrowleftdev }],
   ['HeroImageRight', { ...HeroImageRightdev }],
   ['HeroImageBottomInset', { ...HeroImageBottomInsetdev }],
   ['HeroImageBottom', { ...HeroImageBottomdev }],

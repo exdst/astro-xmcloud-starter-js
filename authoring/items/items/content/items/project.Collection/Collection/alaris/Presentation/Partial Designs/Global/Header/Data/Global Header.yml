@@ -1,0 +1,53 @@
+﻿---
+ID: "6f65bdd0-4280-4f7e-9ce1-63d6f96ca18c"
+Parent: "e7d66fde-8b39-4497-8e7b-ed3de8090173"
+Template: "efd96479-7bf2-4be1-a08a-b01e59f92cdc"
+Path: /sitecore/content/Collection/alaris/Presentation/Partial Designs/Global/Header/Data/Global Header
+BranchID: "5a9aaf68-3342-4682-bd1d-33e7d00bac8b"
+SharedFields:
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{7870BF23-EF09-48C2-8E1F-696A40318418}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214250Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{F7FE5BDD-A991-4A58-9735-CD08F9B097AB}"
+    - ID: "4da75bcf-390e-46fa-ad87-926ec4db0876"
+      Hint: headerLogo
+      Value: |
+        <image mediaid="64830274-70ec-42e0-83e4-a429e42ec11e" alt="Test Alt" />
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\Admin
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "6876bb5e-6b8d-46a5-806c-91737c8c32b7"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214452Z
+    - ID: "e3289100-a242-4fc7-814f-0ffef0ffe8bd"
+      Hint: headerContact
+      Value: |
+        <link class="" id="{5467A130-D956-4A1E-9935-5362A3A624F1}" querystring="" anchor="" target="" title="" linktype="internal" text="Schedule a Test Drive" url="" />
+    - ID: "f073d52d-022c-4560-90c2-71fc674cf8bf"
+      Hint: primaryNavigationLinks
+      Value: |
+        {09356B42-9FE3-45AC-8673-C8C81E1E82CD}
+        {768F810C-6B90-4127-A1E8-335CEED15862}
+        {DF98AF93-EC59-4B19-A5F4-C96AF0F1F998}

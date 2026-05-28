@@ -1,0 +1,39 @@
+﻿---
+ID: "1810682d-8b34-4dee-9d58-d3e99376246f"
+Parent: "ee1f7808-cdbf-4b52-ac1c-a8c9cf237388"
+Template: "b04ab8f4-2bdc-42d0-b8e1-87186dc8bf9c"
+Path: /sitecore/content/Collection/alaris/Presentation/Enumerations/Page Content/Icon Positions
+BranchID: "60005c51-59e7-459f-adb7-eacd10c8da47"
+SharedFields:
+- ID: "f6d8a61c-2f84-4401-bd24-52d2068172bc"
+  Hint: __Originator
+  Value: "{41F0D2A4-EF7F-4F1E-A13D-5D84D60AB3C1}"
+Languages:
+- Language: en
+  Versions:
+  - Version: 1
+    Fields:
+    - ID: "25bed78c-4957-4165-998a-ca1b52f67497"
+      Hint: __Created
+      Value: 20260317T214232Z
+    - ID: "3e431de1-525e-47a3-b6b0-1ccbec3a8c98"
+      Hint: __Workflow state
+      Value: "{F7FE5BDD-A991-4A58-9735-CD08F9B097AB}"
+    - ID: "52807595-0f8f-4b20-8d2a-cb71d28c6103"
+      Hint: __Owner
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "5dd74568-4d4b-44c1-b513-0af5f4cda34f"
+      Hint: __Created by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "8cdc337e-a112-42fb-bbb4-4143751e123f"
+      Hint: __Revision
+      Value: "9872b31e-5479-4cd9-9a5d-0f3318d157c5"
+    - ID: "badd9cf9-53e0-4d0c-bcc0-2d784c282f6a"
+      Hint: __Updated by
+      Value: |
+        sitecore\antontishchenko@gmail.com
+    - ID: "d9cf14b1-fa16-4ba6-9288-e8a174d4d522"
+      Hint: __Updated
+      Value: 20260317T214446Z

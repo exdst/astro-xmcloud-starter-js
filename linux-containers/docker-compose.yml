@@ -1,0 +1,425 @@
+# North Star Outfitters - Mockingbird example stack.
+# Linux only. No CM, mssql, edb, or marketplace.
+#
+# 10 rendering containers (4 Next-kit, 4 Astro-kit, basic-nextjs, basic-astro),
+# all served by one Mockingbird container. Apps are addressed as
+# https://<framework>.<app-short>.local and gated by compose profiles.
+#
+# Profiles:
+#   By site:
+#     alaris            next-location-finder + astro-location-finder
+#     solterra          next-article-starter + astro-article-starter
+#     sync              next-product-listing + astro-product-listing
+#     basic             next-skate-park + astro-skate-part + next-basic + astro-basic
+#   By app (next + astro pair):
+#     location-finder   the alaris pair
+#     article-starter   the solterra pair
+#     product-listing   the sync pair
+#     skate-park        next-skate-park + astro-skate-part
+#     basic-app         next-basic + astro-basic
+#   By framework / scope:
+#     nextjs            all 5 Next.js apps
+#     astro             all 5 Astro apps
+#     kit               the 8 kit apps only
+#     minimal           next-basic + astro-basic only (same as basic-app)
+#     all               everything
+#
+# Mockingbird/Traefik/hostswriter are unprofiled, so they always start.
+
+x-next-rendering: &next-rendering
+  depends_on:
+    - mockingbird
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "wget", "-q", "--spider", "http://localhost:3004/"]
+    interval: 10s
+    timeout: 10s
+    retries: 30
+    start_period: 90s
+
+x-astro-rendering: &astro-rendering
+  depends_on:
+    - mockingbird
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD", "wget", "-q", "--spider", "http://localhost:3005/"]
+    interval: 10s
+    timeout: 10s
+    retries: 30
+    start_period: 90s
+
+x-next-env: &next-env
+  NEXT_PUBLIC_SITECORE_API_HOST: http://mockingbird:3333
+  NEXT_PUBLIC_SITECORE_API_KEY: local-dev
+  GRAPH_QL_ENDPOINT: http://mockingbird:3333/api/graphql
+  NEXT_PUBLIC_SITECORE_LOCAL_CM: "true"
+  NEXT_PUBLIC_DEFAULT_LANGUAGE: en
+  SITECORE_EDITING_SECRET: local-dev-secret
+  NEXTJS_DIST_DIR: ".next-container"
+
+x-astro-env: &astro-env
+  SITECORE_API_HOST: http://mockingbird:3333
+  SITECORE_API_KEY: local-dev
+  SITECORE_EDITING_SECRET: local-dev-secret
+  HOST: 0.0.0.0
+  PORT: "3005"
+
+services:
+
+  traefik:
+    image: ${TRAEFIK_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-traefik
+    command:
+      - "--ping"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.file.directory=/etc/traefik/config/dynamic"
+      - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.websecure.forwardedHeaders.insecure"
+    ports:
+      - "443:443"
+      - "18080:8080"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./linux-containers/traefik/certs:/etc/traefik/certs
+      - ./linux-containers/traefik/config/dynamic:/etc/traefik/config/dynamic
+    depends_on:
+      mockingbird:
+        condition: service_started
+      # All rendering services. required:false (Compose v2.20+) lets traefik
+      # still start when a profile excludes some of these - the dep is treated
+      # as "wait if present, skip if not".
+      next-location-finder:  { condition: service_healthy, required: false }
+      next-article-starter:  { condition: service_healthy, required: false }
+      next-product-listing:  { condition: service_healthy, required: false }
+      next-skate-park:       { condition: service_healthy, required: false }
+      next-basic:            { condition: service_healthy, required: false }
+      astro-location-finder: { condition: service_healthy, required: false }
+      astro-article-starter: { condition: service_healthy, required: false }
+      astro-product-listing: { condition: service_healthy, required: false }
+      astro-skate-part:      { condition: service_healthy, required: false }
+      astro-basic:           { condition: service_healthy, required: false }
+
+  mockingbird:
+    image: ${MOCKINGBIRD_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-mockingbird
+    healthcheck:
+      disable: true
+    environment:
+      PORT: 3333
+      HOST: 0.0.0.0
+      MOCKINGBIRD_CONFIG_PATH: /workspaces/config.mockingbird
+      INDEX_CACHE_PATH: /workspaces/.mockingbird/cache/index.json.gz
+      TACO: 1
+    volumes:
+      - ${MOCKINGBIRD_WORKSPACE}:/workspaces
+    networks:
+      default:
+        aliases:
+          - mockingbird
+          - ${MOCKINGBIRD_HOST}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mockingbird-secure.rule=Host(`${MOCKINGBIRD_HOST}`)"
+      - "traefik.http.routers.mockingbird-secure.entrypoints=websecure"
+      - "traefik.http.routers.mockingbird-secure.tls=true"
+      - "traefik.http.services.mockingbird.loadbalancer.server.port=3333"
+
+  # ===== NEXT.JS RENDERINGS (internal port 3004) =====
+
+  next-location-finder:
+    <<: *next-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-next-location-finder
+    build:
+      context: ./examples/kit-nextjs-location-finder
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-nextjs-location-finder:/app
+      - next-location-finder-node-modules:/app/node_modules
+    environment:
+      <<: *next-env
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: alaris
+    networks:
+      default:
+        aliases:
+          - next.location-finder.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-location-finder.rule=Host(`next.location-finder.local`)"
+      - "traefik.http.routers.next-location-finder.entrypoints=websecure"
+      - "traefik.http.routers.next-location-finder.tls=true"
+      - "traefik.http.services.next-location-finder.loadbalancer.server.port=3004"
+    profiles: ["location-finder", "alaris", "nextjs", "kit", "all"]
+
+  next-article-starter:
+    <<: *next-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-next-article-starter
+    build:
+      context: ./examples/kit-nextjs-article-starter
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-nextjs-article-starter:/app
+      - next-article-starter-node-modules:/app/node_modules
+    environment:
+      <<: *next-env
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: solterra
+    networks:
+      default:
+        aliases:
+          - next.article-starter.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-article-starter.rule=Host(`next.article-starter.local`)"
+      - "traefik.http.routers.next-article-starter.entrypoints=websecure"
+      - "traefik.http.routers.next-article-starter.tls=true"
+      - "traefik.http.services.next-article-starter.loadbalancer.server.port=3004"
+    profiles: ["article-starter", "solterra", "nextjs", "kit", "all"]
+
+  next-product-listing:
+    <<: *next-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-next-product-listing
+    build:
+      context: ./examples/kit-nextjs-product-listing
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-nextjs-product-listing:/app
+      - next-product-listing-node-modules:/app/node_modules
+    environment:
+      <<: *next-env
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: sync
+    networks:
+      default:
+        aliases:
+          - next.product-listing.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-product-listing.rule=Host(`next.product-listing.local`)"
+      - "traefik.http.routers.next-product-listing.entrypoints=websecure"
+      - "traefik.http.routers.next-product-listing.tls=true"
+      - "traefik.http.services.next-product-listing.loadbalancer.server.port=3004"
+    profiles: ["product-listing", "sync", "nextjs", "kit", "all"]
+
+  next-skate-park:
+    <<: *next-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-next-skate-park
+    build:
+      context: ./examples/kit-nextjs-skate-park
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-nextjs-skate-park:/app
+      - next-skate-park-node-modules:/app/node_modules
+    environment:
+      <<: *next-env
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: basic
+    networks:
+      default:
+        aliases:
+          - next.skate-park.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-skate-park.rule=Host(`next.skate-park.local`)"
+      - "traefik.http.routers.next-skate-park.entrypoints=websecure"
+      - "traefik.http.routers.next-skate-park.tls=true"
+      - "traefik.http.services.next-skate-park.loadbalancer.server.port=3004"
+    profiles: ["skate-park", "basic", "nextjs", "kit", "all"]
+
+  next-basic:
+    <<: *next-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-next-basic
+    build:
+      context: ./examples/basic-nextjs
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/basic-nextjs:/app
+      - next-basic-node-modules:/app/node_modules
+    environment:
+      <<: *next-env
+      NEXT_PUBLIC_DEFAULT_SITE_NAME: basic
+    networks:
+      default:
+        aliases:
+          - next.basic.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.next-basic.rule=Host(`next.basic.local`)"
+      - "traefik.http.routers.next-basic.entrypoints=websecure"
+      - "traefik.http.routers.next-basic.tls=true"
+      - "traefik.http.services.next-basic.loadbalancer.server.port=3004"
+    profiles: ["basic-app", "basic", "nextjs", "minimal", "all"]
+
+  # ===== ASTRO RENDERINGS (internal port 3005) =====
+
+  astro-location-finder:
+    <<: *astro-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-location-finder
+    build:
+      context: ./examples/kit-astro-location-finder
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-astro-location-finder:/app
+      - astro-location-finder-node-modules:/app/node_modules
+    environment:
+      <<: *astro-env
+      SITECORE_DEFAULT_SITE_NAME: alaris
+    networks:
+      default:
+        aliases:
+          - astro.location-finder.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro-location-finder.rule=Host(`astro.location-finder.local`)"
+      - "traefik.http.routers.astro-location-finder.entrypoints=websecure"
+      - "traefik.http.routers.astro-location-finder.tls=true"
+      - "traefik.http.services.astro-location-finder.loadbalancer.server.port=3005"
+    profiles: ["location-finder", "alaris", "astro", "kit", "all"]
+
+  astro-article-starter:
+    <<: *astro-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-article-starter
+    build:
+      context: ./examples/kit-astro-article-starter
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-astro-article-starter:/app
+      - astro-article-starter-node-modules:/app/node_modules
+    environment:
+      <<: *astro-env
+      SITECORE_DEFAULT_SITE_NAME: solterra
+    networks:
+      default:
+        aliases:
+          - astro.article-starter.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro-article-starter.rule=Host(`astro.article-starter.local`)"
+      - "traefik.http.routers.astro-article-starter.entrypoints=websecure"
+      - "traefik.http.routers.astro-article-starter.tls=true"
+      - "traefik.http.services.astro-article-starter.loadbalancer.server.port=3005"
+    profiles: ["article-starter", "solterra", "astro", "kit", "all"]
+
+  astro-product-listing:
+    <<: *astro-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-product-listing
+    build:
+      context: ./examples/kit-astro-product-listing
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-astro-product-listing:/app
+      - astro-product-listing-node-modules:/app/node_modules
+    environment:
+      <<: *astro-env
+      SITECORE_DEFAULT_SITE_NAME: sync
+    networks:
+      default:
+        aliases:
+          - astro.product-listing.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro-product-listing.rule=Host(`astro.product-listing.local`)"
+      - "traefik.http.routers.astro-product-listing.entrypoints=websecure"
+      - "traefik.http.routers.astro-product-listing.tls=true"
+      - "traefik.http.services.astro-product-listing.loadbalancer.server.port=3005"
+    profiles: ["product-listing", "sync", "astro", "kit", "all"]
+
+  astro-skate-part:
+    <<: *astro-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-skate-part
+    build:
+      context: ./examples/kit-astro-skate-part
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/kit-astro-skate-part:/app
+      - astro-skate-part-node-modules:/app/node_modules
+    environment:
+      <<: *astro-env
+      SITECORE_DEFAULT_SITE_NAME: basic
+    networks:
+      default:
+        aliases:
+          - astro.skate-part.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro-skate-part.rule=Host(`astro.skate-part.local`)"
+      - "traefik.http.routers.astro-skate-part.entrypoints=websecure"
+      - "traefik.http.routers.astro-skate-part.tls=true"
+      - "traefik.http.services.astro-skate-part.loadbalancer.server.port=3005"
+    profiles: ["skate-park", "basic", "astro", "kit", "all"]
+
+  astro-basic:
+    <<: *astro-rendering
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-basic
+    build:
+      context: ./examples/basic-astro
+      dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
+      target: dev
+    volumes:
+      - ./examples/basic-astro:/app
+      - astro-basic-node-modules:/app/node_modules
+    environment:
+      <<: *astro-env
+      SITECORE_DEFAULT_SITE_NAME: basic
+    networks:
+      default:
+        aliases:
+          - astro.basic.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.astro-basic.rule=Host(`astro.basic.local`)"
+      - "traefik.http.routers.astro-basic.entrypoints=websecure"
+      - "traefik.http.routers.astro-basic.tls=true"
+      - "traefik.http.services.astro-basic.loadbalancer.server.port=3005"
+    profiles: ["basic-app", "basic", "astro", "minimal", "all"]
+
+  # Restarts any container whose healthcheck reports unhealthy. Needed because
+  # Vite's SSR module-runner can hang during the simultaneous cold start of
+  # 10 dev servers ("transport invoke timed out after 60000ms"); a process
+  # restart unblocks it but the healthcheck itself can't trigger one. Watches
+  # every container with a healthcheck (AUTOHEAL_CONTAINER_LABEL=all).
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-autoheal
+    restart: unless-stopped
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: all
+      AUTOHEAL_INTERVAL: "15"
+      AUTOHEAL_START_PERIOD: "0"
+      DOCKER_SOCK: /var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  hostswriter:
+    image: ${WHW_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-hostswriter
+    volumes:
+      - C:/Windows/System32/drivers/etc:/host-etc
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Container IPs from Docker Desktop's Linux engine aren't reachable
+      # from the Windows host. termination_map=loopback writes 127.0.0.1
+      # entries instead, which work because traefik is port-forwarded on
+      # 0.0.0.0:443. Lowercase env name is required (case-sensitive on Linux).
+      termination_map: "mockingbird.local,next.location-finder.local,next.article-starter.local,next.product-listing.local,next.skate-park.local,next.basic.local,astro.location-finder.local,astro.article-starter.local,astro.product-listing.local,astro.skate-part.local,astro.basic.local:loopback"
+
+volumes:
+  next-location-finder-node-modules:
+  next-article-starter-node-modules:
+  next-product-listing-node-modules:
+  next-skate-park-node-modules:
+  next-basic-node-modules:
+  astro-location-finder-node-modules:
+  astro-article-starter-node-modules:
+  astro-product-listing-node-modules:
+  astro-skate-part-node-modules:
+  astro-basic-node-modules:
