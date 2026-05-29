@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-location",
+  "framework": "nextjs",
+  "group": "location",
+  "pageLabel": "Test Drive",
+  "pagePath": "/Test-Drive",
+  "url": "https://sitecore-content-sdk-nextjs-location.netlify.app/Test-Drive",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:49:44.986Z"
+}

@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-article",
+  "framework": "astro",
+  "group": "article",
+  "pageLabel": "Article 1",
+  "pagePath": "/Articles/Article-1",
+  "url": "https://sitecore-content-sdk-astro-article.netlify.app/Articles/Article-1",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T13:57:15.685Z"
+}

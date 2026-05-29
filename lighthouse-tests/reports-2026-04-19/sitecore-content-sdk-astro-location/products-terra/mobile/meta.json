@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-location",
+  "framework": "astro",
+  "group": "location",
+  "pageLabel": "Products - Terra",
+  "pagePath": "/Products/Terra",
+  "url": "https://sitecore-content-sdk-astro-location.netlify.app/Products/Terra",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:10:43.438Z"
+}

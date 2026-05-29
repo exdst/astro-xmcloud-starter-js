@@ -1,0 +1,36 @@
+{
+  "categories": {
+    "performance": {
+      "score": 0.9933333333333333
+    },
+    "accessibility": {
+      "score": 0.9499999999999998
+    },
+    "best-practices": {
+      "score": 0.96
+    },
+    "seo": {
+      "score": 0.85
+    }
+  },
+  "audits": {
+    "largest-contentful-paint": {
+      "numericValue": 690.0978500000001
+    },
+    "total-blocking-time": {
+      "numericValue": 0
+    },
+    "cumulative-layout-shift": {
+      "numericValue": 0.000012
+    },
+    "server-response-time": {
+      "numericValue": 457.263
+    },
+    "first-contentful-paint": {
+      "numericValue": 686.1421166666665
+    },
+    "speed-index": {
+      "numericValue": 769.3003608352114
+    }
+  }
+}

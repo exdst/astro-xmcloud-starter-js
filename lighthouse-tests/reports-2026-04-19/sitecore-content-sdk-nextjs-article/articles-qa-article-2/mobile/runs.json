@@ -1,0 +1,69 @@
+{
+  "warmup": true,
+  "runs": [
+    {
+      "categories": {
+        "performance": 0.67,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 1
+      },
+      "audits": {
+        "largest-contentful-paint": 2045.9036999999998,
+        "total-blocking-time": 552,
+        "cumulative-layout-shift": 0.356005,
+        "server-response-time": 546.115,
+        "first-contentful-paint": 1045.4036999999998,
+        "speed-index": 2427.9763633572584
+      }
+    },
+    {
+      "categories": {
+        "performance": 0.6,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.92
+      },
+      "audits": {
+        "largest-contentful-paint": 4033.7232000000004,
+        "total-blocking-time": 414,
+        "cumulative-layout-shift": 0.356005,
+        "server-response-time": 398.298,
+        "first-contentful-paint": 968.7232,
+        "speed-index": 1983.2452601880773
+      }
+    },
+    {
+      "categories": {
+        "performance": 0.62,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.92
+      },
+      "audits": {
+        "largest-contentful-paint": 4006.9659,
+        "total-blocking-time": 363.0000000000001,
+        "cumulative-layout-shift": 0.356005,
+        "server-response-time": 381.334,
+        "first-contentful-paint": 955.9659,
+        "speed-index": 1843.1373658594107
+      }
+    }
+  ],
+  "average": {
+    "categories": {
+      "performance": 0.63,
+      "accessibility": 1,
+      "best-practices": 1,
+      "seo": 0.9466666666666667
+    },
+    "audits": {
+      "largest-contentful-paint": 3362.1976,
+      "total-blocking-time": 443,
+      "cumulative-layout-shift": 0.35600499999999996,
+      "server-response-time": 441.9156666666667,
+      "first-contentful-paint": 990.0309333333333,
+      "speed-index": 2084.7863298015823
+    }
+  }
+}

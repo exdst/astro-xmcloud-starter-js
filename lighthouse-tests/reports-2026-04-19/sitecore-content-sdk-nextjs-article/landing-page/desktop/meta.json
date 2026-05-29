@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-article",
+  "framework": "nextjs",
+  "group": "article",
+  "pageLabel": "Landing Page",
+  "pagePath": "/Landing-Page",
+  "url": "https://sitecore-content-sdk-nextjs-article.netlify.app/Landing-Page",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:31:29.982Z"
+}

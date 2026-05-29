@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-product",
+  "framework": "astro",
+  "group": "product",
+  "pageLabel": "Speakers - Heritage 10",
+  "pagePath": "/Speakers/Heritage-10",
+  "url": "https://sitecore-content-sdk-astro-product.netlify.app/Speakers/Heritage-10",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T13:49:29.159Z"
+}

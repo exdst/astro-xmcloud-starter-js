@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-location",
+  "framework": "nextjs",
+  "group": "location",
+  "pageLabel": "Homepage",
+  "pagePath": "/",
+  "url": "https://sitecore-content-sdk-nextjs-location.netlify.app/",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:41:49.009Z"
+}

@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-article",
+  "framework": "nextjs",
+  "group": "article",
+  "pageLabel": "QA Article 1",
+  "pagePath": "/Articles/QA-Article-1",
+  "url": "https://sitecore-content-sdk-nextjs-article.netlify.app/Articles/QA-Article-1",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:36:32.221Z"
+}

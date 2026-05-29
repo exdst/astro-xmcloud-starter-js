@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-skatepark",
+  "framework": "nextjs",
+  "group": "skatepark",
+  "pageLabel": "Homepage",
+  "pagePath": "/",
+  "url": "https://sitecore-content-sdk-nextjs-skatepark.netlify.app/",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:51:45.410Z"
+}

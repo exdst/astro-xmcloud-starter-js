@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-location",
+  "framework": "astro",
+  "group": "location",
+  "pageLabel": "Products - Aero",
+  "pagePath": "/Products/Aero",
+  "url": "https://sitecore-content-sdk-astro-location.netlify.app/Products/Aero",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:06:11.902Z"
+}

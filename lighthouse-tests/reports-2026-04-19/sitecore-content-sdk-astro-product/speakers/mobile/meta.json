@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-product",
+  "framework": "astro",
+  "group": "product",
+  "pageLabel": "Speakers",
+  "pagePath": "/Speakers",
+  "url": "https://sitecore-content-sdk-astro-product.netlify.app/Speakers",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T13:47:49.302Z"
+}

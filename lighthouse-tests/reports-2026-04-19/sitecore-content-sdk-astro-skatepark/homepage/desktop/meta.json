@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-skatepark",
+  "framework": "astro",
+  "group": "skatepark",
+  "pageLabel": "Homepage",
+  "pagePath": "/",
+  "url": "https://sitecore-content-sdk-astro-skatepark.netlify.app/",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:15:15.761Z"
+}

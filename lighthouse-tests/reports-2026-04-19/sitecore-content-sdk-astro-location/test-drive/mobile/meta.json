@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-location",
+  "framework": "astro",
+  "group": "location",
+  "pageLabel": "Test Drive",
+  "pagePath": "/Test-Drive",
+  "url": "https://sitecore-content-sdk-astro-location.netlify.app/Test-Drive",
+  "formFactor": "mobile",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:12:55.114Z"
+}

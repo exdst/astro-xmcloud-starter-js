@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-astro-location",
+  "framework": "astro",
+  "group": "location",
+  "pageLabel": "Homepage",
+  "pagePath": "/",
+  "url": "https://sitecore-content-sdk-astro-location.netlify.app/",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:05:07.463Z"
+}

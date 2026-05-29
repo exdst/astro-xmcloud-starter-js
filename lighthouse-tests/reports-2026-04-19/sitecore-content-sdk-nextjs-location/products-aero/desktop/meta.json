@@ -1,0 +1,12 @@
+{
+  "siteId": "sitecore-content-sdk-nextjs-location",
+  "framework": "nextjs",
+  "group": "location",
+  "pageLabel": "Products - Aero",
+  "pagePath": "/Products/Aero",
+  "url": "https://sitecore-content-sdk-nextjs-location.netlify.app/Products/Aero",
+  "formFactor": "desktop",
+  "runsPerPage": 3,
+  "warmup": true,
+  "finishedAt": "2026-04-19T14:44:02.263Z"
+}
