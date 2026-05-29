@@ -75,7 +75,7 @@ if (-not (Test-Path (Join-Path $PSScriptRoot '.env'))) {
 
 if ($Init) {
     Write-Host "Generating mkcert cert via linux-containers /tools/mkcert.ps1..." -ForegroundColor Cyan
-    & (Join-Path $PSScriptRoot 'linux-containers/tools/mkcert.ps1') -sanList "mockingbird.local","*.location-finder.local","*.article-starter.local","*.product-listing.local","*.skate-park.local","*.skate-part.local","*.basic.local"
+    & (Join-Path $PSScriptRoot 'linux-containers/tools/mkcert.ps1') -sanList "mockingbird.local","*.location-finder.local","*.article-starter.local","*.product-listing.local","*.skate-park.local","*.basic.local"
     Write-Host "Cert generated. You can now run start.ps1 (no -Init) to bring up the stack." -ForegroundColor Green
     return
 }
@@ -148,7 +148,7 @@ $urlMap = [ordered]@{
     'astro-location-finder' = 'https://astro.location-finder.local'
     'astro-article-starter' = 'https://astro.article-starter.local'
     'astro-product-listing' = 'https://astro.product-listing.local'
-    'astro-skate-part'      = 'https://astro.skate-part.local'
+    'astro-skate-park'      = 'https://astro.skate-park.local'
     'astro-basic'           = 'https://astro.basic.local'
 }
 $activeServices = @(docker compose --project-directory $PSScriptRoot -f $composeFile --profile $Profile ps --services --filter "status=running" 2>$null)

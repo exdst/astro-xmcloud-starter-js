@@ -52,8 +52,8 @@ packages/
 
 # VS Code settings
 .vscode/
-/examples/kit-astro-skate-part/node_modules
-/examples/kit-astro-skate-part/dist
+/examples/kit-astro-skate-park/node_modules
+/examples/kit-astro-skate-park/dist
 /examples/kit-astro-article-starter/dist
 /examples/kit-astro-article-starter/node_modules
 /examples/kit-astro-location-finder/backstop/backstop_data

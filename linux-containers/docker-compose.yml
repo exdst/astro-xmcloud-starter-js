@@ -10,12 +10,12 @@
 #     alaris            next-location-finder + astro-location-finder
 #     solterra          next-article-starter + astro-article-starter
 #     sync              next-product-listing + astro-product-listing
-#     basic             next-skate-park + astro-skate-part + next-basic + astro-basic
+#     basic             next-skate-park + astro-skate-park + next-basic + astro-basic
 #   By app (next + astro pair):
 #     location-finder   the alaris pair
 #     article-starter   the solterra pair
 #     product-listing   the sync pair
-#     skate-park        next-skate-park + astro-skate-part
+#     skate-park        next-skate-park + astro-skate-park
 #     basic-app         next-basic + astro-basic
 #   By framework / scope:
 #     nextjs            all 5 Next.js apps
@@ -100,7 +100,7 @@ services:
       astro-location-finder: { condition: service_healthy, required: false }
       astro-article-starter: { condition: service_healthy, required: false }
       astro-product-listing: { condition: service_healthy, required: false }
-      astro-skate-part:      { condition: service_healthy, required: false }
+      astro-skate-park:      { condition: service_healthy, required: false }
       astro-basic:           { condition: service_healthy, required: false }
 
   mockingbird:
@@ -332,29 +332,29 @@ services:
       - "traefik.http.services.astro-product-listing.loadbalancer.server.port=3005"
     profiles: ["product-listing", "sync", "astro", "kit", "all"]
 
-  astro-skate-part:
+  astro-skate-park:
     <<: *astro-rendering
-    container_name: ${COMPOSE_PROJECT_NAME}-astro-skate-part
+    container_name: ${COMPOSE_PROJECT_NAME}-astro-skate-park
     build:
-      context: ./examples/kit-astro-skate-part
+      context: ./examples/kit-astro-skate-park
       dockerfile: ../../linux-containers/docker/build/rendering/Dockerfile
       target: dev
     volumes:
-      - ./examples/kit-astro-skate-part:/app
-      - astro-skate-part-node-modules:/app/node_modules
+      - ./examples/kit-astro-skate-park:/app
+      - astro-skate-park-node-modules:/app/node_modules
     environment:
       <<: *astro-env
       SITECORE_DEFAULT_SITE_NAME: basic
     networks:
       default:
         aliases:
-          - astro.skate-part.local
+          - astro.skate-park.local
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.astro-skate-part.rule=Host(`astro.skate-part.local`)"
-      - "traefik.http.routers.astro-skate-part.entrypoints=websecure"
-      - "traefik.http.routers.astro-skate-part.tls=true"
-      - "traefik.http.services.astro-skate-part.loadbalancer.server.port=3005"
+      - "traefik.http.routers.astro-skate-park.rule=Host(`astro.skate-park.local`)"
+      - "traefik.http.routers.astro-skate-park.entrypoints=websecure"
+      - "traefik.http.routers.astro-skate-park.tls=true"
+      - "traefik.http.services.astro-skate-park.loadbalancer.server.port=3005"
     profiles: ["skate-park", "basic", "astro", "kit", "all"]
 
   astro-basic:
@@ -410,7 +410,7 @@ services:
       # from the Windows host. termination_map=loopback writes 127.0.0.1
       # entries instead, which work because traefik is port-forwarded on
       # 0.0.0.0:443. Lowercase env name is required (case-sensitive on Linux).
-      termination_map: "mockingbird.local,next.location-finder.local,next.article-starter.local,next.product-listing.local,next.skate-park.local,next.basic.local,astro.location-finder.local,astro.article-starter.local,astro.product-listing.local,astro.skate-part.local,astro.basic.local:loopback"
+      termination_map: "mockingbird.local,next.location-finder.local,next.article-starter.local,next.product-listing.local,next.skate-park.local,next.basic.local,astro.location-finder.local,astro.article-starter.local,astro.product-listing.local,astro.skate-park.local,astro.basic.local:loopback"
 
 volumes:
   next-location-finder-node-modules:
@@ -421,5 +421,5 @@ volumes:
   astro-location-finder-node-modules:
   astro-article-starter-node-modules:
   astro-product-listing-node-modules:
-  astro-skate-part-node-modules:
+  astro-skate-park-node-modules:
   astro-basic-node-modules:
