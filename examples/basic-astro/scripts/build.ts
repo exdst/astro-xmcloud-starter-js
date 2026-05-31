@@ -2,9 +2,11 @@ import { createRequire } from "module";
 import { generateComponentMap } from "./generate-component-map";
 
 const require = createRequire(import.meta.url);
-const { defineConfig } = require("@sitecore-content-sdk/core/config");
-const { generateSites } = require("@sitecore-content-sdk/core/tools");
-const { generateMetadata } = require("@sitecore-content-sdk/core/tools");
+const { defineConfig } = require("@exdst-sitecore-content-sdk/astro/config");
+const {
+  generateSites,
+  generateMetadata,
+} = require("@exdst-sitecore-content-sdk/astro/tools");
 
 generateComponentMap();
 

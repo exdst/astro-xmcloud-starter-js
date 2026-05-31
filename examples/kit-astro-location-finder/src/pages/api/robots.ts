@@ -1,8 +1,8 @@
 import type { APIRoute } from "astro";
-import { SiteResolver } from "@sitecore-content-sdk/core/site";
+import { SiteResolver } from "@exdst-sitecore-content-sdk/astro/site";
 import client from "@/lib/sitecore-client";
 import sites from ".sitecore/sites.json";
-import type { SiteInfo } from "@sitecore-content-sdk/core";
+import type { SiteInfo } from "@exdst-sitecore-content-sdk/astro/site";
 
 function generateDefaultRobotsTxt(baseUrl: string): string {
   return [

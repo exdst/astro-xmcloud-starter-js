@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 /**
  * This hook is used to send events to SitecoreCloud.
- * Adapted from the Next.js version - uses the @sitecore-cloudsdk/events/browser package.
+ * Adapted from the Next.js version - uses the @sitecore-content-sdk/events package.
  */
 export const useEvent = ({
   query,
@@ -27,7 +27,7 @@ export const useEvent = ({
 
       // Dynamically import to avoid SSR issues
       try {
-        const { event } = await import('@sitecore-cloudsdk/events/browser');
+        const { event } = await import('@sitecore-content-sdk/events');
         event({
           type: 'search',
           siteId: siteName,

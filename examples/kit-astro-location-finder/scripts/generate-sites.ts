@@ -1,8 +1,8 @@
 import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
-const { defineConfig } = require("@sitecore-content-sdk/core/config");
-const { generateSites } = require("@sitecore-content-sdk/core/tools");
+const { defineConfig } = require("@exdst-sitecore-content-sdk/astro/config");
+const { generateSites } = require("@exdst-sitecore-content-sdk/astro/tools");
 
 const config = defineConfig({
   defaultSite:

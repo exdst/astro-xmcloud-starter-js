@@ -2,7 +2,7 @@ import { PageTitles } from './PageTitles.props';
 import { PageImages } from './PageImages.props';
 import { PageTexts } from './PageTexts.props';
 
-import { RouteData } from '@sitecore-content-sdk/core';
+import type { RouteData } from '@sitecore-content-sdk/content/layout';
 
 export type PageType = {
   fields: PageTitles & PageTexts & PageImages;

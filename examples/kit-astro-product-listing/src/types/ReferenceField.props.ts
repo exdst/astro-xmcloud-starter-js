@@ -1,4 +1,4 @@
-import { Field, Item } from '@sitecore-content-sdk/core';
+import type { Field, Item } from '@sitecore-content-sdk/content/layout';
 
 export type ReferenceField = {
   id: string;

@@ -19,11 +19,11 @@
   "dependencies": {
     "@astrojs/netlify": "7.0.5",
     "@astrojs/node": "^10.0.2",
-    "@exdst-sitecore-content-sdk/astro": "^0.0.16",
-    "@sitecore-cloudsdk/core": "^0.5.8",
-    "@sitecore-cloudsdk/events": "^0.5.8",
-    "@sitecore-content-sdk/core": "^1.5.1",
-    "astro": "^6.0.5",
+    "@exdst-sitecore-content-sdk/astro": "^1.0.1",
+    "@sitecore-content-sdk/analytics-core": "^2.0.1",
+    "@sitecore-content-sdk/core": "^2.0.2",
+    "@sitecore-content-sdk/events": "^2.0.1",
+    "astro": "^6.1.10",
     "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
