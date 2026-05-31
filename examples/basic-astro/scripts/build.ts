@@ -24,9 +24,9 @@ const config = defineConfig({
   },
 });
 
-const sitesGen = generateSites({ scConfig: config });
+const sitesGen = generateSites();
 const metadataGen = generateMetadata();
 
-await Promise.all([sitesGen(), metadataGen()]);
+await Promise.all([sitesGen({ scConfig: config }), metadataGen()]);
 
 console.log("Build generation complete.");

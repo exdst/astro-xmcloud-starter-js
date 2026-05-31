@@ -18,5 +18,5 @@ const config = defineConfig({
   },
 });
 
-const fn = generateSites({ scConfig: config });
-await fn();
+const fn = generateSites();
+await fn({ scConfig: config });
